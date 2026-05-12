@@ -71,6 +71,24 @@ export const deleteProduct = async (productId) => {
 };
 
 /**
+ * Get product details
+ * @param {string} productId
+ */
+export const getProductDetails = async (productId) => {
+  try {
+    const response = await apiClient.get(`/product/product-details/${productId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Fetch product details error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to fetch product details.',
+      statusCode: 500
+    };
+  }
+};
+
+/**
  * Create a new product
  * @param {Object} data - Product and variants data
  */

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getVendorDetails, getVendorProducts, getVendorCategories, editVendorDetails, createCategory, deleteCategory, updateCategory, createProduct, updateProduct, deleteProduct } from '../api/vendorService';
+import { getVendorDetails, getVendorProducts, getVendorCategories, editVendorDetails, createCategory, deleteCategory, updateCategory, createProduct, updateProduct, deleteProduct, getProductDetails } from '../api/vendorService';
 import { 
  LayoutDashboard, 
  Package, 
@@ -21,7 +21,8 @@ import {
  X,
  Upload,
  Trash2,
- Menu
+ Menu,
+ Eye
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Swal from 'sweetalert2';
@@ -99,6 +100,7 @@ const VendorDashboard = () => {
   });
   const [productLoading, setProductLoading] = useState(false);
   const [isEditingProduct, setIsEditingProduct] = useState(false);
+  const [isViewingProduct, setIsViewingProduct] = useState(false);
   const [currentProductId, setCurrentProductId] = useState(null);
 
  // Fetch Vendor Details
@@ -330,29 +332,59 @@ const VendorDashboard = () => {
     }
   };
 
-  const handleEditProduct = (product) => {
-    setIsEditingProduct(true);
-    setCurrentProductId(product._id);
-    setProductForm({
-      name: product.name,
-      slug: product.slug,
-      description: product.description,
-      categoryId: product.categoryId?._id || product.categoryId,
-      metaTitle: product.metaTitle || '',
-      metaDescription: product.metaDescription || '',
-      status: product.status || 'ACTIVE',
-      hasVariants: product.hasVariants || false,
-      variants: product.variants.map(v => ({
-        sku: v.sku,
-        price: v.price,
-        salesPrice: v.salesPrice,
-        stock: v.stock,
-        attributes: v.attributes || { color: '', size: '' },
-        thumbnail: v.thumbnail, // Backend image object
-        images: v.images || [] // Backend image objects
-      }))
-    });
-    setShowProductModal(true);
+  const handleEditProduct = async (product) => {
+    const loadingToast = toast.loading('Fetching full details...');
+    try {
+      const res = await getProductDetails(product._id);
+      toast.dismiss(loadingToast);
+      
+      if (res.success) {
+        const fullProduct = res.data?.data || res.data;
+        setIsEditingProduct(true);
+        setCurrentProductId(fullProduct._id);
+        setProductForm({
+          name: fullProduct.name,
+          slug: fullProduct.slug,
+          description: fullProduct.description,
+          categoryId: fullProduct.categoryId?._id || fullProduct.categoryId,
+          metaTitle: fullProduct.metaTitle || '',
+          metaDescription: fullProduct.metaDescription || '',
+          status: fullProduct.status || 'ACTIVE',
+          hasVariants: fullProduct.hasVariants || false,
+          variants: (fullProduct.variants || []).map(v => ({
+            sku: v.sku,
+            price: v.price,
+            salesPrice: v.salesPrice,
+            stock: v.stock,
+            attributes: v.attributes || { color: '', size: '' },
+            thumbnail: v.thumbnail,
+            images: v.images || []
+          }))
+        });
+        
+        // Ensure at least one variant exists if empty
+        if ((fullProduct.variants || []).length === 0) {
+          setProductForm(prev => ({
+            ...prev,
+            variants: [{ sku: '', price: '', salesPrice: '', stock: '', attributes: { color: '', size: '' }, thumbnail: null, images: [] }]
+          }));
+        }
+
+        setShowProductModal(true);
+      } else {
+        toast.error('Failed to fetch product details');
+      }
+    } catch (error) {
+      toast.dismiss(loadingToast);
+      console.error(error);
+      toast.error('Error fetching details');
+    }
+  };
+
+  const handleViewProduct = async (product) => {
+    await handleEditProduct(product);
+    setIsViewingProduct(true);
+    setIsEditingProduct(false);
   };
 
   const handleDeleteProduct = async (id) => {
@@ -519,6 +551,7 @@ const VendorDashboard = () => {
     <button 
       onClick={() => { 
         setIsEditingProduct(false); 
+        setIsViewingProduct(false);
         setProductForm({
           name: '', slug: '', description: '', categoryId: '', metaTitle: '', metaDescription: '', status: 'ACTIVE', hasVariants: false,
           variants: [{ sku: '', price: '', salesPrice: '', stock: '', attributes: { color: '', size: '' }, thumbnail: null, images: [] }]
@@ -563,7 +596,14 @@ const VendorDashboard = () => {
       <td className="px-6 py-4 text-right">
         <div className="flex justify-end gap-2">
           <button 
-            onClick={() => handleEditProduct(product)}
+            onClick={() => handleViewProduct(product)}
+            className="p-2 text-gray-300 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-all"
+            title="View Details"
+          >
+            <Eye size={16} />
+          </button>
+          <button 
+            onClick={() => { setIsViewingProduct(false); handleEditProduct(product); }}
             className="p-2 text-gray-300 hover:text-primary hover:bg-primary/5 rounded-lg transition-all"
             title="Edit Product"
           >
@@ -1046,233 +1086,318 @@ const VendorDashboard = () => {
   <div className="fixed inset-0 bg-black/60 z-[1000] flex items-center justify-center p-4">
    <div className="bg-white w-full max-w-4xl rounded-2xl overflow-hidden shadow-2xl max-h-[90vh] flex flex-col">
     <div className="p-6 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white z-10">
-      <h2 className="text-xl font-bold uppercase tracking-tight">{isEditingProduct ? 'Update Product' : 'Add New Product'}</h2>
+      <h2 className="text-xl font-bold uppercase ">
+        {isViewingProduct ? 'Product Details' : (isEditingProduct ? 'Update Product' : 'Add New Product')}
+      </h2>
       <button onClick={() => setShowProductModal(false)} className="text-gray-400 hover:text-red-500 transition-colors">
         <X size={20} />
       </button>
     </div>
     
-    <form onSubmit={handleProductSubmit} className="p-8 space-y-8 overflow-y-auto flex-1">
-      {/* Basic Info Section */}
-      <div className="space-y-4">
-        <h3 className="text-sm font-black text-gray-900 uppercase border-l-4 border-primary pl-3">Basic Information</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-1">
-            <label className="text-[10px] font-bold text-gray-400 uppercase">Product Name</label>
-            <input 
-              type="text" 
-              required
-              value={productForm.name}
-              onChange={(e) => setProductForm({...productForm, name: e.target.value})}
-              placeholder="e.g. Premium Silk Saree" 
-              className="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-bold outline-none focus:ring-2 focus:ring-primary/10" 
-            />
+    <div className="p-8 space-y-10 overflow-y-auto flex-1">
+      {isViewingProduct ? (
+        <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          {/* Header Info */}
+          <div className="flex items-start justify-between">
+            <div>
+              <h1 className="text-3xl font-black text-gray-900 uppercase">{productForm.name}</h1>
+              <p className="text-xs font-bold text-gray-400 mt-1 uppercase">{categories.find(c => c._id === productForm.categoryId)?.name || 'Uncategorized'}</p>
+            </div>
+            <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase ${productForm.status === 'ACTIVE' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+              {productForm.status}
+            </span>
           </div>
-          <div className="space-y-1">
-            <label className="text-[10px] font-bold text-gray-400 uppercase">Category</label>
-            <select 
-              required
-              value={productForm.categoryId}
-              onChange={(e) => setProductForm({...productForm, categoryId: e.target.value})}
-              className="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-bold outline-none appearance-none"
-            >
-              <option value="">Select Category</option>
-              {categories.map(cat => (
-                <option key={cat._id} value={cat._id}>{cat.name}</option>
+
+          {/* Description */}
+          <div className="space-y-3">
+            <h3 className="text-[10px] font-black text-gray-400 uppercase border-b border-gray-100 pb-2">Description</h3>
+            <p className="text-sm font-medium text-gray-600 leading-relaxed">{productForm.description || 'No description provided.'}</p>
+          </div>
+
+          {/* Metadata Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="p-5 bg-gray-50 rounded-2xl space-y-3">
+              <h3 className="text-[10px] font-black text-gray-400 uppercase">SEO Title</h3>
+              <p className="text-xs font-bold text-gray-800">{productForm.metaTitle || '—'}</p>
+            </div>
+            <div className="p-5 bg-gray-50 rounded-2xl space-y-3">
+              <h3 className="text-[10px] font-black text-gray-400 uppercase">SEO Description</h3>
+              <p className="text-xs font-bold text-gray-800">{productForm.metaDescription || '—'}</p>
+            </div>
+          </div>
+
+          {/* Variants Section */}
+          <div className="space-y-6">
+            <h3 className="text-sm font-black text-gray-900 uppercase  border-l-4 border-primary pl-3">Inventory & Variants ({productForm.variants.length})</h3>
+            <div className="grid grid-cols-1 gap-6">
+              {productForm.variants.map((v, idx) => (
+                <div key={idx} className="group border border-gray-100 rounded-3xl p-6 hover:border-primary/20 hover:bg-primary/[0.01] transition-all">
+                  <div className="flex flex-col md:flex-row gap-8">
+                    {/* Media Display */}
+                    <div className="flex gap-3 overflow-x-auto pb-2 min-w-[200px]">
+                      <div className="w-24 h-24 rounded-2xl bg-gray-100 flex-shrink-0 overflow-hidden border border-gray-100">
+                        <img src={getImageUrl(v.thumbnail)} alt="thumb" className="w-full h-full object-cover" />
+                      </div>
+                      {(v.images || []).map((img, i) => (
+                        <div key={i} className="w-24 h-24 rounded-2xl bg-gray-100 flex-shrink-0 overflow-hidden border border-gray-100">
+                          <img src={getImageUrl(img)} alt="gal" className="w-full h-full object-cover" />
+                        </div>
+                      ))}
+                    </div>
+                    
+                    {/* Details Table-like info */}
+                    <div className="flex-1 grid grid-cols-2 lg:grid-cols-4 gap-6 content-center">
+                      <div className="space-y-1">
+                        <p className="text-[9px] font-black text-gray-400 uppercase">SKU</p>
+                        <p className="text-sm font-black text-gray-900">{v.sku}</p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-[9px] font-black text-gray-400 uppercase">Price</p>
+                        <p className="text-sm font-black text-primary">₹{v.salesPrice} <span className="text-[10px] text-gray-300 line-through ml-1">₹{v.price}</span></p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-[9px] font-black text-gray-400 uppercase">Stock</p>
+                        <p className={`text-sm font-black ${v.stock < 10 ? 'text-orange-500' : 'text-gray-900'}`}>{v.stock} Units</p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-[9px] font-black text-gray-400 uppercase">Attributes</p>
+                        <p className="text-[10px] font-bold text-gray-600 uppercase">
+                          {v.attributes.color || 'N/A'} • {v.attributes.size || 'N/A'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               ))}
-            </select>
+            </div>
           </div>
         </div>
-        <div className="space-y-1">
-          <label className="text-[10px] font-bold text-gray-400 uppercase">Description</label>
-          <textarea 
-            rows="3"
-            value={productForm.description}
-            onChange={(e) => setProductForm({...productForm, description: e.target.value})}
-            placeholder="Tell customers about your product..."
-            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-bold outline-none"
-          ></textarea>
-        </div>
-      </div>
-
-      {/* SEO Section */}
-      <div className="space-y-4">
-        <h3 className="text-sm font-black text-gray-900 uppercase border-l-4 border-gray-200 pl-3">SEO Metadata (Optional)</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-1">
-            <label className="text-[10px] font-bold text-gray-400 uppercase">Meta Title</label>
-            <input 
-              type="text" 
-              value={productForm.metaTitle}
-              onChange={(e) => setProductForm({...productForm, metaTitle: e.target.value})}
-              className="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-bold outline-none" 
-            />
-          </div>
-          <div className="space-y-1">
-            <label className="text-[10px] font-bold text-gray-400 uppercase">Meta Description</label>
-            <input 
-              type="text" 
-              value={productForm.metaDescription}
-              onChange={(e) => setProductForm({...productForm, metaDescription: e.target.value})}
-              className="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-bold outline-none" 
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Variants Section */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="text-sm font-black text-gray-900 uppercase border-l-4 border-primary pl-3">Pricing & Variants</h3>
-          <button 
-            type="button" 
-            onClick={handleAddVariant}
-            className="text-[10px] font-bold text-primary uppercase hover:underline"
-          >
-            + Add Another Variant
-          </button>
-        </div>
-
-        <div className="space-y-6">
-          {productForm.variants.map((variant, vIdx) => (
-            <div key={vIdx} className="p-6 bg-gray-50 rounded-2xl border border-gray-100 space-y-6 relative">
-              {vIdx > 0 && (
-                <button 
-                  type="button"
-                  onClick={() => setProductForm({...productForm, variants: productForm.variants.filter((_, i) => i !== vIdx)})}
-                  className="absolute top-4 right-4 text-gray-400 hover:text-red-500"
+      ) : (
+        <form onSubmit={handleProductSubmit} className="space-y-8">
+          {/* Basic Info Section */}
+          <div className="space-y-4">
+            <h3 className="text-sm font-black text-gray-900 uppercase border-l-4 border-primary pl-3">Basic Information</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-gray-400 uppercase">Product Name</label>
+                <input 
+                  type="text" 
+                  required
+                  value={productForm.name}
+                  onChange={(e) => setProductForm({...productForm, name: e.target.value})}
+                  placeholder="e.g. Premium Silk Saree" 
+                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-bold outline-none focus:ring-2 focus:ring-primary/10" 
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-gray-400 uppercase">Category</label>
+                <select 
+                  required
+                  value={productForm.categoryId}
+                  onChange={(e) => setProductForm({...productForm, categoryId: e.target.value})}
+                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-bold outline-none appearance-none"
                 >
-                  <X size={16} />
-                </button>
-              )}
-              
-              {/* Variant Basic Fields */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-gray-400 uppercase">SKU</label>
-                  <input 
-                    type="text" required
-                    value={variant.sku}
-                    onChange={(e) => updateVariant(vIdx, 'sku', e.target.value)}
-                    placeholder="BLK-MED"
-                    className="w-full px-3 py-2 bg-white border-none rounded-lg text-xs font-bold outline-none" 
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-gray-400 uppercase">Price</label>
-                  <input 
-                    type="number" required
-                    value={variant.price}
-                    onChange={(e) => updateVariant(vIdx, 'price', e.target.value)}
-                    className="w-full px-3 py-2 bg-white border-none rounded-lg text-xs font-bold outline-none" 
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-gray-400 uppercase">Sales Price</label>
-                  <input 
-                    type="number" required
-                    value={variant.salesPrice}
-                    onChange={(e) => updateVariant(vIdx, 'salesPrice', e.target.value)}
-                    className="w-full px-3 py-2 bg-white border-none rounded-lg text-xs font-bold outline-none" 
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-gray-400 uppercase">Stock</label>
-                  <input 
-                    type="number" required
-                    value={variant.stock}
-                    onChange={(e) => updateVariant(vIdx, 'stock', e.target.value)}
-                    className="w-full px-3 py-2 bg-white border-none rounded-lg text-xs font-bold outline-none" 
-                  />
-                </div>
-              </div>
-
-              {/* Variant Attributes */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-gray-400 uppercase">Color</label>
-                  <input 
-                    type="text"
-                    value={variant.attributes.color}
-                    onChange={(e) => updateVariantAttr(vIdx, 'color', e.target.value)}
-                    placeholder="e.g. Black"
-                    className="w-full px-3 py-2 bg-white border-none rounded-lg text-xs font-bold outline-none" 
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-gray-400 uppercase">Size</label>
-                  <input 
-                    type="text"
-                    value={variant.attributes.size}
-                    onChange={(e) => updateVariantAttr(vIdx, 'size', e.target.value)}
-                    placeholder="e.g. Medium"
-                    className="w-full px-3 py-2 bg-white border-none rounded-lg text-xs font-bold outline-none" 
-                  />
-                </div>
-              </div>
-
-              {/* Variant Media */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-gray-400 uppercase">Thumbnail (Featured Image)</label>
-                  <div className="relative h-20 bg-white rounded-lg border-2 border-dashed border-gray-200 flex items-center justify-center gap-2 cursor-pointer group">
-                    {variant.thumbnail ? (
-                      <span className="text-[10px] font-bold text-primary truncate px-4">{variant.thumbnail.name}</span>
-                    ) : (
-                      <div className="flex flex-col items-center">
-                        <Upload size={14} className="text-gray-400" />
-                        <span className="text-[8px] font-bold text-gray-400 uppercase">Pick Main</span>
-                      </div>
-                    )}
-                    <input 
-                      type="file" 
-                      onChange={(e) => updateVariant(vIdx, 'thumbnail', e.target.files[0])}
-                      className="absolute inset-0 opacity-0 cursor-pointer" 
-                    />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-gray-400 uppercase">Gallery (Multiple Images)</label>
-                  <div className="relative h-20 bg-white rounded-lg border-2 border-dashed border-gray-200 flex items-center justify-center gap-2 cursor-pointer">
-                    {variant.images.length > 0 ? (
-                      <span className="text-[10px] font-bold text-primary">{variant.images.length} files selected</span>
-                    ) : (
-                      <div className="flex flex-col items-center">
-                        <Plus size={14} className="text-gray-400" />
-                        <span className="text-[8px] font-bold text-gray-400 uppercase">Add Gallery</span>
-                      </div>
-                    )}
-                    <input 
-                      type="file" multiple
-                      onChange={(e) => updateVariant(vIdx, 'images', Array.from(e.target.files))}
-                      className="absolute inset-0 opacity-0 cursor-pointer" 
-                    />
-                  </div>
-                </div>
+                  <option value="">Select Category</option>
+                  {categories.map(cat => (
+                    <option key={cat._id} value={cat._id}>{cat.name}</option>
+                  ))}
+                </select>
               </div>
             </div>
-          ))}
-        </div>
-      </div>
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold text-gray-400 uppercase">Description</label>
+              <textarea 
+                rows="3"
+                value={productForm.description}
+                onChange={(e) => setProductForm({...productForm, description: e.target.value})}
+                placeholder="Tell customers about your product..."
+                className="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-bold outline-none"
+              ></textarea>
+            </div>
+          </div>
 
-      {/* Actions */}
-      <div className="flex gap-4 pt-6 sticky bottom-0 bg-white py-4 border-t border-gray-50">
-        <button 
-          type="button" 
-          onClick={() => setShowProductModal(false)} 
-          className="flex-1 px-4 py-3 border border-gray-200 rounded-xl font-bold text-sm"
-        >
-          Cancel
-        </button>
-        <button 
-          type="submit" 
-          disabled={productLoading}
-          className="flex-1 px-4 py-3 bg-primary text-white rounded-xl font-bold uppercase text-sm shadow-lg shadow-primary/20 disabled:opacity-50"
-        >
-          {productLoading ? (isEditingProduct ? 'Updating...' : 'Creating...') : (isEditingProduct ? 'Update Product' : 'Save Product')}
-        </button>
-      </div>
-    </form>
+          {/* SEO Section */}
+          <div className="space-y-4">
+            <h3 className="text-sm font-black text-gray-900 uppercase border-l-4 border-gray-200 pl-3">SEO Metadata (Optional)</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-gray-400 uppercase">Meta Title</label>
+                <input 
+                  type="text" 
+                  value={productForm.metaTitle}
+                  onChange={(e) => setProductForm({...productForm, metaTitle: e.target.value})}
+                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-bold outline-none" 
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-gray-400 uppercase">Meta Description</label>
+                <input 
+                  type="text" 
+                  value={productForm.metaDescription}
+                  onChange={(e) => setProductForm({...productForm, metaDescription: e.target.value})}
+                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-bold outline-none" 
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Variants Section */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-black text-gray-900 uppercase border-l-4 border-primary pl-3">Pricing & Variants</h3>
+              <button 
+                type="button" 
+                onClick={handleAddVariant}
+                className="text-[10px] font-bold text-primary uppercase hover:underline"
+              >
+                + Add Another Variant
+              </button>
+            </div>
+
+            <div className="space-y-6">
+              {productForm.variants.map((variant, vIdx) => (
+                <div key={vIdx} className="p-6 bg-gray-50 rounded-2xl border border-gray-100 space-y-6 relative">
+                  {vIdx > 0 && (
+                    <button 
+                      type="button"
+                      onClick={() => setProductForm({...productForm, variants: productForm.variants.filter((_, i) => i !== vIdx)})}
+                      className="absolute top-4 right-4 text-gray-400 hover:text-red-500"
+                    >
+                      <X size={16} />
+                    </button>
+                  )}
+                  
+                  {/* Variant Basic Fields */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold text-gray-400 uppercase">SKU</label>
+                      <input 
+                        type="text" required
+                        value={variant.sku}
+                        onChange={(e) => updateVariant(vIdx, 'sku', e.target.value)}
+                        placeholder="BLK-MED"
+                        className="w-full px-3 py-2 bg-white border-none rounded-lg text-xs font-bold outline-none" 
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold text-gray-400 uppercase">Price</label>
+                      <input 
+                        type="number" required
+                        value={variant.price}
+                        onChange={(e) => updateVariant(vIdx, 'price', e.target.value)}
+                        className="w-full px-3 py-2 bg-white border-none rounded-lg text-xs font-bold outline-none" 
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold text-gray-400 uppercase">Sales Price</label>
+                      <input 
+                        type="number" required
+                        value={variant.salesPrice}
+                        onChange={(e) => updateVariant(vIdx, 'salesPrice', e.target.value)}
+                        className="w-full px-3 py-2 bg-white border-none rounded-lg text-xs font-bold outline-none" 
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold text-gray-400 uppercase">Stock</label>
+                      <input 
+                        type="number" required
+                        value={variant.stock}
+                        onChange={(e) => updateVariant(vIdx, 'stock', e.target.value)}
+                        className="w-full px-3 py-2 bg-white border-none rounded-lg text-xs font-bold outline-none" 
+                      />
+                    </div>
+                  </div>
+
+                  {/* Variant Attributes */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold text-gray-400 uppercase">Color</label>
+                      <input 
+                        type="text"
+                        value={variant.attributes.color}
+                        onChange={(e) => updateVariantAttr(vIdx, 'color', e.target.value)}
+                        placeholder="e.g. Black"
+                        className="w-full px-3 py-2 bg-white border-none rounded-lg text-xs font-bold outline-none" 
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold text-gray-400 uppercase">Size</label>
+                      <input 
+                        type="text"
+                        value={variant.attributes.size}
+                        onChange={(e) => updateVariantAttr(vIdx, 'size', e.target.value)}
+                        placeholder="e.g. Medium"
+                        className="w-full px-3 py-2 bg-white border-none rounded-lg text-xs font-bold outline-none" 
+                      />
+                    </div>
+                  </div>
+
+                  {/* Variant Media */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-bold text-gray-400 uppercase">Thumbnail (Featured Image)</label>
+                      <div className="relative h-20 bg-white rounded-lg border-2 border-dashed border-gray-200 flex items-center justify-center gap-2 cursor-pointer group">
+                        {variant.thumbnail ? (
+                          <span className="text-[10px] font-bold text-primary truncate px-4">
+                            {variant.thumbnail instanceof File ? variant.thumbnail.name : 'Current Image'}
+                          </span>
+                        ) : (
+                          <div className="flex flex-col items-center">
+                            <Upload size={14} className="text-gray-400" />
+                            <span className="text-[8px] font-bold text-gray-400 uppercase">Pick Main</span>
+                          </div>
+                        )}
+                        <input 
+                          type="file" 
+                          onChange={(e) => updateVariant(vIdx, 'thumbnail', e.target.files[0])}
+                          className="absolute inset-0 opacity-0 cursor-pointer" 
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-bold text-gray-400 uppercase">Gallery (Multiple Images)</label>
+                      <div className="relative h-20 bg-white rounded-lg border-2 border-dashed border-gray-200 flex items-center justify-center gap-2 cursor-pointer">
+                        {variant.images.length > 0 ? (
+                          <span className="text-[10px] font-bold text-primary">{variant.images.length} files selected</span>
+                        ) : (
+                          <div className="flex flex-col items-center">
+                            <Plus size={14} className="text-gray-400" />
+                            <span className="text-[8px] font-bold text-gray-400 uppercase">Add Gallery</span>
+                          </div>
+                        )}
+                        <input 
+                          type="file" multiple
+                          onChange={(e) => updateVariant(vIdx, 'images', Array.from(e.target.files))}
+                          className="absolute inset-0 opacity-0 cursor-pointer" 
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Actions - In View mode these are hidden or replaced */}
+          <div className="flex gap-4 pt-6 sticky bottom-0 bg-white py-4 border-t border-gray-50">
+            <button 
+              type="button" 
+              onClick={() => setShowProductModal(false)} 
+              className="flex-1 px-4 py-3 border border-gray-200 rounded-xl font-bold text-sm"
+            >
+              Cancel
+            </button>
+            <button 
+              type="submit" 
+              disabled={productLoading}
+              className="flex-1 px-4 py-3 bg-primary text-white rounded-xl font-bold uppercase text-sm shadow-lg shadow-primary/20 disabled:opacity-50"
+            >
+              {productLoading ? (isEditingProduct ? 'Updating...' : 'Creating...') : (isEditingProduct ? 'Update Product' : 'Save Product')}
+            </button>
+          </div>
+        </form>
+      )}
+    </div>
    </div>
   </div>
   )}
