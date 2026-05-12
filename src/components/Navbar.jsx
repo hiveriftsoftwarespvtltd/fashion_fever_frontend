@@ -141,11 +141,6 @@ const Navbar = () => {
 
               {/* Action Buttons */}
               <div className="flex items-center gap-3 lg:gap-5">
-                <Link to="/wallet" className="text-[#3f414d] hover:text-primary transition-colors p-1 relative group">
-                  <Wallet size={22} strokeWidth={2} />
-                  <span className="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full scale-0 group-hover:scale-100 transition-transform"></span>
-                </Link>
-
                 <Link to="/wishlist" className="text-[#3f414d] hover:text-primary transition-colors p-1 relative group">
                   <Heart size={22} strokeWidth={2} />
                 </Link>
