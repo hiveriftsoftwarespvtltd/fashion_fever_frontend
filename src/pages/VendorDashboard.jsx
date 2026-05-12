@@ -183,13 +183,6 @@ const VendorDashboard = () => {
     { label: 'Store Status', value: vendorData?.status || 'PENDING', icon: <Store className="text-green-600" />, change: 'Status' },
   ];
 
-  const getImageUrl = (image) => {
-    if (!image) return null;
-    if (typeof image === 'object' && image.url) return image.url;
-    if (typeof image === 'string' && image.startsWith('http')) return image;
-    return `${config.API_URL}/upload/${image}`;
-  };
-
   // Handle Edit Submit
   const handleEditSubmit = async (e) => {
     e.preventDefault();
