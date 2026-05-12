@@ -185,6 +185,11 @@ export const updateProduct = async (id, data) => {
 
     if (data.variants && data.variants.length > 0) {
       data.variants.forEach((variant, vIdx) => {
+        // Send variant ID for identification during update
+        if (variant._id) {
+          formData.append(`variants[${vIdx}]._id`, variant._id);
+        }
+        
         formData.append(`variants[${vIdx}].sku`, variant.sku);
         formData.append(`variants[${vIdx}].price`, variant.price);
         formData.append(`variants[${vIdx}].salesPrice`, variant.salesPrice);
@@ -196,25 +201,15 @@ export const updateProduct = async (id, data) => {
           });
         }
 
-        // Send existing thumbnail URL/ID if no new file is selected
-        if (variant.thumbnail) {
-          if (variant.thumbnail instanceof File) {
-            formData.append(`variant_${vIdx}_thumbnail`, variant.thumbnail);
-          } else {
-            // Send the existing image object/URL as a string so backend knows to keep it
-            const thumbValue = typeof variant.thumbnail === 'string' ? variant.thumbnail : JSON.stringify(variant.thumbnail);
-            formData.append(`variants[${vIdx}].thumbnail`, thumbValue);
-          }
+        // Only upload if it's a new file
+        if (variant.thumbnail && variant.thumbnail instanceof File) {
+          formData.append(`variant_${vIdx}_thumbnail`, variant.thumbnail);
         }
         
         if (variant.images && variant.images.length > 0) {
-          variant.images.forEach((img, i) => {
+          variant.images.forEach((img) => {
             if (img instanceof File) {
               formData.append(`variant_${vIdx}_images`, img);
-            } else {
-              // Send the existing image reference
-              const imgValue = typeof img === 'string' ? img : JSON.stringify(img);
-              formData.append(`variants[${vIdx}].images[${i}]`, imgValue);
             }
           });
         }

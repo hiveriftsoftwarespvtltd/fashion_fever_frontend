@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, ShoppingBag, Menu, ChevronDown, Wallet, User, LogOut, Settings, UserCircle } from 'lucide-react';
+import { Search, ShoppingBag, Menu, ChevronDown, Wallet, User, LogOut, Settings, UserCircle, X, Heart } from 'lucide-react';
 import { getUserDetails } from '../api/authService';
+import CartDrawer from './CartDrawer';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -144,10 +146,17 @@ const Navbar = () => {
                   <span className="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full scale-0 group-hover:scale-100 transition-transform"></span>
                 </Link>
 
-                <Link to="/cart" className="text-[#3f414d] hover:text-primary transition-colors p-1 relative">
-                  <ShoppingBag size={22} strokeWidth={2} />
-                  <span className="absolute -top-1 -right-1 bg-primary text-white text-[8px] font-bold w-4 h-4 flex items-center justify-center rounded-full">2</span>
+                <Link to="/wishlist" className="text-[#3f414d] hover:text-primary transition-colors p-1 relative group">
+                  <Heart size={22} strokeWidth={2} />
                 </Link>
+
+                <button 
+                  onClick={() => setIsCartOpen(true)}
+                  className="text-[#3f414d] hover:text-primary transition-colors p-1 relative"
+                >
+                  <ShoppingBag size={22} strokeWidth={2} />
+                  <span className="absolute -top-1 -right-1 bg-primary text-white text-[8px] font-bold w-4 h-4 flex items-center justify-center rounded-full shadow-sm">2</span>
+                </button>
 
                 <div className="w-[1px] h-6 bg-gray-100 hidden sm:block"></div>
 
@@ -298,6 +307,8 @@ const Navbar = () => {
           </div>
         </div>
       </div>
+      {/* Cart Drawer */}
+      <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </div>
   );
 };
