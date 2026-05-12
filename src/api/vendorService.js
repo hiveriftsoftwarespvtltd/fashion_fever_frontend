@@ -89,6 +89,24 @@ export const getProductDetails = async (productId) => {
 };
 
 /**
+ * Delete a product variant
+ * @param {string} variantId
+ */
+export const deleteProductVariant = async (variantId) => {
+  try {
+    const response = await apiClient.delete(`/product/delete-product-variant/${variantId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Delete product variant error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to delete product variant.',
+      statusCode: 500
+    };
+  }
+};
+
+/**
  * Create a new product
  * @param {Object} data - Product and variants data
  */
@@ -178,15 +196,25 @@ export const updateProduct = async (id, data) => {
           });
         }
 
-        // Only upload if it's a new file
-        if (variant.thumbnail && variant.thumbnail instanceof File) {
-          formData.append(`variant_${vIdx}_thumbnail`, variant.thumbnail);
+        // Send existing thumbnail URL/ID if no new file is selected
+        if (variant.thumbnail) {
+          if (variant.thumbnail instanceof File) {
+            formData.append(`variant_${vIdx}_thumbnail`, variant.thumbnail);
+          } else {
+            // Send the existing image object/URL as a string so backend knows to keep it
+            const thumbValue = typeof variant.thumbnail === 'string' ? variant.thumbnail : JSON.stringify(variant.thumbnail);
+            formData.append(`variants[${vIdx}].thumbnail`, thumbValue);
+          }
         }
         
         if (variant.images && variant.images.length > 0) {
-          variant.images.forEach(img => {
+          variant.images.forEach((img, i) => {
             if (img instanceof File) {
               formData.append(`variant_${vIdx}_images`, img);
+            } else {
+              // Send the existing image reference
+              const imgValue = typeof img === 'string' ? img : JSON.stringify(img);
+              formData.append(`variants[${vIdx}].images[${i}]`, imgValue);
             }
           });
         }
