@@ -1,32 +1,113 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { X, ArrowLeft, Heart, ShoppingBag, Trash2, Plus, Minus, Info } from 'lucide-react';
+import { X, ArrowLeft, Heart, ShoppingBag, Trash2, Plus, Minus, Info, Loader2 } from 'lucide-react';
+import { getUserCart, updateCartQuantity, removeFromCart, clearCart, decrementCartQuantity } from '../api/cartService';
+import toast from 'react-hot-toast';
 
 const CartDrawer = ({ isOpen, onClose }) => {
-  const staticItems = [
-    {
-      id: 1,
-      name: "La Roche-Posay Anthelios UV MUNE 400",
-      variant: "50ml",
-      price: 1499,
-      salesPrice: 1424,
-      image: "https://res.cloudinary.com/dn2rvjcpu/raw/upload/v1778569233/product/ixrnc6vglqfi4wo2cisg",
-      qty: 1
-    },
-    {
-      id: 2,
-      name: "Nykaa Skin Potion Facial Oil",
-      variant: "30ml",
-      price: 999,
-      salesPrice: 799,
-      image: "https://res.cloudinary.com/dn2rvjcpu/raw/upload/v1778569234/product/ldxxsamuvef34r7mcxge",
-      qty: 2
-    }
-  ];
+  const [cartItems, setCartItems] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [updatingId, setUpdatingId] = useState(null);
 
-  const totalOriginal = staticItems.reduce((acc, item) => acc + (item.price * item.qty), 0);
-  const totalSales = staticItems.reduce((acc, item) => acc + (item.salesPrice * item.qty), 0);
+  const fetchCart = async () => {
+    setLoading(true);
+    try {
+      const response = await getUserCart();
+      if (response.success) {
+        setCartItems(response.data?.items || []);
+      }
+    } catch (error) {
+      console.error("Failed to fetch cart:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchCart();
+    }
+  }, [isOpen]);
+
+  const handleUpdateQuantity = async (productId, variantId, action) => {
+    setUpdatingId(variantId);
+    try {
+      let response;
+      if (action === 'increment') {
+        response = await updateCartQuantity(productId, variantId);
+      } else {
+        response = await decrementCartQuantity(variantId);
+      }
+
+      if (response.success) {
+        setCartItems(prev => prev.map(item => 
+          item.variant?._id === variantId 
+            ? { ...item, quantity: action === 'increment' ? item.quantity + 1 : item.quantity - 1 } 
+            : item
+        ).filter(item => item.quantity > 0)); // Filter out items with 0 quantity if needed
+      } else {
+        toast.error(response.message || "Failed to update quantity");
+      }
+    } catch (error) {
+      toast.error("Something went wrong");
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
+  const handleRemoveItem = async (variantId) => {
+    setUpdatingId(variantId);
+    try {
+      const response = await removeFromCart(variantId);
+      if (response.success) {
+        toast.success("Item removed from bag");
+        setCartItems(prev => prev.filter(item => item.variant?._id !== variantId));
+      } else {
+        toast.error(response.message || "Failed to remove item");
+      }
+    } catch (error) {
+      toast.error("Something went wrong");
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
+  const handleClearCart = async () => {
+    if (!window.confirm("Are you sure you want to empty your bag?")) return;
+    
+    setLoading(true);
+    try {
+      const response = await clearCart();
+      if (response.success) {
+        toast.success("Bag cleared!");
+        setCartItems([]);
+      }
+    } catch (error) {
+      toast.error("Failed to clear bag");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const totalOriginal = cartItems.reduce((acc, item) => {
+    const price = item.variant?.price || 0;
+    return acc + (price * item.quantity);
+  }, 0);
+
+  const totalSales = cartItems.reduce((acc, item) => {
+    const price = item.variant?.salesPrice || 0;
+    return acc + (price * item.quantity);
+  }, 0);
+
   const discount = totalOriginal - totalSales;
+
+  const getImageUrl = (img) => {
+    if (!img) return '';
+    if (typeof img === 'string') return img;
+    if (img.url) return img.url;
+    return '';
+  };
+
   return (
     <>
       {/* Overlay */}
@@ -47,6 +128,14 @@ const CartDrawer = ({ isOpen, onClose }) => {
                 <ArrowLeft size={22} />
               </button>
               <h2 className="text-xl font-bold text-gray-900 uppercase">Bag</h2>
+              {cartItems.length > 0 && (
+                <button 
+                  onClick={handleClearCart}
+                  className="ml-2 text-xs font-bold text-gray-300 hover:text-red-500 uppercase transition-colors"
+                >
+                  Clear All
+                </button>
+              )}
             </div>
             <Link 
               to="/wishlist" 
@@ -59,35 +148,69 @@ const CartDrawer = ({ isOpen, onClose }) => {
 
           {/* Content */}
           <div className="flex-grow overflow-y-auto bg-gray-50/30">
-            {staticItems.length > 0 ? (
+            {loading ? (
+              <div className="h-full flex items-center justify-center">
+                <Loader2 className="animate-spin text-primary" size={32} />
+              </div>
+            ) : cartItems.length > 0 ? (
               <div className="p-4 space-y-4">
-                {staticItems.map((item) => (
-                  <div key={item.id} className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex gap-4 relative group">
+                {cartItems.map((item) => (
+                  <div key={item._id} className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex gap-4 relative group">
                     <div className="w-20 h-24 bg-gray-50 rounded-xl overflow-hidden flex-shrink-0">
-                      <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                      <img 
+                        src={getImageUrl(item.variant?.thumbnail)} 
+                        alt={item.product?.name} 
+                        className="w-full h-full object-cover" 
+                      />
                     </div>
                     
                     <div className="flex-grow flex flex-col justify-between py-1">
                       <div>
-                        <h4 className="text-[13px] font-bold text-gray-800 leading-tight line-clamp-2 uppercase">{item.name}</h4>
-                        <p className="text-[10px] font-bold text-gray-400 mt-1 uppercase">Size: {item.variant}</p>
+                        <h4 className="text-sm font-bold text-gray-800 leading-tight line-clamp-2 uppercase">
+                          {item.product?.name}
+                        </h4>
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {item.variant?.attributes && Object.entries(item.variant.attributes).map(([k, v]) => (
+                            <p key={k} className="text-xs font-bold text-gray-400 uppercase bg-gray-50 px-2 py-0.5 rounded">
+                              {k}: {v}
+                            </p>
+                          ))}
+                        </div>
                       </div>
                       
-                      <div className="flex items-center justify-between mt-2">
+                      <div className="flex items-center justify-between mt-3">
                         <div className="flex items-center gap-2">
-                          <span className="text-[14px] font-bold text-gray-900">₹{item.salesPrice}</span>
-                          <span className="text-[11px] font-bold text-gray-400 line-through">₹{item.price}</span>
+                          <span className="text-sm font-bold text-gray-900">₹{item.variant?.salesPrice}</span>
+                          <span className="text-xs font-bold text-gray-400 line-through">₹{item.variant?.price}</span>
                         </div>
                         
                         <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden h-8">
-                          <button className="px-2 hover:bg-gray-50 text-gray-500 transition-colors"><Minus size={12} /></button>
-                          <span className="px-3 text-xs font-bold text-gray-800 border-x border-gray-200 h-full flex items-center">{item.qty}</span>
-                          <button className="px-2 hover:bg-gray-50 text-gray-500 transition-colors"><Plus size={12} /></button>
+                          <button 
+                            onClick={() => handleUpdateQuantity(item.product?._id, item.variant?._id, 'decrement')}
+                            disabled={updatingId === item.variant?._id || item.quantity <= 1}
+                            className="px-2 hover:bg-gray-50 text-gray-500 transition-colors disabled:opacity-30"
+                          >
+                            <Minus size={12} />
+                          </button>
+                          <span className="px-3 text-xs font-bold text-gray-800 border-x border-gray-200 h-full flex items-center">
+                            {updatingId === item.variant?._id ? <Loader2 size={10} className="animate-spin" /> : item.quantity}
+                          </span>
+                          <button 
+                            onClick={() => handleUpdateQuantity(item.product?._id, item.variant?._id, 'increment')}
+                            disabled={updatingId === item.variant?._id}
+                            className="px-2 hover:bg-gray-50 text-gray-500 transition-colors disabled:opacity-30"
+                          >
+                            <Plus size={12} />
+                          </button>
                         </div>
                       </div>
                     </div>
                     
-                    <button className="absolute top-2 right-2 p-1.5 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all opacity-0 group-hover:opacity-100">
+                    <button 
+                      onClick={() => handleRemoveItem(item.variant?._id)}
+                      disabled={updatingId === item.variant?._id}
+                      className="absolute top-2 right-2 p-1.5 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all opacity-0 group-hover:opacity-100 disabled:opacity-50"
+                    >
                       <Trash2 size={14} />
                     </button>
                   </div>
@@ -97,7 +220,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
                 <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm mt-6">
                   <div className="flex items-center gap-2 mb-4 border-b border-gray-50 pb-3">
                     <Info size={16} className="text-primary" />
-                    <h5 className="text-[12px] font-bold text-gray-800 uppercase">Bill Details</h5>
+                    <h5 className="text-xs font-bold text-gray-800 uppercase">Bill Details</h5>
                   </div>
                   
                   <div className="space-y-3">
@@ -140,12 +263,12 @@ const CartDrawer = ({ isOpen, onClose }) => {
           </div>
 
           {/* Footer Actions */}
-          {staticItems.length > 0 && (
+          {cartItems.length > 0 && (
             <div className="p-4 bg-white border-t border-gray-100 shadow-[0_-10px_20px_rgba(0,0,0,0.02)] sticky bottom-0 z-20">
               <div className="flex items-center justify-between mb-4 px-2">
                  <div className="flex flex-col">
-                   <span className="text-[14px] font-bold text-gray-900">₹{totalSales}</span>
-                   <span className="text-[10px] font-bold text-primary uppercase">View Details</span>
+                   <span className="text-sm font-bold text-gray-900">₹{totalSales}</span>
+                   <span className="text-xs font-bold text-primary uppercase">View Details</span>
                  </div>
                  <button className="bg-primary text-white px-10 py-3.5 rounded-xl font-bold uppercase text-xs shadow-lg shadow-primary/20 hover:bg-primary-hover transition-all flex items-center gap-2">
                    Proceed <ArrowLeft size={16} className="rotate-180" />
@@ -154,7 +277,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
             </div>
           )}
           
-          {!staticItems.length && (
+          {!cartItems.length && !loading && (
              <div className="p-6">
                 <button 
                   onClick={onClose}

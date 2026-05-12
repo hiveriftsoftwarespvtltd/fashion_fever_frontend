@@ -12,11 +12,13 @@ import UnlockMoreBeauty from '../components/UnlockMoreBeauty'
 import MoreBeautyToLove from '../components/MoreBeautyToLove'
 import BeautyBFF from '../components/BeautyBFF'
 import BuyingGuides from '../components/BuyingGuides'
+import ProductSection from '../components/ProductSection'
 
 const Home = () => {
  return (
  <div className="w-full flex flex-col overflow-x-hidden">
   <Hero />
+  <ProductSection />
   <Promotions />
   <BrandBanners />
   <LastChance />
