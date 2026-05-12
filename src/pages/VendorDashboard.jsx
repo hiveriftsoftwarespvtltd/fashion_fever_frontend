@@ -104,6 +104,14 @@ const VendorDashboard = () => {
   const [currentProductId, setCurrentProductId] = useState(null);
   const [originalProductForm, setOriginalProductForm] = useState(null);
 
+  const getImageUrl = (img) => {
+    if (!img) return '';
+    if (img instanceof File) return URL.createObjectURL(img);
+    if (typeof img === 'string') return img;
+    if (img.url) return img.url;
+    return '';
+  };
+
   // Fetch Vendor Details
   const fetchVendorData = async () => {
     try {
@@ -1421,40 +1429,61 @@ const VendorDashboard = () => {
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-2">
                               <label className="text-xs font-bold text-gray-400 uppercase">Thumbnail (Featured Image)</label>
-                              <div className="relative h-20 bg-white rounded-lg border-2 border-dashed border-gray-200 flex items-center justify-center gap-2 cursor-pointer group">
+                              <div className="relative h-24 bg-white rounded-xl border-2 border-dashed border-gray-200 overflow-hidden group">
                                 {variant.thumbnail ? (
-                                  <span className="text-xs font-bold text-primary truncate px-4">
-                                    {variant.thumbnail instanceof File ? variant.thumbnail.name : 'Current Image'}
-                                  </span>
+                                  <div className="w-full h-full relative">
+                                    <img 
+                                      src={getImageUrl(variant.thumbnail)} 
+                                      alt="preview" 
+                                      className="w-full h-full object-cover"
+                                    />
+                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                      <span className="text-[10px] font-bold text-white uppercase bg-primary px-3 py-1.5 rounded-lg">Change</span>
+                                    </div>
+                                  </div>
                                 ) : (
-                                  <div className="flex flex-col items-center">
-                                    <Upload size={14} className="text-gray-400" />
+                                  <div className="w-full h-full flex flex-col items-center justify-center gap-1">
+                                    <Upload size={16} className="text-gray-400" />
                                     <span className="text-[8px] font-bold text-gray-400 uppercase">Pick Main</span>
                                   </div>
                                 )}
-                                <input
-                                  type="file"
+                                <input 
+                                  type="file" 
                                   onChange={(e) => updateVariant(vIdx, 'thumbnail', e.target.files[0])}
-                                  className="absolute inset-0 opacity-0 cursor-pointer"
+                                  className="absolute inset-0 opacity-0 cursor-pointer z-10" 
                                 />
                               </div>
                             </div>
                             <div className="space-y-2">
                               <label className="text-xs font-bold text-gray-400 uppercase">Gallery (Multiple Images)</label>
-                              <div className="relative h-20 bg-white rounded-lg border-2 border-dashed border-gray-200 flex items-center justify-center gap-2 cursor-pointer">
-                                {variant.images.length > 0 ? (
-                                  <span className="text-xs font-bold text-primary">{variant.images.length} files selected</span>
+                              <div className="relative min-h-[96px] bg-white rounded-xl border-2 border-dashed border-gray-200 p-2 group">
+                                {variant.images && variant.images.length > 0 ? (
+                                  <div className="grid grid-cols-4 gap-2">
+                                    {variant.images.map((img, i) => (
+                                      <div key={i} className="aspect-square rounded-lg bg-gray-50 overflow-hidden border border-gray-100 relative group/img">
+                                        <img src={getImageUrl(img)} alt="gal" className="w-full h-full object-cover" />
+                                      </div>
+                                    ))}
+                                    <div className="aspect-square rounded-lg bg-gray-50 flex items-center justify-center border-2 border-dashed border-gray-200 relative">
+                                       <Plus size={14} className="text-gray-400" />
+                                       <input 
+                                        type="file" multiple
+                                        onChange={(e) => updateVariant(vIdx, 'images', [...variant.images, ...Array.from(e.target.files)])}
+                                        className="absolute inset-0 opacity-0 cursor-pointer" 
+                                      />
+                                    </div>
+                                  </div>
                                 ) : (
-                                  <div className="flex flex-col items-center">
-                                    <Plus size={14} className="text-gray-400" />
+                                  <div className="w-full h-20 flex flex-col items-center justify-center gap-1">
+                                    <Plus size={16} className="text-gray-400" />
                                     <span className="text-[8px] font-bold text-gray-400 uppercase">Add Gallery</span>
+                                    <input 
+                                      type="file" multiple
+                                      onChange={(e) => updateVariant(vIdx, 'images', Array.from(e.target.files))}
+                                      className="absolute inset-0 opacity-0 cursor-pointer" 
+                                    />
                                   </div>
                                 )}
-                                <input
-                                  type="file" multiple
-                                  onChange={(e) => updateVariant(vIdx, 'images', Array.from(e.target.files))}
-                                  className="absolute inset-0 opacity-0 cursor-pointer"
-                                />
                               </div>
                             </div>
                           </div>
