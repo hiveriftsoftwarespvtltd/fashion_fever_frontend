@@ -1,3 +1,5 @@
+import React from 'react';
+import { Link } from 'react-router-dom';
 import { X, ArrowLeft, Heart, ShoppingBag, Trash2, Plus, Minus, Info } from 'lucide-react';
 
 const CartDrawer = ({ isOpen, onClose }) => {
@@ -46,9 +48,13 @@ const CartDrawer = ({ isOpen, onClose }) => {
               </button>
               <h2 className="text-xl font-bold text-gray-900 uppercase">Bag</h2>
             </div>
-            <button className="text-xs font-bold text-primary uppercase hover:underline">
+            <Link 
+              to="/wishlist" 
+              onClick={onClose}
+              className="text-xs font-bold text-primary uppercase hover:underline"
+            >
               View Wishlist
-            </button>
+            </Link>
           </div>
 
           {/* Content */}
