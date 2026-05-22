@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useUser } from '../context/UserContext';
 import { Mail, Lock, User, ArrowRight, Eye, EyeOff, Loader2, ShieldCheck, KeyRound } from 'lucide-react';
-import { registerUser, verifyEmail, loginUser, verifyLoginOtp, sendForgotPasswordOtp, verifyForgotPasswordOtp } from '../api/authService';
+import { registerUser, verifyEmail, loginUser, verifyLoginOtp, sendForgotPasswordOtp, verifyForgotPasswordOtp, sendVerifyEmailOtp } from '../api/authService';
 
 const Auth = () => {
+  const navigate = useNavigate();
+  const { login } = useUser();
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -16,7 +20,7 @@ const Auth = () => {
   const [message, setMessage] = useState({ type: '', text: '' });
   const [showOTP, setShowOTP] = useState(false);
   const [otp, setOtp] = useState('');
-  
+
   // Forgot Password States
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [forgotStep, setForgotStep] = useState(1); // 1: Email, 2: OTP + New Password
@@ -46,24 +50,24 @@ const Auth = () => {
         const result = response.data || response;
 
         if (response.success && result.success) {
-          setMessage({ 
-            type: 'success', 
-            text: result.message || 'OTP sent successfully' 
+          setMessage({
+            type: 'success',
+            text: result.message || 'OTP sent successfully'
           });
           setTimeout(() => {
             setShowOTP(true);
             setMessage({ type: '', text: '' });
           }, 2000);
         } else {
-          setMessage({ 
-            type: 'error', 
-            text: result.message || response.message || 'Login failed' 
+          setMessage({
+            type: 'error',
+            text: result.message || response.message || 'Login failed'
           });
         }
       } catch (error) {
-        setMessage({ 
-          type: 'error', 
-          text: 'Login failed. Please check your credentials.' 
+        setMessage({
+          type: 'error',
+          text: 'Login failed. Please check your credentials.'
         });
       } finally {
         setLoading(false);
@@ -72,26 +76,26 @@ const Auth = () => {
       try {
         const response = await registerUser(formData);
         const result = response.data || response;
-        
+
         if (response.success && result.success) {
-          setMessage({ 
-            type: 'success', 
-            text: result.message || 'Verification OTP sent to your email' 
+          setMessage({
+            type: 'success',
+            text: result.message || 'Verification OTP sent to your email'
           });
           setTimeout(() => {
             setShowOTP(true);
             setMessage({ type: '', text: '' });
           }, 2000);
         } else {
-          setMessage({ 
-            type: 'error', 
-            text: result.message || response.message || 'Registration failed' 
+          setMessage({
+            type: 'error',
+            text: result.message || response.message || 'Registration failed'
           });
         }
       } catch (error) {
-        setMessage({ 
-          type: 'error', 
-          text: 'Something went wrong. Please try again.' 
+        setMessage({
+          type: 'error',
+          text: 'Something went wrong. Please try again.'
         });
       } finally {
         setLoading(false);
@@ -110,16 +114,16 @@ const Auth = () => {
         otp: otp
       };
 
-      const response = isLogin 
+      const response = isLogin
         ? await verifyLoginOtp(payload)
         : await verifyEmail(payload);
-        
+
       const result = response.data || response;
 
       if (response.success && result.success) {
-        setMessage({ 
-          type: 'success', 
-          text: result.message || (isLogin ? 'Login successful!' : 'Email verified successfully!') 
+        setMessage({
+          type: 'success',
+          text: result.message || (isLogin ? 'Login successful!' : 'Email verified successfully!')
         });
 
         if (isLogin) {
@@ -128,20 +132,19 @@ const Auth = () => {
             token: result.data.access_token,
             isLoggedIn: true
           };
-          localStorage.setItem('user_session', JSON.stringify(sessionData));
-          
+          login(sessionData);
+
           setTimeout(() => {
             const user = result.data.safeUser;
             const role = user.role;
-            if (role === 'admin') window.location.href = '/admin?tab=dashboard';
+            if (role === 'admin') navigate('/admin?tab=dashboard');
             else if (role === 'vendor') {
-              // If vendorId exists, they have already registered
-              if (user.vendorId) window.location.href = '/vendor/dashboard';
-              else window.location.href = '/vendor/register';
+              if (user.vendorId) navigate('/vendor/dashboard');
+              else navigate('/vendor/register');
             }
-            else if (role === 'influencer') window.location.href = '/influencer/dashboard';
-            else if (role === 'distributor') window.location.href = '/distributor/dashboard';
-            else window.location.href = '/';
+            else if (role === 'influencer') navigate('/influencer/dashboard');
+            else if (role === 'distributor') navigate('/distributor/dashboard');
+            else navigate('/');
           }, 1500);
         } else {
           setTimeout(() => {
@@ -152,16 +155,34 @@ const Auth = () => {
           }, 2500);
         }
       } else {
-        setMessage({ 
-          type: 'error', 
-          text: result.message || response.message || 'Invalid OTP' 
+        setMessage({
+          type: 'error',
+          text: result.message || response.message || 'Invalid OTP'
         });
       }
     } catch (error) {
-      setMessage({ 
-        type: 'error', 
-        text: 'Verification failed. Please try again.' 
+      setMessage({
+        type: 'error',
+        text: 'Verification failed. Please try again.'
       });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResendOTP = async () => {
+    setLoading(true);
+    setMessage({ type: '', text: '' });
+    try {
+      const response = await sendVerifyEmailOtp({ email: formData.email });
+      const result = response.data || response;
+      if (response.success && result.success) {
+        setMessage({ type: 'success', text: result.message || 'OTP resent successfully!' });
+      } else {
+        setMessage({ type: 'error', text: result.message || 'Failed to resend OTP' });
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: 'Something went wrong. Please try again.' });
     } finally {
       setLoading(false);
     }
@@ -230,7 +251,7 @@ const Auth = () => {
             {isForgotPassword ? 'Reset Password' : (showOTP ? 'Verification' : (isLogin ? 'Sign In' : 'Join Us'))}
           </h3>
           <p className="mt-2 text-sm text-gray-500 font-medium">
-            {isForgotPassword 
+            {isForgotPassword
               ? (forgotStep === 1 ? 'Enter your email to receive an OTP' : 'Enter the OTP and your new password')
               : (showOTP ? 'Enter the code sent to your email' : (isLogin ? 'Access your beauty portal' : 'Start your journey with WAKEUP'))}
           </p>
@@ -261,9 +282,8 @@ const Auth = () => {
           )}
 
           {message.text && (
-            <div className={`p-4 rounded-xl mb-6 text-sm font-bold border transition-all animate-in fade-in slide-in-from-top-2 duration-300 ${
-              message.type === 'success' ? 'bg-green-50 text-green-700 border-green-100' : 'bg-red-50 text-red-700 border-red-100'
-            }`}>
+            <div className={`p-4 rounded-xl mb-6 text-sm font-bold border transition-all animate-in fade-in slide-in-from-top-2 duration-300 ${message.type === 'success' ? 'bg-green-50 text-green-700 border-green-100' : 'bg-red-50 text-red-700 border-red-100'
+              }`}>
               {message.text}
             </div>
           )}
@@ -403,7 +423,16 @@ const Auth = () => {
                   )}
                 </button>
 
-                <div className="text-center">
+                <div className="text-center space-y-4">
+                  <button
+                    type="button"
+                    onClick={handleResendOTP}
+                    disabled={loading}
+                    className="text-sm font-bold text-primary hover:text-primary-hover transition-colors disabled:opacity-50"
+                  >
+                    Didn't receive code? Resend OTP
+                  </button>
+                  <br />
                   <button
                     type="button"
                     onClick={() => setShowOTP(false)}
@@ -503,7 +532,7 @@ const Auth = () => {
                     </label>
                   </div>
                   <div className="text-sm">
-                    <button 
+                    <button
                       type="button"
                       onClick={() => {
                         setIsForgotPassword(true);

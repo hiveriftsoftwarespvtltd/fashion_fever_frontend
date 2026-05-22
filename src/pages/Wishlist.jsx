@@ -73,21 +73,38 @@ const Wishlist = () => {
     }
   };
 
-  const handleClear = async () => {
-    if (!window.confirm("Are you sure you want to clear your entire wishlist?")) return;
-    
-    setClearing(true);
-    try {
-      const response = await clearWishlist();
-      if (response.success) {
-        toast.success("Wishlist cleared!");
-        setItems([]);
-      }
-    } catch (error) {
-      toast.error("Failed to clear wishlist");
-    } finally {
-      setClearing(false);
-    }
+  const handleClear = () => {
+    toast((t) => (
+      <div className="flex flex-col gap-3">
+        <p className="text-sm font-bold text-gray-800">Clear entire wishlist?</p>
+        <div className="flex gap-2">
+          <button
+            onClick={async () => {
+              toast.dismiss(t.id);
+              setClearing(true);
+              try {
+                const response = await clearWishlist();
+                if (response.success) {
+                  toast.success("Wishlist cleared!");
+                  setItems([]);
+                } else {
+                  toast.error("Failed to clear wishlist.");
+                }
+              } catch {
+                toast.error("Error clearing wishlist.");
+              } finally {
+                setClearing(false);
+              }
+            }}
+            className="flex-1 bg-red-500 hover:bg-red-600 text-white text-xs font-bold px-3 py-2 rounded-lg cursor-pointer"
+          >Yes, Clear</button>
+          <button
+            onClick={() => toast.dismiss(t.id)}
+            className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold px-3 py-2 rounded-lg cursor-pointer"
+          >Cancel</button>
+        </div>
+      </div>
+    ), { duration: 8000 });
   };
 
   const sidebarLinks = [
@@ -129,7 +146,7 @@ const Wishlist = () => {
                       <span className={`${link.active ? 'text-primary' : 'text-gray-400 group-hover:text-primary'}`}>
                         {link.icon}
                       </span>
-                      <span className="text-xs font-bold uppercase tracking-tight">{link.label}</span>
+                      <span className="text-xs font-bold uppercase">{link.label}</span>
                     </div>
                   </Link>
                 ))}
@@ -149,7 +166,7 @@ const Wishlist = () => {
                   <button 
                     onClick={handleClear}
                     disabled={clearing}
-                    className="text-xs font-bold text-gray-400 hover:text-red-500 uppercase tracking-widest flex items-center gap-2 transition-colors disabled:opacity-50"
+                    className="text-xs font-bold text-gray-400 hover:text-red-500 uppercase flex items-center gap-2 transition-colors disabled:opacity-50"
                   >
                     {clearing ? <Loader2 size={14} className="animate-spin" /> : <X size={14} />}
                     Clear Wishlist
@@ -215,7 +232,7 @@ const Wishlist = () => {
                           <button 
                             onClick={() => handleMoveToBag(item.product._id, item.variant._id)}
                             disabled={actionId === item.variant._id}
-                            className="w-full py-2.5 border border-primary/10 rounded-lg text-xs font-bold text-primary uppercase tracking-widest hover:bg-primary hover:text-white transition-all mt-auto flex items-center justify-center gap-2 disabled:opacity-50"
+                            className="w-full py-2.5 border border-primary/10 rounded-lg text-xs font-bold text-primary uppercase hover:bg-primary hover:text-white transition-all mt-auto flex items-center justify-center gap-2 disabled:opacity-50"
                           >
                             {actionId === item.variant._id ? <Loader2 size={12} className="animate-spin" /> : "Move to Bag"}
                           </button>
@@ -228,7 +245,7 @@ const Wishlist = () => {
                     <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6">
                       <Heart size={32} className="text-gray-200" />
                     </div>
-                    <h2 className="text-sm font-bold text-gray-400 uppercase tracking-widest">Your wishlist is empty</h2>
+                    <h2 className="text-sm font-bold text-gray-400 uppercase">Your wishlist is empty</h2>
                     <Link to="/" className="mt-8 bg-primary text-white px-10 py-4 rounded-xl font-bold uppercase text-xs shadow-xl shadow-primary/20">
                       Go Shopping
                     </Link>
@@ -237,7 +254,7 @@ const Wishlist = () => {
 
                 {/* Footer text */}
                 <div className="mt-20 border-t border-gray-50 pt-10 text-center">
-                   <p className="text-xs font-bold text-gray-300 uppercase tracking-[0.2em]">No More Products to Show</p>
+                   <p className="text-xs font-bold text-gray-300 uppercase">No More Products to Show</p>
                 </div>
               </div>
             </div>

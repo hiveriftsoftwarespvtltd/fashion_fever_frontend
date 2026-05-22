@@ -1,22 +1,17 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
+import { useUser } from '../context/UserContext';
 
-// Proper useAuth hook that reads from our session structure
+// Proper useAuth hook that reads from our UserContext
 export const useAuth = () => {
-  const sessionStr = localStorage.getItem('user_session');
-  let session = null;
-  try {
-    session = sessionStr ? JSON.parse(sessionStr) : null;
-  } catch (e) {
-    console.error("Auth session parse error", e);
-  }
-  
+  const { user, token, isAuthenticated, isLoading, role } = useUser();
+
   return {
-    user: session?.user || null,
-    token: session?.token || null,
-    isAuthenticated: !!session?.token,
-    role: session?.user?.role || null,
-    isLoading: false
+    user,
+    token,
+    isAuthenticated,
+    role,
+    isLoading
   };
 };
 

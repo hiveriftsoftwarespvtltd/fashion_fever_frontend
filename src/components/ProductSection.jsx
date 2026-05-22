@@ -5,8 +5,10 @@ import { addToCart } from '../api/cartService';
 import { addToWishlist, getWishlist, removeFromWishlist } from '../api/wishlistService';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { useCart } from '../context/CartContext';
 
 const ProductSection = () => {
+  const { cart, addToCart: addGlobalCart, removeFromCart, updateQty } = useCart();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [addingId, setAddingId] = useState(null);
@@ -15,6 +17,7 @@ const ProductSection = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       const response = await getProducts({ limit: 10 });
+      console.log('Home Page Products Response:', response);
       if (response.success) {
         setProducts(response.data.data || []);
       }
@@ -95,7 +98,7 @@ const ProductSection = () => {
     return (
       <div className="container mx-auto px-4 py-20 flex flex-col items-center justify-center">
         <Loader2 className="animate-spin text-primary mb-4" size={40} />
-        <p className="text-sm font-bold text-gray-400 uppercase tracking-widest">Discovering Beauty...</p>
+        <p className="text-sm font-bold text-gray-400 uppercase ">Discovering Beauty...</p>
       </div>
     );
   }
@@ -105,10 +108,10 @@ const ProductSection = () => {
       <div className="container mx-auto px-4 md:px-8">
         <div className="flex flex-col md:flex-row items-end justify-between mb-12 gap-4">
           <div>
-            <span className="text-xs font-bold text-primary uppercase tracking-[0.2em] mb-2 block">Our Curated Collection</span>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 uppercase italic">Best Sellers For You</h2>
+            <span className="text-xs font-bold text-primary uppercase mb-2 block">Our Curated Collection</span>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 uppercase italic">Best Sellers For You</h2>
           </div>
-          <Link to="/shop" className="text-xs font-bold text-gray-400 hover:text-primary transition-colors uppercase border-b border-gray-200 pb-1">
+          <Link to="/shop" className="text-xs font-semibold text-gray-400 hover:text-primary transition-colors uppercase border-b border-gray-200 pb-1">
             View All Products
           </Link>
         </div>
@@ -152,11 +155,11 @@ const ProductSection = () => {
                   </Link>
 
                   <div className="flex items-center flex-wrap gap-2">
-                    <span className="text-sm font-bold text-gray-900">₹{firstVariant?.salesPrice || firstVariant?.price}</span>
+                    <span className="text-sm font-bold text-gray-800">₹{firstVariant?.salesPrice || firstVariant?.price}</span>
                     {firstVariant?.salesPrice < firstVariant?.price && (
                       <>
                         <span className="text-xs font-bold text-gray-400 line-through">₹{firstVariant.price}</span>
-                        <span className="text-xs font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded uppercase tracking-tighter">
+                        <span className="text-xs font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded uppercase ">
                           {Math.round(((firstVariant.price - firstVariant.salesPrice) / firstVariant.price) * 100)}% Off
                         </span>
                       </>
@@ -166,23 +169,70 @@ const ProductSection = () => {
                   <div className="flex items-center gap-1.5">
                     <div className="flex items-center">
                       {[...Array(5)].map((_, i) => (
-                        <Star key={i} size={12} className={i < 4 ? "fill-gray-900 text-gray-900" : "text-gray-300"} />
+                        <Star key={i} size={12} className={i < 4 ? "fill-gray-900 text-gray-800" : "text-gray-300"} />
                       ))}
                     </div>
-                    <span className="text-xs font-bold text-gray-400 uppercase tracking-tighter">(120)</span>
+                    <span className="text-xs font-bold text-gray-400 uppercase ">(120)</span>
                   </div>
 
-                  <button 
-                    onClick={() => handleAddToCart(product._id, firstVariant?._id)}
-                    disabled={addingId === firstVariant?._id}
-                    className="mt-4 w-full border border-gray-100 hover:border-primary py-3 rounded-xl text-xs font-bold text-primary uppercase tracking-widest transition-all hover:bg-primary hover:text-white flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {addingId === firstVariant?._id ? (
-                      <Loader2 size={14} className="animate-spin" />
+                  {(() => {
+                    const cartItem = cart?.find(item => item.id === firstVariant?._id);
+                    const isInCart = !!cartItem;
+                    
+                    return isInCart ? (
+                      <div className="mt-4 w-full h-11 border border-primary rounded-xl flex items-center justify-between overflow-hidden bg-primary text-white text-xs font-bold uppercase select-none">
+                        <button
+                          onClick={() => {
+                            if (cartItem.qty === 1) {
+                              removeFromCart(cartItem.id);
+                              toast.success("Removed from Bag");
+                            } else {
+                              updateQty(cartItem.id, -1, product._id);
+                            }
+                          }}
+                          className="w-12 h-full flex items-center justify-center bg-black/10 hover:bg-black/25 text-sm font-bold cursor-pointer transition-colors"
+                        >
+                          -
+                        </button>
+                        <span className="flex-grow text-center text-[10px] tracking-wider uppercase">
+                          In Bag ({cartItem.qty})
+                        </span>
+                        <button
+                          onClick={() => {
+                            if (firstVariant?.stock && cartItem.qty >= firstVariant.stock) {
+                              toast.error("Not enough stock!");
+                            } else {
+                              updateQty(cartItem.id, 1, product._id);
+                            }
+                          }}
+                          className="w-12 h-full flex items-center justify-center bg-black/10 hover:bg-black/25 text-sm font-bold cursor-pointer transition-colors"
+                        >
+                          +
+                        </button>
+                      </div>
                     ) : (
-                      "Move to Bag"
-                    )}
-                  </button>
+                      <button 
+                        onClick={async () => {
+                          const cartItemLocal = {
+                            id: firstVariant?._id,
+                            name: `${product.name} ${firstVariant.attributes?.Color ? `(${firstVariant.attributes.Color})` : ''}`,
+                            price: firstVariant.salesPrice || firstVariant.price,
+                            image: firstVariant.thumbnail?.url || (product.images?.[0]?.url || product.images?.[0]) || 'https://images.unsplash.com/photo-1586776977607-310e9c725c37?w=100&h=100&fit=crop',
+                          };
+                          addGlobalCart(cartItemLocal, firstVariant?._id, product._id);
+                          await handleAddToCart(product._id, firstVariant?._id);
+                        }}
+                        disabled={addingId === firstVariant?._id}
+                        className="mt-4 w-full border border-gray-100 hover:border-primary py-3 rounded-xl text-xs font-bold text-primary uppercase transition-all hover:bg-primary hover:text-white flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                      >
+                        {addingId === firstVariant?._id ? (
+                          <Loader2 size={14} className="animate-spin" />
+                        ) : (
+                          "Move to Bag"
+                        )}
+                      </button>
+                    );
+                  })()}
                 </div>
               </div>
             );

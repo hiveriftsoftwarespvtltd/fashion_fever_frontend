@@ -41,6 +41,8 @@ export const getVendorDetails = async () => {
 export const getVendorProducts = async (params = {}) => {
   try {
     const response = await apiClient.get('/product/fetch-products', { params });
+       console.log(response.data); // data check
+
     return response.data;
   } catch (error) {
     console.error('Fetch vendor products error:', error);

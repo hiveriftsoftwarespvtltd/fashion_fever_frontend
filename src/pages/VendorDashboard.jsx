@@ -732,11 +732,11 @@ const VendorDashboard = () => {
                   <table className="w-full text-left">
                     <thead className="bg-gray-50 border-b border-gray-100">
                       <tr>
-                        <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Category</th>
-                        <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Slug</th>
-                        <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Description</th>
-                        <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Status</th>
-                        <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-right">Actions</th>
+                        <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase">Category</th>
+                        <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase">Slug</th>
+                        <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase">Description</th>
+                        <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase">Status</th>
+                        <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase text-right">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-50">

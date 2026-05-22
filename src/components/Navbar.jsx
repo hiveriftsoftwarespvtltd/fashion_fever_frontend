@@ -1,14 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Search, ShoppingBag, Menu, ChevronDown, Wallet, User, LogOut, Settings, UserCircle, X, Heart } from 'lucide-react';
-import { getUserDetails } from '../api/authService';
+import { useUser } from '../context/UserContext';
+import { useSearch } from '../context/SearchContext';
+import { useCart } from '../context/CartContext';
 import CartDrawer from './CartDrawer';
+import logo from '../assets/logo.png.jpeg';
 
 const Navbar = () => {
+  const navigate = useNavigate();
+  const { user, logout } = useUser();
+  const { searchQuery, setSearchQuery } = useSearch();
+  const { cartCount } = useCart();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [isCartOpen, setIsCartOpen] = useState(false);
 
   useEffect(() => {
@@ -23,34 +28,9 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Fetch user details if logged in
-  useEffect(() => {
-    const fetchUser = async () => {
-      const session = localStorage.getItem('user_session');
-      if (session) {
-        try {
-          const response = await getUserDetails();
-          if (response.success) {
-            setUser(response.data);
-          }
-        } catch (error) {
-          console.error("Failed to fetch user:", error);
-        }
-      }
-      setLoading(false);
-    };
-
-    fetchUser();
-
-    // Listen for storage changes (for login/logout in other tabs)
-    window.addEventListener('storage', fetchUser);
-    return () => window.removeEventListener('storage', fetchUser);
-  }, []);
-
   const handleLogout = () => {
-    localStorage.removeItem('user_session');
-    setUser(null);
-    window.location.href = '/';
+    logout();
+    navigate('/');
   };
 
   // Close menu when resizing to desktop
@@ -90,9 +70,7 @@ const Navbar = () => {
             {/* Logo & Links Group */}
             <div className="flex items-center gap-4 lg:gap-10">
               <Link to="/" className="flex-shrink-0">
-                <span className="text-[24px] lg:text-[32px] font-bold text-primary uppercase">
-                  WAKEUP
-                </span>
+                <img src={logo} alt="WakeUp MakeUp" className="h-[60px] lg:h-[80px] w-auto object-contain" />
               </Link>
 
               {/* Nav Links (Desktop) */}
@@ -108,7 +86,7 @@ const Navbar = () => {
                 ))}
 
                 {/* Portals Dropdown */}
-                <div className="relative group">
+                {/* <div className="relative group">
                   <button className="text-[13px] font-bold text-[#3f414d] hover:text-primary transition-all uppercase flex items-center gap-1">
                     Portals <ChevronDown size={14} />
                   </button>
@@ -121,7 +99,7 @@ const Navbar = () => {
                       ))}
                     </div>
                   </div>
-                </div>
+                </div> */}
               </div>
             </div>
 
@@ -134,8 +112,10 @@ const Navbar = () => {
                 </div>
                 <input
                   type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search products, brands..."
-                  className="w-full bg-[#f4f4f4] border border-[#e0e0e0] rounded-xl h-[44px] pl-4 pr-11 text-[13px] outline-none placeholder:text-gray-400 font-bold"
+                  className="w-full bg-[#f4f4f4] border border-[#e0e0e0] rounded-xl h-[44px] pl-4 pr-11 text-[13px] outline-none placeholder:text-gray-400 placeholder:font-normal placeholder:text-[11px] font-medium"
                 />
               </div>
 
@@ -145,34 +125,54 @@ const Navbar = () => {
                   <Heart size={22} strokeWidth={2} />
                 </Link>
 
-                <button 
+                <button
                   onClick={() => setIsCartOpen(true)}
                   className="text-[#3f414d] hover:text-primary transition-colors p-1 relative"
                 >
                   <ShoppingBag size={22} strokeWidth={2} />
-                  <span className="absolute -top-1 -right-1 bg-primary text-white text-[8px] font-bold w-4 h-4 flex items-center justify-center rounded-full shadow-sm">2</span>
+                  {cartCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-primary text-white text-[8px] font-bold w-4 h-4 flex items-center justify-center rounded-full shadow-sm transition-all duration-300 scale-100">
+                      {cartCount}
+                    </span>
+                  )}
                 </button>
 
                 <div className="w-[1px] h-6 bg-gray-100 hidden sm:block"></div>
 
                 <div className="hidden sm:flex items-center gap-3">
-                  {!loading && user ? (
+                  {user ? (
                     <div className="relative group">
-                      <button className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 hover:bg-primary/20 text-primary border-2 border-transparent hover:border-primary/30 transition-all duration-300">
-                        <UserCircle size={24} strokeWidth={1.5} />
+                      <button className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 hover:bg-primary/20 text-primary border-2 border-transparent hover:border-primary/30 overflow-hidden transition-all duration-300">
+                        {user.avatar ? (
+                          <img
+                            src={typeof user.avatar === 'string' ? user.avatar : (user.avatar.url || '')}
+                            alt={user.name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <UserCircle size={24} strokeWidth={1.5} />
+                        )}
                       </button>
 
                       {/* Profile Dropdown */}
-                      <div className="absolute top-full right-0 mt-3 bg-white shadow-2xl rounded-2xl border border-gray-100 p-2 w-64 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all z-[500] before:content-[''] before:absolute before:-top-2 before:right-4 before:w-4 before:h-4 before:bg-white before:rotate-45 before:border-l before:border-t before:border-gray-100">
+                      <div className="absolute top-full right-0 mt-3 bg-white shadow-2xl rounded-2xl border border-gray-100 p-2 w-64 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all z-[500] before:content-[''] before:absolute before:-top-2 before:right-4 before:w-4 before:h-4 before:bg-white before:rotate-45 before:border-l before:border-t before:border-gray-100 after:absolute after:-top-3 after:left-0 after:right-0 after:h-3 after:content-['']">
                         <div className="flex flex-col gap-1 text-left relative z-10 bg-white rounded-xl overflow-hidden">
                           {/* User Info Header */}
                           <div className="px-4 py-4 bg-gray-50/50 border-b border-gray-100">
                             <div className="flex items-center gap-3 mb-2">
-                              <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white font-bold text-sm uppercase shadow-lg shadow-primary/20">
-                                {user.name?.charAt(0) || 'U'}
+                              <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white font-bold text-sm uppercase shadow-lg shadow-primary/20 overflow-hidden">
+                                {user.avatar ? (
+                                  <img
+                                    src={typeof user.avatar === 'string' ? user.avatar : (user.avatar.url || '')}
+                                    alt={user.name}
+                                    className="w-full h-full object-cover"
+                                  />
+                                ) : (
+                                  user.name?.charAt(0) || 'U'
+                                )}
                               </div>
                               <div className="flex flex-col leading-none">
-                                <p className="text-[13px] font-bold text-gray-900 uppercase truncate max-w-[140px]">
+                                <p className="text-[13px] font-bold text-gray-800 uppercase truncate max-w-[140px]">
                                   {user.name}
                                 </p>
                                 <p className="text-[10px] font-bold text-primary uppercase mt-0.5">
@@ -235,9 +235,11 @@ const Navbar = () => {
         >
           <div className="flex flex-col h-full">
             <div className="p-6 border-b border-gray-100 flex items-center justify-between">
-              <span className="text-[24px] font-bold text-primary uppercase">WAKEUP</span>
-              <button onClick={() => setIsMenuOpen(false)} className="text-gray-400">
-                <Menu size={24} />
+              <Link to="/" onClick={() => setIsMenuOpen(false)}>
+                <img src={logo} alt="WakeUp MakeUp" className="h-[36px] w-auto object-contain" />
+              </Link>
+              <button onClick={() => setIsMenuOpen(false)} className="text-gray-400 hover:text-primary transition-colors">
+                <X size={24} />
               </button>
             </div>
 

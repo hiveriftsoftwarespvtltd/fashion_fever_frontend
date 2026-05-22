@@ -1,21 +1,17 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Zap, MapPin, Phone, Mail } from 'lucide-react';
+import { MapPin, Phone, Mail } from 'lucide-react';
+import logo from '../assets/logo.png.jpeg';
 
 const Footer = () => {
  return (
  <footer className="bg-white pt-20 pb-10 border-t border-gray-100">
-  <div className="container">
+  <div className="container mx-auto px-4 max-w-[1600px]">
   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
    {/* Brand Column */}
    <div className="flex flex-col gap-6">
-   <Link to="/" className="flex items-center gap-2">
-    <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white shadow-lg">
-    <Zap size={24} fill="white" />
-    </div>
-    <span className="text-2xl font-bold text-text-dark">
-    WAKE<span className="text-primary">UP</span>
-    </span>
+   <Link to="/" className="flex items-center">
+    <img src={logo} alt="WakeUp MakeUp" className="h-[80px] w-auto object-contain" />
    </Link>
    <p className="text-text-muted">
     Designing the future of web experiences with a focus on speed, aesthetics, and user conversion.
