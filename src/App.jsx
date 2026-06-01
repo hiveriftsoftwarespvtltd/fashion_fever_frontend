@@ -11,26 +11,30 @@ import ProductDetail from './pages/ProductDetail';
 import VendorDashboard from './pages/VendorDashboard';
 import InfluencerDashboard from './pages/InfluencerDashboard';
 import Booking from './pages/Booking';
-import AdminPanel from './pages/AdminPanel';
+import AdminPanel from './pages/admin/AdminPanel';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
-import Wallet from './pages/Wallet';
-import CourseCatalog from './pages/CourseCatalog';
+import Wallet from './pages/profile/Wallet';
+import CourseCatalog from './pages/academy/CourseCatalog';
 import DistributorDashboard from './pages/DistributorDashboard';
-import CoursePlayer from './pages/CoursePlayer';
-import MyAppointments from './pages/MyAppointments';
-import Wishlist from './pages/Wishlist';
-import MyLearning from './pages/MyLearning';
+import CoursePlayer from './pages/academy/CoursePlayer';
+import MyAppointments from './pages/profile/MyAppointments';
+import Wishlist from './pages/profile/Wishlist';
+import MyLearning from './pages/academy/MyLearning';
 import VendorRegistration from './pages/VendorRegistration';
-import Profile from './pages/Profile';
-import Address from './pages/Address';
+import InfluencerRegistration from './pages/InfluencerRegistration';
+import Profile from './pages/profile/Profile';
+import Address from './pages/profile/Address';
+import Coupons from './pages/profile/Coupons';
+import Payments from './pages/profile/Payments';
+import Orders from './pages/profile/Orders';
 import { CartProvider } from './context/CartContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { UserProvider } from './context/UserContext';
 import { SearchProvider } from './context/SearchContext';
+import { WishlistProvider } from './context/WishlistContext';
 import { RoleGuard } from './components/AuthGuards';
 import { MessageCircle } from 'lucide-react';
-import { Toaster } from 'react-hot-toast';
 
 // Scroll to top on route change
 const ScrollToTop = () => {
@@ -50,11 +54,11 @@ const App = () => {
 
   return (
     <UserProvider>
-      <SearchProvider>
-        <CartProvider>
-          <ThemeProvider>
-        <div className="min-h-screen flex flex-col">
-          <Toaster position="bottom-center" reverseOrder={false} />
+      <WishlistProvider>
+        <SearchProvider>
+          <CartProvider>
+            <ThemeProvider>
+        <div className="min-h-screen flex flex-col antialiased">
           <ScrollToTop />
 
           {!isDashboard && <TopStrip />}
@@ -110,7 +114,11 @@ const App = () => {
               <Route path="/wishlist" element={<Wishlist />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/address" element={<Address />} />
+              <Route path="/coupons" element={<Coupons />} />
+              <Route path="/payments" element={<Payments />} />
+              <Route path="/orders" element={<Orders />} />
 
+              <Route path="/influencer/registration" element={<InfluencerRegistration />} />
               <Route path="/services" element={<Booking />} />
               <Route path="/about" element={<Home />} />
               <Route path="/contact" element={<Home />} />
@@ -128,9 +136,10 @@ const App = () => {
 
           {!isDashboard && <Footer />}
         </div>
-      </ThemeProvider>
-    </CartProvider>
-      </SearchProvider>
+            </ThemeProvider>
+          </CartProvider>
+        </SearchProvider>
+      </WishlistProvider>
     </UserProvider>
   );
 };

@@ -23,8 +23,8 @@ const MyLearning = () => {
   ];
 
   return (
-    <div className="bg-gray-50 min-h-screen py-16">
-      <div className="container max-w-6xl">
+    <div className="bg-gray-50 min-h-screen py-16 text-left">
+      <div className="container max-w-6xl mx-auto px-4">
         <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
            <div className="space-y-4">
               <span className="text-xs font-bold uppercase text-primary">Academy</span>

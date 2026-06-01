@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { X, ArrowLeft, Heart, ShoppingBag, Trash2, Plus, Minus, Info, Loader2 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
-import toast from 'react-hot-toast';
+import { toast } from '../utils/toast';
+import Swal from 'sweetalert2';
 
 const CartDrawer = ({ isOpen, onClose }) => {
+  const navigate = useNavigate();
   const { cart, isLoading, removeFromCart, updateQty, clearCart, cartTotal } = useCart();
   const [updatingId, setUpdatingId] = useState(null);
 
@@ -39,21 +41,25 @@ const CartDrawer = ({ isOpen, onClose }) => {
               {cart.length > 0 && (
                 <button 
                   onClick={() => {
-                    toast((t) => (
-                      <div className="flex flex-col gap-3">
-                        <p className="text-sm font-bold text-gray-800">Empty your entire bag?</p>
-                        <div className="flex gap-2">
-                          <button
-                            onClick={async () => { toast.dismiss(t.id); await clearCart(); toast.success("Bag cleared!"); }}
-                            className="flex-1 bg-red-500 hover:bg-red-600 text-white text-xs font-bold px-3 py-2 rounded-lg cursor-pointer"
-                          >Yes, Clear</button>
-                          <button
-                            onClick={() => toast.dismiss(t.id)}
-                            className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold px-3 py-2 rounded-lg cursor-pointer"
-                          >Cancel</button>
-                        </div>
-                      </div>
-                    ), { duration: 8000 });
+                    Swal.fire({
+                      title: 'Empty your entire bag?',
+                      text: "You won't be able to revert this!",
+                      icon: 'warning',
+                      showCancelButton: true,
+                      confirmButtonColor: '#ef4444',
+                      cancelButtonColor: '#f3f4f6',
+                      confirmButtonText: 'Yes, Clear',
+                      cancelButtonText: 'Cancel',
+                      customClass: {
+                        cancelButton: 'text-gray-700 font-bold',
+                        confirmButton: 'font-bold'
+                      }
+                    }).then(async (result) => {
+                      if (result.isConfirmed) {
+                        await clearCart();
+                        toast.success("Bag cleared!");
+                      }
+                    });
                   }}
                   className="ml-2 text-xs font-bold text-gray-300 hover:text-red-500 uppercase transition-colors cursor-pointer"
                 >
@@ -78,8 +84,8 @@ const CartDrawer = ({ isOpen, onClose }) => {
               </div>
             ) : cart.length > 0 ? (
               <div className="p-4 space-y-4">
-                {cart.map((item) => (
-                  <div key={item.id} className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex gap-4 relative group">
+                {cart.map((item, index) => (
+                  <div key={`${item.id}-${index}`} className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex gap-4 relative group">
                     <div className="w-20 h-24 bg-gray-50 rounded-xl overflow-hidden flex-shrink-0">
                       <img 
                         src={item.image} 
@@ -212,7 +218,13 @@ const CartDrawer = ({ isOpen, onClose }) => {
                    <span className="text-sm font-bold text-gray-900">₹{totalSales}</span>
                    <span className="text-xs font-bold text-primary uppercase">View Details</span>
                  </div>
-                 <button className="bg-primary text-white px-10 py-3.5 rounded-xl font-bold uppercase text-xs shadow-lg shadow-primary/20 hover:bg-primary-hover transition-all flex items-center gap-2 cursor-pointer">
+                 <button 
+                    onClick={() => {
+                      onClose();
+                      navigate('/checkout');
+                    }}
+                    className="bg-primary text-white px-10 py-3.5 rounded-xl font-bold uppercase text-xs shadow-lg shadow-primary/20 hover:bg-primary-hover transition-all flex items-center gap-2 cursor-pointer"
+                  >
                    Proceed <ArrowLeft size={16} className="rotate-180" />
                  </button>
               </div>

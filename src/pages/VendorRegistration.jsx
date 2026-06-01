@@ -14,7 +14,7 @@ import {
   Globe
 } from 'lucide-react';
 import { registerVendor } from '../api/vendorService';
-import toast from 'react-hot-toast';
+import { toast } from '../utils/toast';
 
 const VendorRegistration = () => {
   const [loading, setLoading] = useState(false);

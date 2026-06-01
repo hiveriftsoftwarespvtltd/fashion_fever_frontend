@@ -1,24 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
-  User, Ticket, Wallet, ShoppingBag, Heart, CreditCard,
-  LogOut, ChevronRight, Loader2, MapPin, Plus, Pencil,
+  ChevronRight, Loader2, MapPin, Plus, Pencil,
   Trash2, X, Check, Home, Phone
 } from 'lucide-react';
-import { useUser } from '../context/UserContext';
-import { getAddresses, getAddressDetails, addAddress, editAddress, deleteAddress } from '../api/authService';
-import toast from 'react-hot-toast';
-
-/* ── Sidebar links (shared pattern) ───────────────────────── */
-const sidebarLinks = [
-  { icon: <User size={18} />,        label: 'My Profile',       path: '/profile' },
-  { icon: <MapPin size={18} />,      label: 'My Addresses',     path: '/address', active: true },
-  { icon: <Ticket size={18} />,      label: 'My Coupons',       path: '/coupons' },
-  { icon: <Wallet size={18} />,      label: 'My Wallet',        path: '/wallet' },
-  { icon: <ShoppingBag size={18} />, label: 'My Orders',        path: '/my-appointments' },
-  { icon: <Heart size={18} />,       label: 'My Wishlist',      path: '/wishlist' },
-  { icon: <CreditCard size={18} />,  label: 'My Saved Payment', path: '/payments' },
-];
+import { getAddresses, getAddressDetails, addAddress, editAddress, deleteAddress } from '../../api/authService';
+import { toast } from '../../utils/toast';
+import UserSidebar from './UserSidebar';
 
 /* ── Empty form state ──────────────────────────────────────── */
 const EMPTY_FORM = {
@@ -29,7 +17,6 @@ const EMPTY_FORM = {
 /* ══════════════════════════════════════════════════════════ */
 const Address = () => {
   const navigate = useNavigate();
-  const { logout } = useUser();
 
   const [addresses, setAddresses]   = useState([]);
   const [isLoading, setIsLoading]   = useState(true);
@@ -150,9 +137,6 @@ const Address = () => {
     ), { duration: 8000 });
   };
 
-  /* ── logout ────────────────────────────────────────────── */
-  const handleLogout = () => { logout(); navigate('/'); };
-
   /* ══════════════════════════════════════════════════════ */
   return (
     <div className="bg-[#f3f3f3] min-h-screen py-10 font-outfit">
@@ -168,30 +152,7 @@ const Address = () => {
         <div className="flex flex-col lg:flex-row gap-8">
 
           {/* ── Sidebar ──────────────────────────────────── */}
-          <div className="w-full lg:w-80 flex-shrink-0">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-              <div className="flex flex-col">
-                {sidebarLinks.map((link, idx) => (
-                  <Link
-                    key={idx}
-                    to={link.path}
-                    className={`flex items-center gap-4 px-6 py-4 transition-all border-b border-gray-50 last:border-0 group ${
-                      link.active
-                        ? 'bg-white text-primary border-r-4 border-r-primary'
-                        : 'text-gray-600 hover:bg-gray-50 hover:text-primary'
-                    }`}
-                  >
-                    <span className={link.active ? 'text-primary' : 'text-gray-400 group-hover:text-primary'}>{link.icon}</span>
-                    <span className="text-xs font-bold uppercase">{link.label}</span>
-                  </Link>
-                ))}
-                <button onClick={handleLogout} className="flex items-center gap-4 px-6 py-4 text-red-500 hover:bg-red-50 w-full text-left transition-all">
-                  <LogOut size={18} />
-                  <span className="text-xs font-bold uppercase">Log Out</span>
-                </button>
-              </div>
-            </div>
-          </div>
+          <UserSidebar />
 
           {/* ── Right Content ─────────────────────────────── */}
           <div className="flex-grow">
@@ -199,14 +160,14 @@ const Address = () => {
 
               {/* Header */}
               <div className="p-6 border-b border-gray-100 flex items-center justify-between">
-                <h1 className="text-xl font-extrabold text-gray-900 uppercase tracking-tight flex items-center gap-2">
+                <h1 className="text-xl font-extrabold text-gray-900 uppercase  flex items-center gap-2">
                   <MapPin size={20} className="text-primary" /> My Addresses
                   <span className="text-primary text-base">({addresses.length})</span>
                 </h1>
                 {!showForm && (
                   <button
                     onClick={openAdd}
-                    className="flex items-center gap-2 bg-primary hover:bg-primary-hover text-white text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-xl transition-all shadow-md shadow-primary/10 cursor-pointer"
+                    className="flex items-center gap-2 bg-primary hover:bg-primary-hover text-white text-xs font-bold uppercase  px-4 py-2.5 rounded-xl transition-all shadow-md shadow-primary/10 cursor-pointer"
                   >
                     <Plus size={14} /> Add New Address
                   </button>
@@ -217,7 +178,7 @@ const Address = () => {
               {showForm && (
                 <div className="p-6 border-b border-gray-100 bg-gray-50/50">
                   <div className="flex items-center justify-between mb-5">
-                    <h2 className="text-sm font-extrabold text-gray-900 uppercase tracking-wider">
+                    <h2 className="text-sm font-extrabold text-gray-900 uppercase ">
                       {editingId ? 'Edit Address' : 'Add New Address'}
                     </h2>
                     <button onClick={closeForm} className="p-2 rounded-lg hover:bg-gray-100 text-gray-400 cursor-pointer transition-all">
@@ -228,7 +189,7 @@ const Address = () => {
                   <form onSubmit={handleSave} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {/* Line 1 */}
                     <div className="sm:col-span-2">
-                      <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1 block">Address Line 1 *</label>
+                      <label className="text-[10px] font-bold text-gray-400 uppercase  mb-1 block">Address Line 1 *</label>
                       <input
                         value={form.line1}
                         onChange={e => setForm(f => ({ ...f, line1: e.target.value }))}
@@ -239,7 +200,7 @@ const Address = () => {
 
                     {/* Line 2 */}
                     <div className="sm:col-span-2">
-                      <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1 block">Address Line 2</label>
+                      <label className="text-[10px] font-bold text-gray-400 uppercase  mb-1 block">Address Line 2</label>
                       <input
                         value={form.line2}
                         onChange={e => setForm(f => ({ ...f, line2: e.target.value }))}
@@ -250,7 +211,7 @@ const Address = () => {
 
                     {/* Landmark */}
                     <div className="sm:col-span-2">
-                      <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1 block">Landmark</label>
+                      <label className="text-[10px] font-bold text-gray-400 uppercase  mb-1 block">Landmark</label>
                       <input
                         value={form.landmark}
                         onChange={e => setForm(f => ({ ...f, landmark: e.target.value }))}
@@ -261,7 +222,7 @@ const Address = () => {
 
                     {/* City */}
                     <div>
-                      <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1 block">City *</label>
+                      <label className="text-[10px] font-bold text-gray-400 uppercase  mb-1 block">City *</label>
                       <input
                         value={form.city}
                         onChange={e => setForm(f => ({ ...f, city: e.target.value }))}
@@ -272,7 +233,7 @@ const Address = () => {
 
                     {/* State */}
                     <div>
-                      <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1 block">State</label>
+                      <label className="text-[10px] font-bold text-gray-400 uppercase  mb-1 block">State</label>
                       <input
                         value={form.state}
                         onChange={e => setForm(f => ({ ...f, state: e.target.value }))}
@@ -283,7 +244,7 @@ const Address = () => {
 
                     {/* Pincode */}
                     <div>
-                      <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1 block">Pincode *</label>
+                      <label className="text-[10px] font-bold text-gray-400 uppercase  mb-1 block">Pincode *</label>
                       <input
                         value={form.pincode}
                         onChange={e => setForm(f => ({ ...f, pincode: e.target.value }))}
@@ -294,7 +255,7 @@ const Address = () => {
 
                     {/* Phone 1 */}
                     <div>
-                      <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1 block">Phone 1 *</label>
+                      <label className="text-[10px] font-bold text-gray-400 uppercase  mb-1 block">Phone 1 *</label>
                       <input
                         value={form.phone1}
                         onChange={e => setForm(f => ({ ...f, phone1: e.target.value }))}
@@ -305,7 +266,7 @@ const Address = () => {
 
                     {/* Phone 2 */}
                     <div>
-                      <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1 block">Phone 2 (Optional)</label>
+                      <label className="text-[10px] font-bold text-gray-400 uppercase  mb-1 block">Phone 2 (Optional)</label>
                       <input
                         value={form.phone2}
                         onChange={e => setForm(f => ({ ...f, phone2: e.target.value }))}
@@ -319,7 +280,7 @@ const Address = () => {
                       <button
                         type="submit"
                         disabled={isSaving}
-                        className="flex-1 bg-primary hover:bg-primary-hover text-white text-xs font-bold uppercase tracking-wider py-3 rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+                        className="flex-1 bg-primary hover:bg-primary-hover text-white text-xs font-bold uppercase  py-3 rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
                       >
                         {isSaving ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
                         {editingId ? 'Save Changes' : 'Add Address'}
@@ -342,7 +303,7 @@ const Address = () => {
                   <div className="flex items-center justify-center py-24">
                     <div className="flex flex-col items-center gap-3">
                       <Loader2 className="animate-spin text-primary" size={32} />
-                      <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Loading Addresses...</p>
+                      <p className="text-xs font-bold text-gray-400 uppercase ">Loading Addresses...</p>
                     </div>
                   </div>
                 ) : addresses.length === 0 ? (
@@ -350,7 +311,7 @@ const Address = () => {
                     <div className="w-16 h-16 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-center mb-4">
                       <MapPin size={28} className="text-gray-300" />
                     </div>
-                    <p className="text-sm font-extrabold text-gray-400 uppercase tracking-widest mb-1">No Addresses Yet</p>
+                    <p className="text-sm font-extrabold text-gray-400 uppercase  mb-1">No Addresses Yet</p>
                     <p className="text-xs text-gray-400 mb-6">Add a delivery address to get started</p>
                     <button onClick={openAdd} className="flex items-center gap-2 bg-primary text-white text-xs font-bold uppercase px-5 py-3 rounded-xl cursor-pointer hover:bg-primary-hover transition-all shadow-md shadow-primary/20">
                       <Plus size={14} /> Add Your First Address
@@ -422,7 +383,7 @@ const Address = () => {
                       <div className="w-10 h-10 rounded-xl bg-gray-50 group-hover:bg-primary/5 border border-gray-100 group-hover:border-primary/20 flex items-center justify-center transition-all">
                         <Plus size={20} />
                       </div>
-                      <span className="text-[10px] font-bold uppercase tracking-wider">Add Another Address</span>
+                      <span className="text-[10px] font-bold uppercase ">Add Another Address</span>
                     </button>
                   </div>
                 )}

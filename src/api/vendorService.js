@@ -41,9 +41,16 @@ export const getVendorDetails = async () => {
 export const getVendorProducts = async (params = {}) => {
   try {
     const response = await apiClient.get('/product/fetch-products', { params });
-       console.log(response.data); // data check
-
-    return response.data;
+    console.log(response.data); // data check
+    
+    // Support nested response shapes cleanly
+    if (response.data && response.data.success) {
+      return response.data;
+    }
+    return {
+      success: true,
+      data: response.data
+    };
   } catch (error) {
     console.error('Fetch vendor products error:', error);
     return error.response?.data || {
@@ -79,7 +86,14 @@ export const deleteProduct = async (productId) => {
 export const getProductDetails = async (productId) => {
   try {
     const response = await apiClient.get(`/product/product-details/${productId}`);
-    return response.data;
+    // Support nested response payload schemas
+    if (response.data && response.data.success) {
+      return response.data;
+    }
+    return {
+      success: true,
+      data: response.data
+    };
   } catch (error) {
     console.error('Fetch product details error:', error);
     return error.response?.data || {
@@ -125,15 +139,35 @@ export const createProduct = async (data) => {
     formData.append('metaDescription', data.metaDescription || '');
     formData.append('status', data.status || 'ACTIVE');
     formData.append('hasVariants', data.hasVariants || false);
+    formData.append('isShippingApply', data.isShippingApply !== undefined ? data.isShippingApply : true);
 
     // Variants Handling
     if (data.variants && data.variants.length > 0) {
       data.variants.forEach((variant, vIdx) => {
         formData.append(`variants[${vIdx}].sku`, variant.sku);
-        formData.append(`variants[${vIdx}].price`, variant.price);
         formData.append(`variants[${vIdx}].salesPrice`, variant.salesPrice);
         formData.append(`variants[${vIdx}].stock`, variant.stock);
         
+        // Add new optional fields
+        if (variant.costPrice !== undefined && variant.costPrice !== '') {
+          formData.append(`variants[${vIdx}].costPrice`, variant.costPrice);
+        }
+        if (variant.offeredPrice !== undefined && variant.offeredPrice !== '') {
+          formData.append(`variants[${vIdx}].offeredPrice`, variant.offeredPrice);
+        }
+        if (variant.weight !== undefined && variant.weight !== '') {
+          formData.append(`variants[${vIdx}].weight`, variant.weight);
+        }
+        if (variant.length !== undefined && variant.length !== '') {
+          formData.append(`variants[${vIdx}].length`, variant.length);
+        }
+        if (variant.width !== undefined && variant.width !== '') {
+          formData.append(`variants[${vIdx}].width`, variant.width);
+        }
+        if (variant.height !== undefined && variant.height !== '') {
+          formData.append(`variants[${vIdx}].height`, variant.height);
+        }
+
         // Variant Attributes
         if (variant.attributes) {
           Object.keys(variant.attributes).forEach(key => {
@@ -151,6 +185,13 @@ export const createProduct = async (data) => {
             formData.append(`variant_${vIdx}_images`, img);
           });
         }
+      });
+    }
+
+    // Add optional tags handling
+    if (data.tags && data.tags.length > 0) {
+      data.tags.forEach((tag, idx) => {
+        formData.append(`tags[${idx}]`, tag);
       });
     }
 
@@ -184,6 +225,7 @@ export const updateProduct = async (id, data) => {
     formData.append('metaTitle', data.metaTitle || '');
     formData.append('metaDescription', data.metaDescription || '');
     formData.append('status', data.status || 'ACTIVE');
+    formData.append('isShippingApply', data.isShippingApply !== undefined ? data.isShippingApply : true);
 
     if (data.variants && data.variants.length > 0) {
       data.variants.forEach((variant, vIdx) => {
@@ -193,10 +235,29 @@ export const updateProduct = async (id, data) => {
         }
         
         formData.append(`variants[${vIdx}].sku`, variant.sku);
-        formData.append(`variants[${vIdx}].price`, variant.price);
         formData.append(`variants[${vIdx}].salesPrice`, variant.salesPrice);
         formData.append(`variants[${vIdx}].stock`, variant.stock);
         
+        // Add new optional fields
+        if (variant.costPrice !== undefined && variant.costPrice !== '') {
+          formData.append(`variants[${vIdx}].costPrice`, variant.costPrice);
+        }
+        if (variant.offeredPrice !== undefined && variant.offeredPrice !== '') {
+          formData.append(`variants[${vIdx}].offeredPrice`, variant.offeredPrice);
+        }
+        if (variant.weight !== undefined && variant.weight !== '') {
+          formData.append(`variants[${vIdx}].weight`, variant.weight);
+        }
+        if (variant.length !== undefined && variant.length !== '') {
+          formData.append(`variants[${vIdx}].length`, variant.length);
+        }
+        if (variant.width !== undefined && variant.width !== '') {
+          formData.append(`variants[${vIdx}].width`, variant.width);
+        }
+        if (variant.height !== undefined && variant.height !== '') {
+          formData.append(`variants[${vIdx}].height`, variant.height);
+        }
+
         if (variant.attributes) {
           Object.keys(variant.attributes).forEach(key => {
             formData.append(`variants[${vIdx}].attributes.${key}`, variant.attributes[key]);
@@ -215,6 +276,13 @@ export const updateProduct = async (id, data) => {
             }
           });
         }
+      });
+    }
+
+    // Add optional tags handling
+    if (data.tags && data.tags.length > 0) {
+      data.tags.forEach((tag, idx) => {
+        formData.append(`tags[${idx}]`, tag);
       });
     }
 
@@ -346,13 +414,157 @@ export const editVendorDetails = async (formData) => {
  */
 export const getVendorCategories = async () => {
   try {
-    const response = await apiClient.get('/vendor/vendor-categories');
+    const response = await apiClient.get('/admin-public/categories');
     return response.data;
   } catch (error) {
     console.error('Fetch vendor categories error:', error);
     return error.response?.data || {
       success: false,
       message: 'Failed to fetch vendor categories.',
+      statusCode: 500
+    };
+  }
+};
+
+/**
+ * Fetch all vendor orders
+ * Method: GET
+ * URL: /vendor/vendor-orders
+ */
+export const getVendorOrders = async (params = {}) => {
+  try {
+    const response = await apiClient.get('/vendor/vendor-orders', { params });
+    return response.data;
+  } catch (error) {
+    console.error('Fetch vendor orders error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to fetch vendor orders.',
+      statusCode: 500
+    };
+  }
+};
+
+/**
+ * Update an existing vendor order status
+ * Method: PUT
+ * URL: /vendor/update-order/:orderId
+ * @param {string} orderId
+ * @param {Object} data - { orderStatus, paymentStatus, trackingId, cancellationReason }
+ */
+export const updateVendorOrder = async (orderId, data) => {
+  try {
+    // Remove empty or undefined fields to satisfy backend validation and avoid conflict errors
+    const cleanData = {};
+    if (data.orderStatus) cleanData.orderStatus = data.orderStatus;
+    if (data.paymentStatus) cleanData.paymentStatus = data.paymentStatus;
+    if (data.trackingId) cleanData.trackingId = data.trackingId;
+    if (data.cancellationReason) cleanData.cancellationReason = data.cancellationReason;
+    const response = await apiClient.put(`/vendor/update-order/${orderId}`, cleanData);
+    return response.data;
+  } catch (error) {
+    console.error('Update vendor order error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to update order.',
+      statusCode: 500
+    };
+  }
+};
+
+/**
+ * Get vendor dashboard overview analytics
+ * Method: GET
+ * URL: /vendor/overview
+ */
+export const getVendorOverview = async () => {
+  try {
+    const response = await apiClient.get('/vendor/overview');
+    return response.data;
+  } catch (error) {
+    console.error('Fetch vendor overview error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to fetch vendor dashboard overview.',
+      statusCode: 500
+    };
+  }
+};
+
+/**
+ * Fetch top selling products of the active vendor
+ * Method: GET
+ * URL: /vendor/top-products
+ */
+export const getVendorTopProducts = async () => {
+  try {
+    const response = await apiClient.get('/vendor/top-products');
+    return response.data;
+  } catch (error) {
+    console.error('Fetch vendor top products error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to fetch top selling products.',
+      statusCode: 500
+    };
+  }
+};
+
+/**
+ * Fetch vendor order graph data over a number of days
+ * Method: GET
+ * URL: /vendor/order-graph
+ * @param {number} days - optional range (e.g. 20)
+ */
+export const getVendorOrderGraph = async (days = 20) => {
+  try {
+    const response = await apiClient.get('/vendor/order-graph', {
+      params: { days }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Fetch vendor order graph error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to fetch vendor order graph data.',
+      statusCode: 500
+    };
+  }
+};
+
+/**
+ * Fetch top performing categories of the active vendor
+ * Method: GET
+ * URL: /vendor/top-categories
+ */
+export const getVendorTopCategories = async () => {
+  try {
+    const response = await apiClient.get('/vendor/top-categories');
+    return response.data;
+  } catch (error) {
+    console.error('Fetch vendor top categories error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to fetch top categories.',
+      statusCode: 500
+    };
+  }
+};
+
+/**
+ * Fetch order and revenue comparisons between current and previous month
+ * Method: GET
+ * URL: /vendor/order-comparison
+ */
+export const getVendorOrderComparison = async () => {
+  try {
+    const response = await apiClient.get('/vendor/order-comparison');
+    return response.data;
+  } catch (error) {
+    console.error('Fetch vendor order comparison error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to fetch order comparison data.',
       statusCode: 500
     };
   }

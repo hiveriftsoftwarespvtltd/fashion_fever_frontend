@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, ShoppingBag, Menu, ChevronDown, Wallet, User, LogOut, Settings, UserCircle, X, Heart } from 'lucide-react';
+import { Search, ShoppingBag, Menu, ChevronDown, Wallet, User, LogOut, Settings, UserCircle, X, Heart, LayoutDashboard } from 'lucide-react';
 import { useUser } from '../context/UserContext';
 import { useSearch } from '../context/SearchContext';
 import { useCart } from '../context/CartContext';
+import { useWishlist } from '../context/WishlistContext';
 import CartDrawer from './CartDrawer';
 import logo from '../assets/logo.png.jpeg';
 
@@ -12,6 +13,7 @@ const Navbar = () => {
   const { user, logout } = useUser();
   const { searchQuery, setSearchQuery } = useSearch();
   const { cartCount } = useCart();
+  const { wishlistCount } = useWishlist();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -84,22 +86,6 @@ const Navbar = () => {
                     {link.name}
                   </Link>
                 ))}
-
-                {/* Portals Dropdown */}
-                {/* <div className="relative group">
-                  <button className="text-[13px] font-bold text-[#3f414d] hover:text-primary transition-all uppercase flex items-center gap-1">
-                    Portals <ChevronDown size={14} />
-                  </button>
-                  <div className="absolute top-full left-0 bg-white shadow-2xl rounded-2xl border border-gray-50 p-4 w-64 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all z-[200]">
-                    <div className="flex flex-col gap-1">
-                      {dashboardLinks.map((link) => (
-                        <Link key={link.name} to={link.path} className="px-4 py-3 hover:bg-gray-50 rounded-xl text-xs font-bold text-gray-700 hover:text-primary transition-all">
-                          {link.name}
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                </div> */}
               </div>
             </div>
 
@@ -123,6 +109,11 @@ const Navbar = () => {
               <div className="flex items-center gap-3 lg:gap-5">
                 <Link to="/wishlist" className="text-[#3f414d] hover:text-primary transition-colors p-1 relative group">
                   <Heart size={22} strokeWidth={2} />
+                  {wishlistCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-primary text-white text-[8px] font-bold w-4 h-4 flex items-center justify-center rounded-full shadow-sm transition-all duration-300 scale-100">
+                      {wishlistCount}
+                    </span>
+                  )}
                 </Link>
 
                 <button
@@ -184,6 +175,26 @@ const Navbar = () => {
                           </div>
 
                           <div className="p-1.5 flex flex-col gap-0.5">
+                            {user.role === 'admin' && (
+                              <Link to="/admin" className="flex items-center gap-3 px-3.5 py-2.5 hover:bg-gray-50 rounded-xl text-[12px] font-bold text-gray-600 hover:text-primary transition-all">
+                                <LayoutDashboard size={16} /> Admin Panel
+                              </Link>
+                            )}
+                            {user.role === 'vendor' && (
+                              <Link to="/vendor/dashboard" className="flex items-center gap-3 px-3.5 py-2.5 hover:bg-gray-50 rounded-xl text-[12px] font-bold text-gray-600 hover:text-primary transition-all">
+                                <LayoutDashboard size={16} /> Vendor Dashboard
+                              </Link>
+                            )}
+                            {user.role === 'influencer' && (
+                              <Link to="/influencer/dashboard" className="flex items-center gap-3 px-3.5 py-2.5 hover:bg-gray-50 rounded-xl text-[12px] font-bold text-gray-600 hover:text-primary transition-all">
+                                <LayoutDashboard size={16} /> Influencer Portal
+                              </Link>
+                            )}
+                            {user.role === 'distributor' && (
+                              <Link to="/distributor/dashboard" className="flex items-center gap-3 px-3.5 py-2.5 hover:bg-gray-50 rounded-xl text-[12px] font-bold text-gray-600 hover:text-primary transition-all">
+                                <LayoutDashboard size={16} /> Distributor Portal
+                              </Link>
+                            )}
                             <Link to="/profile" className="flex items-center gap-3 px-3.5 py-2.5 hover:bg-gray-50 rounded-xl text-[12px] font-bold text-gray-600 hover:text-primary transition-all">
                               <User size={16} /> My Profile
                             </Link>

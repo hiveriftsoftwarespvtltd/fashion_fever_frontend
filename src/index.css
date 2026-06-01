@@ -1,8 +1,8 @@
-/* Tailwind must be first */
-@import "tailwindcss";
-
-/* Premium Google Fonts */
+/* Premium Google Fonts - Must be at the very top */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap');
+
+/* Tailwind must be first of framework imports */
+@import "tailwindcss";
 
 /* Root Variables */
 :root {
@@ -22,6 +22,7 @@ body {
   background-color: var(--bg-site);
   color: var(--text-dark);
   line-height: 1.6;
+  text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -36,7 +37,7 @@ body {
   --font-outfit: 'Outfit', sans-serif;
 }
 
-/* Headings */
+/* Headings - Reduced default weight to 700 (Bold) for maximum clarity and subpixel sharpness */
 h1,
 h2,
 h3,
@@ -44,8 +45,10 @@ h4,
 h5,
 h6 {
   font-family: 'Outfit', sans-serif;
-  font-weight: 800;
+  font-weight: 700;
   color: var(--text-dark);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
 
 /* Links */
@@ -61,4 +64,9 @@ button {
   border: none;
   outline: none;
   font-family: inherit;
+}
+
+/* Ensure SweetAlert2 Toast/Alert Container is always on top of modals & blurred backdrops */
+.swal2-container {
+  z-index: 99999 !important;
 }

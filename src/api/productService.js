@@ -6,7 +6,7 @@ import apiClient from './apiClient';
  */
 export const getProducts = async (params = {}) => {
   try {
-    const response = await apiClient.get('/user/products', { params });
+    const response = await apiClient.get('/public-user/products', { params });
     return response.data;
   } catch (error) {
     console.error('Fetch products error:', error);

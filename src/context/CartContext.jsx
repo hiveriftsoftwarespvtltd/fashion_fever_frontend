@@ -7,7 +7,7 @@ import {
   decrementCartQuantity,
   clearCart as apiClearCart
 } from '../api/cartService';
-import toast from 'react-hot-toast';
+import { toast } from '../utils/toast';
 
 const CartContext = createContext();
 
@@ -15,11 +15,13 @@ export const CartProvider = ({ children }) => {
   const { user } = useUser();
   const [cart, setCart] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [cartId, setCartId] = useState(null);
 
   // Sync / Fetch user's cart from backend database
   const fetchUserCart = async () => {
     if (!user) {
       setCart([]);
+      setCartId(null);
       return;
     }
     
@@ -27,6 +29,7 @@ export const CartProvider = ({ children }) => {
     try {
       const res = await getUserCart();
       if (res?.success) {
+        setCartId(res.data?._id || res.data?.id || null);
         const items = res.data?.items || [];
         const formatted = items.map(item => ({
           id: item.variant?._id || item.product?._id,
@@ -154,7 +157,8 @@ export const CartProvider = ({ children }) => {
       clearCart,
       cartTotal, 
       cartCount,
-      fetchUserCart
+      fetchUserCart,
+      cartId
     }}>
       {children}
     </CartContext.Provider>

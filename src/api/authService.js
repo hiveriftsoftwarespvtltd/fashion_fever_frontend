@@ -207,3 +207,15 @@ export const deleteAddress = async (id) => {
   }
 };
 
+/** Fetch user orders history */
+export const getUserOrders = async () => {
+  try {
+    const response = await apiClient.get('/orders/user-orders');
+    return response.data;
+  } catch (error) {
+    console.error('Fetch user orders error:', error);
+    return error.response?.data || { success: false, message: 'Failed to fetch orders history', statusCode: 500 };
+  }
+};
+
+

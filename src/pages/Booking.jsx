@@ -9,7 +9,7 @@ import {
   Search,
   Navigation
 } from 'lucide-react';
-import toast from 'react-hot-toast';
+import { toast } from '../utils/toast';
 
 const Booking = () => {
   const [selectedDate, setSelectedDate] = useState('2024-05-15');
@@ -60,10 +60,10 @@ const Booking = () => {
       {/* Search Header */}
       <div className="bg-white border-b border-gray-100 py-16">
         <div className="container mx-auto px-4 max-w-3xl text-center">
-          <h1 className="text-3xl lg:text-5xl font-black text-gray-900 uppercase tracking-tight mb-4">
+          <h1 className="text-3xl lg:text-5xl font-black text-gray-900 uppercase  mb-4">
             Book Your Service
           </h1>
-          <p className="text-xs lg:text-sm text-gray-500 font-bold uppercase tracking-wider mb-8">
+          <p className="text-xs lg:text-sm text-gray-500 font-bold uppercase  mb-8">
             Professional beauty services at your doorstep or our nearest lounge.
           </p>
           
@@ -75,10 +75,10 @@ const Booking = () => {
                 placeholder="Your Location" 
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                className="w-full pl-11 pr-4 py-3.5 bg-white border border-gray-100 rounded-xl font-bold text-xs uppercase tracking-wider outline-none shadow-sm focus:border-primary/20 transition-all text-gray-700" 
+                className="w-full pl-11 pr-4 py-3.5 bg-white border border-gray-100 rounded-xl font-bold text-xs uppercase  outline-none shadow-sm focus:border-primary/20 transition-all text-gray-700" 
               />
             </div>
-            <button className="bg-primary hover:bg-primary-hover text-white px-8 py-3.5 rounded-xl font-black uppercase text-[10px] tracking-widest flex items-center justify-center gap-2 transition-all shadow-md shadow-primary/20 cursor-pointer">
+            <button className="bg-primary hover:bg-primary-hover text-white px-8 py-3.5 rounded-xl font-black uppercase text-[10px]  flex items-center justify-center gap-2 transition-all shadow-md shadow-primary/20 cursor-pointer">
               <Search size={14} /> Find Salons
             </button>
           </div>
@@ -92,9 +92,9 @@ const Booking = () => {
           {/* Salon Listing */}
           <div className="lg:col-span-2 space-y-8">
             <div className="flex items-center justify-between border-b border-gray-100 pb-4">
-              <h2 className="text-lg font-black uppercase tracking-wider text-gray-800 flex items-center gap-2.5">
+              <h2 className="text-lg font-black uppercase  text-gray-800 flex items-center gap-2.5">
                 Nearby Salons 
-                <span className="bg-primary/10 text-primary text-[9px] font-black tracking-widest px-2.5 py-1 rounded-lg uppercase">
+                <span className="bg-primary/10 text-primary text-[9px] font-black  px-2.5 py-1 rounded-lg uppercase">
                   Top Rated
                 </span>
               </h2>
@@ -125,10 +125,10 @@ const Booking = () => {
                     </div>
                     <div className="p-6 text-left">
                       <div className="flex items-center justify-between mb-2">
-                        <h3 className="text-base font-extrabold text-gray-800 uppercase tracking-tight truncate max-w-[170px]">
+                        <h3 className="text-base font-extrabold text-gray-800 uppercase  truncate max-w-[170px]">
                           {salon.name}
                         </h3>
-                        <span className="text-[9px] font-black text-primary uppercase tracking-widest flex items-center gap-1 bg-primary/5 px-2 py-0.5 rounded-md">
+                        <span className="text-[9px] font-black text-primary uppercase  flex items-center gap-1 bg-primary/5 px-2 py-0.5 rounded-md">
                           <Navigation size={9} /> {salon.distance}
                         </span>
                       </div>
@@ -138,7 +138,7 @@ const Booking = () => {
                       
                       <button 
                         onClick={() => setSelectedSalon(salon)}
-                        className={`w-full py-3 rounded-xl font-black uppercase text-[10px] tracking-wider transition-all cursor-pointer ${
+                        className={`w-full py-3 rounded-xl font-black uppercase text-[10px]  transition-all cursor-pointer ${
                           isSelected 
                             ? 'bg-primary text-white shadow-md shadow-primary/10' 
                             : 'border-2 border-primary/25 hover:border-primary text-primary hover:bg-primary hover:text-white'
@@ -156,22 +156,22 @@ const Booking = () => {
           {/* Booking Summary / Slot Picker */}
           <div className="space-y-8">
             <div className="bg-white rounded-2xl p-6 lg:p-8 border border-gray-100 shadow-xl sticky top-[100px] lg:top-[120px] text-left">
-              <h2 className="text-sm font-black uppercase tracking-wider text-gray-800 mb-6 pb-3 border-b border-gray-50 flex items-center gap-2">
+              <h2 className="text-sm font-black uppercase  text-gray-800 mb-6 pb-3 border-b border-gray-50 flex items-center gap-2">
                 <CalendarIcon size={16} className="text-primary" /> Select Slot
               </h2>
               
               {/* Salon info if selected */}
               {selectedSalon && (
                 <div className="mb-6 p-4 bg-gray-50 border border-gray-100 rounded-xl">
-                  <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest block mb-1">Selected Location</span>
-                  <p className="text-xs font-black text-gray-800 uppercase tracking-tight truncate">{selectedSalon.name}</p>
-                  <p className="text-[9px] font-bold text-gray-500 uppercase tracking-wider mt-0.5">{selectedSalon.location}</p>
+                  <span className="text-[8px] font-black text-gray-400 uppercase  block mb-1">Selected Location</span>
+                  <p className="text-xs font-black text-gray-800 uppercase  truncate">{selectedSalon.name}</p>
+                  <p className="text-[9px] font-bold text-gray-500 uppercase  mt-0.5">{selectedSalon.location}</p>
                 </div>
               )}
 
               {/* Date Picker */}
               <div className="space-y-3 mb-6">
-                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block">
+                <span className="text-[10px] font-black text-gray-400 uppercase  block">
                   Choose Date
                 </span>
                 <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
@@ -185,7 +185,7 @@ const Booking = () => {
                           : 'bg-gray-50 text-gray-400 hover:bg-gray-100 hover:text-gray-600'
                       }`}
                     >
-                      <span className="text-[8px] font-black uppercase tracking-wider">May</span>
+                      <span className="text-[8px] font-black uppercase ">May</span>
                       <span className="text-lg font-black">{d}</span>
                     </button>
                   ))}
@@ -194,7 +194,7 @@ const Booking = () => {
 
               {/* Time Slot Grid */}
               <div className="space-y-3 mb-6">
-                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block">
+                <span className="text-[10px] font-black text-gray-400 uppercase  block">
                   Available Slots
                 </span>
                 <div className="grid grid-cols-3 gap-2">
@@ -219,10 +219,10 @@ const Booking = () => {
                 <div className="flex items-center gap-3 p-3.5 bg-green-50/50 border border-green-100/50 rounded-xl">
                   <ShieldCheck className="text-green-600" size={18} />
                   <div className="flex flex-col">
-                    <span className="text-[9px] font-black text-green-600 uppercase tracking-wider leading-none mb-0.5">
+                    <span className="text-[9px] font-black text-green-600 uppercase  leading-none mb-0.5">
                       Instant Confirmation
                     </span>
-                    <span className="text-[8px] font-bold text-green-600/70 uppercase tracking-wider">
+                    <span className="text-[8px] font-bold text-green-600/70 uppercase ">
                       Pay after service
                     </span>
                   </div>
@@ -231,7 +231,7 @@ const Booking = () => {
 
               <button 
                 onClick={handleBooking}
-                className="w-full bg-primary hover:bg-primary-hover text-white py-4 rounded-xl font-black uppercase text-xs tracking-widest shadow-lg shadow-primary/20 flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:shadow-none cursor-pointer" 
+                className="w-full bg-primary hover:bg-primary-hover text-white py-4 rounded-xl font-black uppercase text-xs  shadow-lg shadow-primary/20 flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:shadow-none cursor-pointer" 
                 disabled={!selectedSlot || !selectedSalon}
               >
                 Confirm Booking <ChevronRight size={14} />
