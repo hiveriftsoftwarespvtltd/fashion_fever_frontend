@@ -8,10 +8,11 @@ import Home from './pages/Home';
 import Auth from './pages/Auth';
 import Shop from './pages/Shop';
 import ProductDetail from './pages/ProductDetail';
-import VendorDashboard from './pages/VendorDashboard';
+import VendorDashboard from './pages/vendor/VendorDashboard';
 import InfluencerDashboard from './pages/InfluencerDashboard';
 import Booking from './pages/Booking';
 import AdminPanel from './pages/admin/AdminPanel';
+import ServiceProviderPanel from './pages/service_provider/ServiceProviderPanel';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import Wallet from './pages/profile/Wallet';
@@ -50,7 +51,8 @@ const App = () => {
   const isDashboard = location.pathname.startsWith('/admin') ||
     location.pathname.startsWith('/vendor') ||
     location.pathname.startsWith('/influencer') ||
-    location.pathname.startsWith('/distributor');
+    location.pathname.startsWith('/distributor') ||
+    location.pathname.startsWith('/service-provider');
 
   return (
     <UserProvider>
@@ -99,6 +101,12 @@ const App = () => {
               <Route path="/distributor/dashboard" element={
                 <RoleGuard allowedRoles={['distributor', 'admin']}>
                   <DistributorDashboard />
+                </RoleGuard>
+              } />
+
+              <Route path="/service-provider/dashboard" element={
+                <RoleGuard allowedRoles={['service_provider', 'admin']}>
+                  <ServiceProviderPanel />
                 </RoleGuard>
               } />
 

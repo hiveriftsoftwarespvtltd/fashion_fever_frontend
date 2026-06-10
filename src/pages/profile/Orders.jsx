@@ -19,11 +19,13 @@ import {
 import UserSidebar from './UserSidebar';
 import { getUserOrders } from '../../api/authService';
 import { toast } from '../../utils/toast';
+import apiClient from '../../api/apiClient';
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('all');
+  const [productDetails, setProductDetails] = useState({});
 
   const fetchOrders = async () => {
     setIsLoading(true);
@@ -46,6 +48,93 @@ const Orders = () => {
   useEffect(() => {
     fetchOrders();
   }, []);
+
+  useEffect(() => {
+    if (orders.length === 0) return;
+
+    // Gather all unique product IDs from orders
+    const productIds = new Set();
+    orders.forEach(order => {
+      order.vendorOrders?.forEach(vendorOrd => {
+        vendorOrd.items?.forEach(item => {
+          const pId = item.productId?._id || item.productId;
+          if (pId && typeof pId === 'string') {
+            productIds.add(pId);
+          }
+        });
+      });
+    });
+
+    const uniqueProductIds = Array.from(productIds);
+    if (uniqueProductIds.length === 0) return;
+
+    // Fetch product details for all unique product IDs
+    const fetchAllDetails = async () => {
+      const detailsMap = { ...productDetails };
+      let updated = false;
+
+      // We only fetch product details that we don't already have in productDetails
+      const toFetch = uniqueProductIds.filter(pId => !detailsMap[pId]);
+      if (toFetch.length === 0) return;
+
+      try {
+        const fetchPromises = toFetch.map(async (pId) => {
+          try {
+            const response = await apiClient.get(`/public-user/product-details/${pId}`);
+            const product = response?.data?.data?.data || response?.data?.data;
+            return { pId, product };
+          } catch (err) {
+            console.error(`Failed to load product details for ${pId}:`, err);
+            return { pId, product: null };
+          }
+        });
+
+        const results = await Promise.all(fetchPromises);
+        results.forEach(({ pId, product }) => {
+          if (product) {
+            detailsMap[pId] = product;
+            updated = true;
+          }
+        });
+
+        if (updated) {
+          setProductDetails(detailsMap);
+        }
+      } catch (err) {
+        console.error("Error fetching product details for orders list:", err);
+      }
+    };
+
+    fetchAllDetails();
+  }, [orders]);
+
+  const getVariantImage = (item) => {
+    const pId = item.productId?._id || item.productId;
+    const vId = item.variantId?._id || item.variantId;
+    
+    if (pId && vId && productDetails[pId]) {
+      const product = productDetails[pId];
+      const variant = product.variants?.find(v => v._id === vId);
+      if (variant) {
+        if (variant.thumbnail?.url) return variant.thumbnail.url;
+        if (typeof variant.thumbnail === 'string') return variant.thumbnail;
+        if (variant.images?.[0]?.url) return variant.images[0].url;
+        if (typeof variant.images?.[0] === 'string') return variant.images[0];
+      }
+    }
+    
+    // Fallbacks if not yet loaded or not found
+    if (item.variantId?.thumbnail?.url) return item.variantId.thumbnail.url;
+    if (typeof item.variantId?.thumbnail === 'string' && !item.variantId.thumbnail.match(/^[0-9a-fA-F]{24}$/)) {
+      return item.variantId.thumbnail;
+    }
+    if (item.variantId?.images?.[0]?.url) return item.variantId.images[0].url;
+    if (typeof item.variantId?.images?.[0] === 'string' && !item.variantId.images[0].match(/^[0-9a-fA-F]{24}$/)) {
+      return item.variantId.images[0];
+    }
+    
+    return 'https://images.unsplash.com/photo-1586776977607-310e9c725c37?w=100&h=100&fit=crop';
+  };
 
   const getStatusBadge = (status) => {
     const s = status?.toLowerCase() || 'pending';
@@ -215,7 +304,7 @@ const Orders = () => {
                                 <div key={item._id || idx} className="flex gap-4 items-start group pb-4 border-b border-gray-100 last:border-0 last:pb-0">
                                   <div className="w-16 h-16 rounded-2xl bg-gray-50 border border-gray-100 flex-shrink-0 overflow-hidden relative">
                                     <img 
-                                      src={item.variantId?.images?.[0] || 'https://images.unsplash.com/photo-1586776977607-310e9c725c37?w=100&h=100&fit=crop'} 
+                                      src={getVariantImage(item)} 
                                       alt="" 
                                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                                       onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1586776977607-310e9c725c37?w=100&h=100&fit=crop'; }}

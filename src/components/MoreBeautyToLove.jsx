@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import bannerImg from '../assets/banner.png';
 
 const MoreBeautyToLove = () => {
  const categoriesRef = useRef(null);
@@ -82,18 +83,13 @@ const MoreBeautyToLove = () => {
       <img src={wellness.logo} alt="Nykaa Wellness Logo" className="h-6 md:h-8 object-contain" />
      </div>
 
-     <div className="w-full grid grid-cols-3 mb-12 shadow-sm rounded-2xl overflow-hidden border border-gray-100">
-      {wellness.banners.map((img, index) => (
-       <div key={index} className="relative group overflow-hidden">
-        <img 
-         src={img} 
-         alt="banner" 
-         className="w-full h-[120px] md:h-[230px] object-cover transition-transform duration-500 group-hover:scale-105" 
-        />
-        {/* Optional subtile border to separate images if they look too similar */}
-        <div className="absolute inset-0 border-r border-white/10 last:border-0 pointer-events-none"></div>
-       </div>
-      ))}
+     {/* Single full-width banner */}
+     <div className="w-full mb-12 rounded-2xl overflow-hidden shadow-sm border border-gray-100">
+      <img
+       src={bannerImg}
+       alt="Explore Wellness"
+       className="w-full h-auto block"
+      />
      </div>
 
      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">

@@ -9,7 +9,7 @@ export const UserProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   // Safe Local Storage Session Loader
-  useEffect(() => {
+  useEffect(() => { 
     const bootstrapAuth = async () => {
       try {
         const sessionStr = localStorage.getItem('user_session');

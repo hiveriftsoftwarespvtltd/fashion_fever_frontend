@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { X, Upload } from 'lucide-react';
 import Swal from 'sweetalert2';
-import { editVendorDetails } from '../../api/vendorService';
+import { editVendorDetails } from '../../../api/vendorService';
+import { useTheme } from '../../../context/ThemeContext';
 
 const Toast = Swal.mixin({
   toast: true,
@@ -12,6 +13,7 @@ const Toast = Swal.mixin({
 });
 
 const EditProfileModal = ({ isOpen, onClose, initialData, onSuccess }) => {
+  const { isDarkMode } = useTheme();
   const [editForm, setEditForm] = useState({
     businessName: initialData?.businessName || '',
     slug: initialData?.slug || '',
@@ -68,10 +70,14 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onSuccess }) => {
 
   return (
     <div className="fixed inset-0 bg-black/60 z-[1000] flex items-center justify-center p-4">
-      <div className="bg-white w-full max-w-2xl rounded-2xl overflow-hidden shadow-2xl max-h-[90vh] overflow-y-auto">
-        <div className="p-6 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white z-10">
+      <div className={`w-full max-w-2xl rounded-2xl overflow-hidden shadow-2xl max-h-[90vh] overflow-y-auto transition-colors duration-300 ${
+        isDarkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-800'
+      }`}>
+        <div className={`p-6 border-b flex items-center justify-between sticky top-0 z-10 ${
+          isDarkMode ? 'border-white/5 bg-gray-900 text-white' : 'border-gray-100 bg-white text-gray-800'
+        }`}>
           <h2 className="text-xl font-bold">Edit Store Profile</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+          <button onClick={onClose} className={`transition-colors cursor-pointer ${isDarkMode ? 'text-gray-500 hover:text-gray-300' : 'text-gray-400 hover:text-gray-600'}`}>
             <X size={20} />
           </button>
         </div>
@@ -83,7 +89,9 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onSuccess }) => {
                 type="text"
                 value={editForm.businessName}
                 onChange={(e) => setEditForm({ ...editForm, businessName: e.target.value })}
-                className="w-full px-4 py-2 bg-gray-50 border border-gray-100 rounded-lg text-xs font-bold outline-none focus:ring-2 focus:ring-primary/10 transition-all"
+                className={`w-full px-4 py-2 border rounded-lg text-xs font-bold outline-none focus:ring-2 focus:ring-primary/10 transition-all ${
+                  isDarkMode ? 'bg-gray-950 border-white/5 text-gray-200' : 'bg-gray-50 border-gray-100 text-gray-700'
+                }`}
               />
             </div>
             <div className="space-y-2">
@@ -92,7 +100,9 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onSuccess }) => {
                 type="text"
                 value={editForm.slug}
                 onChange={(e) => setEditForm({ ...editForm, slug: e.target.value })}
-                className="w-full px-4 py-2 bg-gray-50 border border-gray-100 rounded-lg text-xs font-bold outline-none focus:ring-2 focus:ring-primary/10 transition-all"
+                className={`w-full px-4 py-2 border rounded-lg text-xs font-bold outline-none focus:ring-2 focus:ring-primary/10 transition-all ${
+                  isDarkMode ? 'bg-gray-950 border-white/5 text-gray-200' : 'bg-gray-50 border-gray-100 text-gray-700'
+                }`}
               />
             </div>
           </div>
@@ -103,7 +113,9 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onSuccess }) => {
               rows="3"
               value={editForm.description}
               onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
-              className="w-full px-4 py-2 bg-gray-50 border border-gray-100 rounded-lg text-xs font-bold outline-none focus:ring-2 focus:ring-primary/10 transition-all"
+              className={`w-full px-4 py-2 border rounded-lg text-xs font-bold outline-none focus:ring-2 focus:ring-primary/10 transition-all ${
+                isDarkMode ? 'bg-gray-950 border-white/5 text-gray-250' : 'bg-gray-50 border-gray-100 text-gray-700'
+              }`}
             ></textarea>
           </div>
 
@@ -114,7 +126,9 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onSuccess }) => {
                 type="email"
                 value={editForm.email}
                 onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
-                className="w-full px-4 py-2 bg-gray-50 border border-gray-100 rounded-lg text-xs font-bold outline-none focus:ring-2 focus:ring-primary/10 transition-all"
+                className={`w-full px-4 py-2 border rounded-lg text-xs font-bold outline-none focus:ring-2 focus:ring-primary/10 transition-all ${
+                  isDarkMode ? 'bg-gray-950 border-white/5 text-gray-200' : 'bg-gray-50 border-gray-100 text-gray-700'
+                }`}
               />
             </div>
             <div className="space-y-2">
@@ -123,7 +137,9 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onSuccess }) => {
                 type="text"
                 value={editForm.phone}
                 onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
-                className="w-full px-4 py-2 bg-gray-50 border border-gray-100 rounded-lg text-xs font-bold outline-none focus:ring-2 focus:ring-primary/10 transition-all"
+                className={`w-full px-4 py-2 border rounded-lg text-xs font-bold outline-none focus:ring-2 focus:ring-primary/10 transition-all ${
+                  isDarkMode ? 'bg-gray-950 border-white/5 text-gray-200' : 'bg-gray-50 border-gray-100 text-gray-700'
+                }`}
               />
             </div>
           </div>
@@ -134,16 +150,20 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onSuccess }) => {
               type="text"
               value={editForm.address}
               onChange={(e) => setEditForm({ ...editForm, address: e.target.value })}
-              className="w-full px-4 py-3 bg-gray-50 border-none rounded-xl text-sm font-bold outline-none focus:ring-2 focus:ring-primary/20"
+              className={`w-full px-4 py-3 border rounded-xl text-sm font-bold outline-none focus:ring-2 focus:ring-primary/20 ${
+                isDarkMode ? 'bg-gray-950 border-white/5 text-gray-200' : 'bg-gray-50 border-gray-100 text-gray-700'
+              }`}
             />
           </div>
 
           <div className="grid grid-cols-2 gap-6">
             <div className="space-y-2">
               <label className="text-xs font-bold text-gray-400 uppercase">Update Logo</label>
-              <div className="relative group cursor-pointer h-32 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center gap-2 hover:bg-gray-100 transition-all">
+              <div className={`relative group cursor-pointer h-32 rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-2 transition-all ${
+                isDarkMode ? 'bg-gray-950 border-white/10 hover:bg-white/5' : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
+              }`}>
                 <Upload size={20} className="text-gray-400" />
-                <span className="text-xs font-bold text-gray-400 uppercase">Upload New Logo</span>
+                <span className="text-xs font-bold text-gray-400 uppercase">Upload Logo</span>
                 <input
                   type="file"
                   onChange={(e) => setEditForm({ ...editForm, logo: e.target.files[0] })}
@@ -154,9 +174,11 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onSuccess }) => {
             </div>
             <div className="space-y-2">
               <label className="text-xs font-bold text-gray-400 uppercase">Update Banner</label>
-              <div className="relative group cursor-pointer h-32 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center gap-2 hover:bg-gray-100 transition-all">
+              <div className={`relative group cursor-pointer h-32 rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-2 transition-all ${
+                isDarkMode ? 'bg-gray-950 border-white/10 hover:bg-white/5' : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
+              }`}>
                 <Upload size={20} className="text-gray-400" />
-                <span className="text-xs font-bold text-gray-400 uppercase">Upload New Banner</span>
+                <span className="text-xs font-bold text-gray-400 uppercase">Upload Banner</span>
                 <input
                   type="file"
                   onChange={(e) => setEditForm({ ...editForm, banner: e.target.files[0] })}
@@ -167,18 +189,20 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onSuccess }) => {
             </div>
           </div>
 
-          <div className="flex gap-4 pt-4 sticky bottom-0 bg-white">
+          <div className={`flex gap-4 pt-4 sticky bottom-0 z-10 transition-colors duration-300 ${isDarkMode ? 'bg-gray-900' : 'bg-white'}`}>
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-3 border border-gray-200 rounded-xl font-bold text-sm"
+              className={`flex-1 px-4 py-3 border rounded-xl font-bold text-sm transition-all cursor-pointer ${
+                isDarkMode ? 'border-white/10 text-gray-300 hover:bg-white/5' : 'border-gray-200 text-gray-700 hover:bg-gray-50'
+              }`}
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={editLoading}
-              className="flex-1 px-4 py-3 bg-primary text-white rounded-xl font-bold uppercase text-sm disabled:opacity-50"
+              className="flex-1 px-4 py-3 bg-primary text-white rounded-xl font-bold uppercase text-sm disabled:opacity-50 cursor-pointer hover:bg-primary/95 transition-colors"
             >
               {editLoading ? 'Saving...' : 'Save Changes'}
             </button>

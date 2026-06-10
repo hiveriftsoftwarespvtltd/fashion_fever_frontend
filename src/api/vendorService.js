@@ -498,7 +498,7 @@ export const getVendorOverview = async () => {
  */
 export const getVendorTopProducts = async () => {
   try {
-    const response = await apiClient.get('/vendor/top-products');
+    const response = await apiClient.get('/vendor/dashboard/top-products');
     return response.data;
   } catch (error) {
     console.error('Fetch vendor top products error:', error);
@@ -569,3 +569,64 @@ export const getVendorOrderComparison = async () => {
     };
   }
 };
+
+/**
+ * Fetch vendor sales performance details
+ * Method: GET
+ * URL: /vendor/dashboard/sales-performance
+ */
+export const getVendorSalesPerformance = async () => {
+  try {
+    const response = await apiClient.get('/vendor/dashboard/sales-performance');
+    return response.data;
+  } catch (error) {
+    console.error('Fetch vendor sales performance error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to fetch sales performance.',
+      statusCode: 500
+    };
+  }
+};
+
+/**
+ * Fetch vendor customer demographics details
+ * Method: GET
+ * URL: /vendor/dashboard/customer-demographics
+ */
+export const getVendorCustomerDemographics = async () => {
+  try {
+    const response = await apiClient.get('/vendor/dashboard/customer-demographics');
+    return response.data;
+  } catch (error) {
+    console.error('Fetch customer demographics error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to fetch customer demographics.',
+      statusCode: 500
+    };
+  }
+};
+
+/**
+ * Export vendor orders as CSV
+ * Method: GET
+ * URL: /vendor/dashboard/export-orders
+ */
+export const exportVendorOrders = async () => {
+  try {
+    const response = await apiClient.get('/vendor/dashboard/export-orders', {
+      responseType: 'text'
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Export vendor orders error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to export vendor orders.',
+      statusCode: 500
+    };
+  }
+};
+
+

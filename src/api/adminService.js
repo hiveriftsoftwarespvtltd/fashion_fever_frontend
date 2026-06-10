@@ -976,6 +976,460 @@ export const settleVendorPayout = async (data) => {
   }
 };
 
+/**
+ * Fetch all service subscription plans
+ * Method: GET
+ * URL: /service/get-all-service-subscription-plans
+ */
+export const getAllServiceCategories = async () => {
+  try {
+    const response = await apiClient.get('/service/get-all-service-categories');
+    return response.data;
+  } catch (error) {
+    console.error('Fetch service categories error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to fetch service categories.',
+      statusCode: 500
+    };
+  }
+};
+
+export const getAllServiceSubscriptionPlans = async () => {
+  try {
+    const response = await apiClient.get('/service/get-all-service-subscription-plans');
+    return response.data;
+  } catch (error) {
+    console.error('Fetch subscription plans error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to fetch subscription plans.',
+      statusCode: 500
+    };
+  }
+};
+
+/**
+ * Create a new service category
+ * Method: POST
+ * URL: /service/create-service-category
+ * @param {FormData} data - Form data with name, label, description, file
+ */
+export const createServiceCategory = async (data) => {
+  try {
+    const response = await apiClient.post('/service/create-service-category', data, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Create service category error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to create service category.',
+      statusCode: 500
+    };
+  }
+};
+
+/**
+ * Update an existing service category
+ * Method: PUT
+ * URL: /service/update-service-category/:id
+ * @param {string} id - The category ID
+ * @param {FormData} data - Form data with name, label, description, file, isActive
+ */
+export const updateServiceCategory = async (id, data) => {
+  try {
+    const response = await apiClient.put(`/service/update-service-category/${id}`, data, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Update service category error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to update service category.',
+      statusCode: 500
+    };
+  }
+};
+
+/**
+ * Fetch details of a service category
+ * Method: GET
+ * URL: /service/get-service-category-details/:id
+ * @param {string} id - Service category ID
+ */
+export const getServiceCategoryDetails = async (id) => {
+  try {
+    const response = await apiClient.get(`/service/get-service-category-details/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Fetch service category details error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to fetch service category details.',
+      statusCode: 500
+    };
+  }
+};
+
+/**
+ * Delete an existing service category
+ * Method: DELETE
+ * URL: /service/delete-service-category/:id
+ * @param {string} id - Service category ID
+ */
+export const deleteServiceCategory = async (id) => {
+  try {
+    const response = await apiClient.delete(`/service/delete-service-category/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Delete service category error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to delete service category.',
+      statusCode: 500
+    };
+  }
+};
+
+/**
+ * Create a new service subscription plan
+ * Method: POST
+ * URL: /service/create-service-subscription-plan
+ * @param {Object} data - Subscription plan details
+ */
+export const createServiceSubscriptionPlan = async (data) => {
+  try {
+    const response = await apiClient.post('/service/create-service-subscription-plan', data);
+    return response.data;
+  } catch (error) {
+    console.error('Create service subscription plan error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to create subscription plan.',
+      statusCode: 500
+    };
+  }
+};
+
+/**
+ * Update an existing service subscription plan
+ * Method: PUT
+ * URL: /service/update-service-subscription-plan/:id
+ */
+export const updateServiceSubscriptionPlan = async (id, data) => {
+  try {
+    const response = await apiClient.put(`/service/update-service-subscription-plan/${id}`, data);
+    return response.data;
+  } catch (error) {
+    console.error('Update subscription plan error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to update subscription plan.',
+      statusCode: 500
+    };
+  }
+};
+
+/**
+ * Delete a service subscription plan
+ * Method: DELETE
+ * URL: /service/delete-service-subscription-plan/:id
+ */
+export const deleteServiceSubscriptionPlan = async (id) => {
+  try {
+    const response = await apiClient.delete(`/service/delete-service-subscription-plan/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Delete subscription plan error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to delete subscription plan.',
+      statusCode: 500
+    };
+  }
+};
+
+/**
+ * Fetch details of a service subscription plan by ID
+ * Method: GET
+ * URL: /service/get-service-subscription-plan-details/:id
+ * @param {string} id - The subscription plan ID
+ */
+export const getServiceSubscriptionPlanDetails = async (id) => {
+  try {
+    const response = await apiClient.get(`/service/get-service-subscription-plan-details/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Fetch subscription plan details error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to fetch subscription plan details.',
+      statusCode: 500
+    };
+  }
+};
+
+/**
+ * Fetch all service providers
+ * Method: GET
+ * URL: /service/get-all-service-providers
+ */
+export const getAllServiceProviders = async (params = {}) => {
+  try {
+    const response = await apiClient.get('/service/get-all-service-providers', { params });
+    return response.data;
+  } catch (error) {
+    console.error('Fetch service providers error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to fetch service providers.',
+      statusCode: 500
+    };
+  }
+};
+
+/**
+ * Verify a service provider (Approve/Reject)
+ * Method: PUT
+ * URL: /service/service-provider/:providerId/verify
+ * @param {string} providerId - Service provider ID
+ * @param {string} status - Target status (e.g. APPROVED, REJECTED)
+ */
+export const verifyServiceProvider = async (providerId, status) => {
+  try {
+    const response = await apiClient.put(`/service/service-provider/${providerId}/verify`, { status });
+    return response.data;
+  } catch (error) {
+    console.error('Verify service provider error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to verify service provider.',
+      statusCode: 500
+    };
+  }
+};
+
+/**
+ * Add home content banner / item (POST /admin/home-content/add)
+ * @param {Object} data - Homepage content configuration including title, images, and redirect options
+ */
+export const addHomeContent = async (data) => {
+  try {
+    const formData = new FormData();
+    
+    // Core text attributes
+    if (data.title !== undefined && data.title !== null) formData.append('title', data.title);
+    if (data.subTitle !== undefined && data.subTitle !== null) formData.append('subTitle', data.subTitle);
+    if (data.description !== undefined && data.description !== null) formData.append('description', data.description);
+    
+    // Append tags/labels if present
+    if (data.labels && Array.isArray(data.labels)) {
+      data.labels.forEach((label, index) => {
+        formData.append(`labels[${index}]`, label);
+      });
+    }
+    
+    // Multi-platform banner images (File structures)
+    if (data.computerImage) {
+      formData.append('computerImage', data.computerImage);
+    }
+    if (data.mobileImage) {
+      formData.append('mobileImage', data.mobileImage);
+    }
+    
+    // Styling & configuration controls
+    if (data.contentType !== undefined && data.contentType !== null) formData.append('contentType', data.contentType);
+    if (data.redirectType !== undefined && data.redirectType !== null) formData.append('redirectType', data.redirectType);
+    if (data.redirectId !== undefined && data.redirectId !== null) formData.append('redirectId', data.redirectId);
+    if (data.redirectUrl !== undefined && data.redirectUrl !== null) formData.append('redirectUrl', data.redirectUrl);
+    if (data.backgroundColor !== undefined && data.backgroundColor !== null) formData.append('backgroundColor', data.backgroundColor);
+    if (data.textColor !== undefined && data.textColor !== null) formData.append('textColor', data.textColor);
+    if (data.displayOrder !== undefined && data.displayOrder !== null) formData.append('displayOrder', data.displayOrder);
+    if (data.isActive !== undefined && data.isActive !== null) formData.append('isActive', data.isActive);
+    if (data.startDate !== undefined && data.startDate !== null) formData.append('startDate', data.startDate);
+    if (data.endDate !== undefined && data.endDate !== null) formData.append('endDate', data.endDate);
+    
+    if (data.metaData !== undefined && data.metaData !== null) {
+      formData.append('metaData', typeof data.metaData === 'object' ? JSON.stringify(data.metaData) : data.metaData);
+    }
+    if (data.isFeatured !== undefined && data.isFeatured !== null) formData.append('isFeatured', data.isFeatured);
+    if (data.page !== undefined && data.page !== null) formData.append('page', data.page);
+    if (data.buttonText !== undefined && data.buttonText !== null) formData.append('buttonText', data.buttonText);
+
+    const response = await apiClient.post('/admin/home-content/add', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Add home content error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to add home content.',
+      statusCode: 500
+    };
+  }
+};
+
+/**
+ * Fetch homepage banner content items (GET /admin/home-content/list)
+ * @param {Object} params - Query parameters for pagination / filtering
+ */
+export const getHomeContents = async (params = {}) => {
+  try {
+    // Attempt fetching from standard list endpoint
+    const response = await apiClient.get('/admin/home-content/list', { params });
+    return response.data;
+  } catch (error) {
+    // Resilient fallback to base route if /list returns 404
+    if (error.response?.status === 404) {
+      try {
+        const response = await apiClient.get('/admin/home-content', { params });
+        return response.data;
+      } catch (innerErr) {
+        console.error('Fetch home contents base fallback error:', innerErr);
+      }
+    }
+    console.error('Fetch home contents error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to fetch home contents.',
+      statusCode: 500
+    };
+  }
+};
+
+/**
+ * Fetch all home contents (public view, no authorization token required)
+ * GET /admin/home-content/get-all
+ */
+export const getHomeContentsPublic = async (params = {}) => {
+  try {
+    const response = await apiClient.get('/admin/home-content/get-all', {
+      params,
+      skipAuth: true
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Fetch home contents public error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to fetch public home contents.',
+      statusCode: 500
+    };
+  }
+};
+
+/**
+ * Update homepage banner / content configuration (PUT /admin/home-content/update/:id)
+ * @param {string} id - The home content config ID
+ * @param {Object} data - Configuration attributes including files to upload
+ */
+export const updateHomeContent = async (id, data) => {
+  try {
+    const formData = new FormData();
+    
+    // Core text attributes
+    if (data.title !== undefined && data.title !== null) formData.append('title', data.title);
+    if (data.subTitle !== undefined && data.subTitle !== null) formData.append('subTitle', data.subTitle);
+    if (data.description !== undefined && data.description !== null) formData.append('description', data.description);
+    
+    // Append tags/labels if present
+    if (data.labels && Array.isArray(data.labels)) {
+      data.labels.forEach((label, index) => {
+        formData.append(`labels[${index}]`, label);
+      });
+    }
+    
+    // Multi-platform banner images (Only append if they are new File instances)
+    if (data.computerImage instanceof File) {
+      formData.append('computerImage', data.computerImage);
+    }
+    if (data.mobileImage instanceof File) {
+      formData.append('mobileImage', data.mobileImage);
+    }
+    
+    // Styling & configuration controls
+    if (data.contentType !== undefined && data.contentType !== null) formData.append('contentType', data.contentType);
+    if (data.redirectType !== undefined && data.redirectType !== null) formData.append('redirectType', data.redirectType);
+    if (data.redirectId !== undefined && data.redirectId !== null) formData.append('redirectId', data.redirectId);
+    if (data.redirectUrl !== undefined && data.redirectUrl !== null) formData.append('redirectUrl', data.redirectUrl);
+    if (data.backgroundColor !== undefined && data.backgroundColor !== null) formData.append('backgroundColor', data.backgroundColor);
+    if (data.textColor !== undefined && data.textColor !== null) formData.append('textColor', data.textColor);
+    if (data.displayOrder !== undefined && data.displayOrder !== null) formData.append('displayOrder', data.displayOrder);
+    if (data.isActive !== undefined && data.isActive !== null) formData.append('isActive', data.isActive);
+    if (data.startDate !== undefined && data.startDate !== null) formData.append('startDate', data.startDate);
+    if (data.endDate !== undefined && data.endDate !== null) formData.append('endDate', data.endDate);
+    
+    if (data.metaData !== undefined && data.metaData !== null) {
+      formData.append('metaData', typeof data.metaData === 'object' ? JSON.stringify(data.metaData) : data.metaData);
+    }
+    if (data.isFeatured !== undefined && data.isFeatured !== null) formData.append('isFeatured', data.isFeatured);
+    if (data.page !== undefined && data.page !== null) formData.append('page', data.page);
+    if (data.buttonText !== undefined && data.buttonText !== null) formData.append('buttonText', data.buttonText);
+
+    const response = await apiClient.put(`/admin/home-content/update/${id}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Update home content error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to update home content.',
+      statusCode: 500
+    };
+  }
+};
+
+/**
+ * Delete homepage banner / content config (DELETE /admin/home-content/delete-home-content/:id)
+ * @param {string} id - The banner config ID
+ */
+export const deleteHomeContent = async (id) => {
+  try {
+    const response = await apiClient.delete(`/admin/home-content/delete-home-content/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Delete home content error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to delete home content.',
+      statusCode: 500
+    };
+  }
+};
+
+/**
+ * Fetch detailed homepage banner configuration by ID (GET /admin/home-content/get-details/:id)
+ * @param {string} id - The banner config ID
+ */
+export const getHomeContentDetails = async (id) => {
+  try {
+    const response = await apiClient.get(`/admin/home-content/get-details/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Fetch home content details error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to fetch home content details.',
+      statusCode: 500
+    };
+  }
+};
+
+
+
 
 
 

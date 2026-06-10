@@ -1,5 +1,6 @@
 import React from 'react'
 import Hero from '../components/Hero'
+import TopBrands from '../components/TopBrands'
 import HeroPromotion from '../components/HeroPromotion'
 import Promotions from '../components/Promotions'
 import BrandBanners from '../components/BrandBanners'
@@ -18,6 +19,7 @@ const Home = () => {
  return (
  <div className="w-full flex flex-col overflow-x-hidden">
   <Hero />
+  <TopBrands />
   <ProductSection />
   <Promotions />
   <BrandBanners />

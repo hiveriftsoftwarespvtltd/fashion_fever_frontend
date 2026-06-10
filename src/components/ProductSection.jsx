@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { ShoppingBag, Heart, Star, Loader2 } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { ShoppingBag, Heart, Star, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { getProducts } from '../api/productService';
 import { addToCart } from '../api/cartService';
 import { addToWishlist, getWishlist, removeFromWishlist } from '../api/wishlistService';
@@ -13,6 +13,49 @@ const ProductSection = () => {
   const [loading, setLoading] = useState(true);
   const [addingId, setAddingId] = useState(null);
   const [wishlistIds, setWishlistIds] = useState([]);
+  const scrollRef    = useRef(null);
+  const rafRef       = useRef(null);
+  const isPausedRef  = useRef(false);
+
+  const scrollBy = (dir) => {
+    isPausedRef.current = true;
+    scrollRef.current?.scrollBy({ left: dir * 260, behavior: 'smooth' });
+    setTimeout(() => { isPausedRef.current = false; }, 900);
+  };
+
+  // ── Smooth auto-scroll via RAF ──────────────────────────────────
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    const tick = () => {
+      if (!isPausedRef.current && el.scrollWidth > el.clientWidth) {
+        el.scrollLeft += 0.7;
+        // Loop back to start when reaching the end
+        if (el.scrollLeft + el.clientWidth >= el.scrollWidth - 2) {
+          el.scrollLeft = 0;
+        }
+      }
+      rafRef.current = requestAnimationFrame(tick);
+    };
+
+    rafRef.current = requestAnimationFrame(tick);
+    return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); };
+  }, [products]); // restart when products load
+
+  // ── Pause on touch ──────────────────────────────────────────────
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const pause  = () => { isPausedRef.current = true; };
+    const resume = () => { setTimeout(() => { isPausedRef.current = false; }, 1000); };
+    el.addEventListener('touchstart', pause,  { passive: true });
+    el.addEventListener('touchend',   resume, { passive: true });
+    return () => {
+      el.removeEventListener('touchstart', pause);
+      el.removeEventListener('touchend',   resume);
+    };
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
@@ -136,6 +179,7 @@ const ProductSection = () => {
 
   return (
     <section className="bg-white py-16 font-outfit">
+      <style>{`.ps-track::-webkit-scrollbar{display:none}`}</style>
       <div className="container mx-auto px-4 md:px-8 max-w-[1600px]">
         <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-12 gap-4">
           <div className="text-left">
@@ -147,14 +191,45 @@ const ProductSection = () => {
           </Link>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
+        {/* ── Carousel strip ─────────────────────────────── */}
+        <div className="relative">
+
+          {/* ← Prev */}
+          <button
+            onClick={() => scrollBy(-1)}
+            className="absolute left-0 top-1/2 -translate-y-6 z-20 w-10 h-10 rounded-full bg-white border border-gray-100 shadow-md flex items-center justify-center text-gray-600 hover:text-primary hover:border-primary transition-all duration-200 hover:scale-105"
+            aria-label="Previous"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+
+          {/* → Next */}
+          <button
+            onClick={() => scrollBy(1)}
+            className="absolute right-0 top-1/2 -translate-y-6 z-20 w-10 h-10 rounded-full bg-white border border-gray-100 shadow-md flex items-center justify-center text-gray-600 hover:text-primary hover:border-primary transition-all duration-200 hover:scale-105"
+            aria-label="Next"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
+
+          {/* Scrollable track */}
+          <div
+            ref={scrollRef}
+            className="ps-track flex gap-4 overflow-x-auto px-10 py-2"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            onMouseEnter={() => { isPausedRef.current = true; }}
+            onMouseLeave={() => { isPausedRef.current = false; }}
+          >
           {products.map((product) => {
             const firstVariant = product.variants?.[0];
             const uniqueId = firstVariant?._id || product._id;
             const isItemWishlisted = wishlistIds.includes(firstVariant?._id);
 
             return (
-              <div key={product._id} className="group flex flex-col h-full bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden">
+              <div
+                key={product._id}
+                className="group flex flex-col flex-shrink-0 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden w-[200px] sm:w-[220px] lg:w-[240px]"
+              >
                 {/* Image Wrapper Block */}
                 <div className="relative aspect-[4/3] sm:aspect-square overflow-hidden bg-gray-50">
                   <Link to={`/product/${product._id}`}>
@@ -285,6 +360,7 @@ const ProductSection = () => {
               </div>
             );
           })}
+          </div>
         </div>
       </div>
     </section>

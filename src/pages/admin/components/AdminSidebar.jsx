@@ -2,7 +2,7 @@ import { useState } from 'react';
 import {
   X, LayoutDashboard, Users, Store, CircleAlert, TrendingUp,
   TicketPercent, LogOut, Sparkles, Grid, ShoppingBag, Package,
-  Percent, IndianRupee, ChevronDown
+  Percent, IndianRupee, ChevronDown, CreditCard, Layers, Briefcase, Image
 } from 'lucide-react';
 
 const AdminSidebar = ({
@@ -132,7 +132,7 @@ const AdminSidebar = ({
         `}
       >
         {/* ── Brand Header ── */}
-        <div className={`px-5 py-6 flex items-center justify-between border-b flex-shrink-0 ${isDarkMode ? 'border-white/5' : 'border-gray-100'}`}>
+        <div className={`h-24 px-5 flex items-center justify-between border-b flex-shrink-0 ${isDarkMode ? 'border-white/5' : 'border-gray-100'}`}>
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/30 flex-shrink-0">
               <span className="text-white text-xs font-black tracking-tight">WM</span>
@@ -170,6 +170,7 @@ const AdminSidebar = ({
             </p>
             <div className="space-y-0.5">
               <NavItem id="users" label="User Management" icon={<Users size={16} />} />
+              <NavItem id="service-providers" label="Service Providers" icon={<Briefcase size={16} />} />
 
               {/* Vendors Group */}
               <GroupHeader
@@ -206,6 +207,7 @@ const AdminSidebar = ({
               <NavItem id="categories"     label="Categories"      icon={<Grid size={16} />} />
               <NavItem id="products"       label="Products"        icon={<Package size={16} />} />
               <NavItem id="coupons"        label="Coupons"         icon={<TicketPercent size={16} />} />
+              <NavItem id="subscription-plans" label="Beauty Services" icon={<Sparkles size={16} />} />
             </div>
           </div>
 
@@ -215,8 +217,10 @@ const AdminSidebar = ({
               Operations
             </p>
             <div className="space-y-0.5">
-              <NavItem id="orders"         label="Orders Manager"  icon={<ShoppingBag size={16} />} />
-              <NavItem id="beauty-services" label="Beauty Services" icon={<Sparkles size={16} />} />
+              <NavItem id="orders"            label="Orders Manager"     icon={<ShoppingBag size={16} />} />
+              <NavItem id="beauty-services"   label="Services Subscription"    icon={<CreditCard size={16} />} />
+              <NavItem id="service-categories" label="Service Categories" icon={<Layers size={16} />} />
+              <NavItem id="home-content"      label="Home Content"       icon={<Image size={16} />} />
             </div>
           </div>
         </nav>

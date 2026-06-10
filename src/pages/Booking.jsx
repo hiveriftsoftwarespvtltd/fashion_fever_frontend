@@ -1,246 +1,385 @@
-import React, { useState } from 'react';
-import { 
-  Calendar as CalendarIcon, 
-  Clock, 
-  MapPin, 
-  ChevronRight, 
-  Star, 
-  ShieldCheck,
-  Search,
-  Navigation
-} from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
 import { toast } from '../utils/toast';
+import Swal from 'sweetalert2';
+import { searchServices, getAvailableSlots, createBooking } from '../api/serviceProviderService';
+import { useUser } from '../context/UserContext';
+import { useNavigate } from 'react-router-dom';
+
+// Booking Sub-components
+import BookingSearchForm from '../components/booking/BookingSearchForm';
+import LoungeSelection from '../components/booking/LoungeSelection';
+import ServicesCatalog from '../components/booking/ServicesCatalog';
+import StylistSelector from '../components/booking/StylistSelector';
+import DateTimeSlotSelector from '../components/booking/DateTimeSlotSelector';
+import BookingSummary from '../components/booking/BookingSummary';
 
 const Booking = () => {
-  const [selectedDate, setSelectedDate] = useState('2024-05-15');
+  const navigate = useNavigate();
+  const { isAuthenticated } = useUser();
+  const [loading, setLoading] = useState(false);
+  const [searchingLocation, setSearchingLocation] = useState(false);
+  const [bookingConfirmLoading, setBookingConfirmLoading] = useState(false);
+  
+  // Geolocation & Search params
+  const [city, setCity] = useState('');
+  const [maxDistanceKm, setMaxDistanceKm] = useState(100);
+  const [lat, setLat] = useState(28.5245);
+  const [lng, setLng] = useState(77.2066);
+  const [searchResults, setSearchResults] = useState([]);
+  
+  // Selection states
+  const [selectedResult, setSelectedResult] = useState(null);
+  const [selectedServices, setSelectedServices] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(() => {
+    const today = new Date();
+    return today.toISOString().split('T')[0];
+  });
   const [selectedSlot, setSelectedSlot] = useState(null);
-  const [selectedSalon, setSelectedSalon] = useState(null);
-  const [location, setLocation] = useState('HSR Layout, Bangalore');
+  const [selectedStaff, setSelectedStaff] = useState(null);
+  const [slots, setSlots] = useState([]);
+  const [slotsLoading, setSlotsLoading] = useState(false);
 
-  const salons = [
-    { 
-      id: 1, 
-      name: "Wakeup Beauty Lounge", 
-      location: "HSR Layout, Bangalore", 
-      distance: "1.2 km", 
-      rating: 4.9, 
-      image: "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=400&h=300&fit=crop" 
-    },
-    { 
-      id: 2, 
-      name: "Glam & Glow Salon", 
-      location: "Koramangala, Bangalore", 
-      distance: "3.5 km", 
-      rating: 4.7, 
-      image: "https://images.unsplash.com/photo-1522337660859-02fbefca4702?w=400&h=300&fit=crop" 
-    }
-  ];
+  // Refs for smooth scrolling
+  const servicesRef = useRef(null);
+  const scheduleRef = useRef(null);
 
-  const slots = [
-    "09:00 AM", "09:30 AM", "10:00 AM", "10:30 AM", "11:00 AM", 
-    "11:30 AM", "01:00 PM", "01:30 PM", "02:00 PM", "02:30 PM",
-    "04:00 PM", "04:30 PM", "05:00 PM", "05:30 PM", "06:00 PM"
-  ];
+  // Load initial search on mount
+  useEffect(() => {
+    detectLocation(true); // Silent detect on mount, fallbacks to Gorakhpur
+  }, []);
 
-  const handleBooking = () => {
-    if (!selectedSalon) {
-      toast.error('Please select a salon first!');
+  // Fetch slots dynamically when selectedResult, selectedServices, or selectedDate changes
+  useEffect(() => {
+    const fetchSlotsData = async () => {
+      if (!selectedResult || selectedServices.length === 0 || !selectedDate) {
+        setSlots([]);
+        return;
+      }
+      
+      setSlotsLoading(true);
+      try {
+        const providerId = selectedResult.provider._id;
+        const serviceId = selectedServices[0]._id; // Use the first selected service
+        const res = await getAvailableSlots(providerId, serviceId, selectedDate);
+        
+        const unpacked = res?.data?.data ?? res?.data ?? res;
+        if (Array.isArray(unpacked)) {
+          setSlots(unpacked);
+        } else {
+          setSlots([]);
+        }
+      } catch (err) {
+        console.error("Error fetching available slots:", err);
+        setSlots([]);
+        toast.error("Failed to load time slots.");
+      } finally {
+        setSlotsLoading(false);
+      }
+    };
+
+    fetchSlotsData();
+  }, [selectedResult, selectedServices, selectedDate]);
+
+  const detectLocation = (isSilent = false) => {
+    if (!navigator.geolocation) {
+      if (!isSilent) toast.error("Geolocation is not supported by your browser");
+      handleSearch(lat, lng, city, maxDistanceKm);
       return;
     }
-    if (!selectedSlot) {
-      toast.error('Please select an available time slot!');
-      return;
-    }
-    toast.success(`Booking confirmed at ${selectedSalon.name} for ${selectedDate} at ${selectedSlot}!`);
+    
+    if (!isSilent) setSearchingLocation(true);
+    
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const uLat = position.coords.latitude;
+        const uLng = position.coords.longitude;
+        setLat(uLat);
+        setLng(uLng);
+        if (!isSilent) {
+          setSearchingLocation(false);
+          toast.success("Location retrieved successfully!");
+        }
+        handleSearch(uLat, uLng, city, maxDistanceKm);
+      },
+      (error) => {
+        console.error("Geolocation retrieval error:", error);
+        if (!isSilent) {
+          setSearchingLocation(false);
+          toast.error("Location permission denied. Searching by city default.");
+        }
+        handleSearch(lat, lng, city, maxDistanceKm);
+      },
+      { timeout: 8000 }
+    );
   };
 
-  return (
-    <div className="bg-[#f8f9fa] min-h-screen font-outfit">
+  const handleSearchClick = (e) => {
+    e.preventDefault();
+    handleSearch(lat, lng, city, maxDistanceKm);
+  };
+
+  const handleSearch = async (sLat, sLng, sCity, sDist) => {
+    setLoading(true);
+    try {
+      const res = await searchServices({
+        lat: sLat,
+        lng: sLng,
+        maxDistanceKm: sDist,
+        city: sCity
+      });
+
+      const unpacked = res?.data?.data ?? res?.data ?? res;
+      if (Array.isArray(unpacked)) {
+        setSearchResults(unpacked);
+      } else {
+        setSearchResults([]);
+      }
+    } catch (err) {
+      console.error("Search API error:", err);
+      toast.error("Failed to fetch nearby salons.");
+      setSearchResults([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Toggle service selection
+  const handleToggleService = (service) => {
+    setSelectedServices(prev => {
+      const exists = prev.some(s => s._id === service._id);
+      let updated;
+      if (exists) {
+        updated = prev.filter(s => s._id !== service._id);
+      } else {
+        updated = [...prev, service];
+      }
+
+      // Smooth scroll to schedule if first service added
+      if (updated.length === 1 && prev.length === 0) {
+        setTimeout(() => {
+          scheduleRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 150);
+      }
+      return updated;
+    });
+    setSelectedSlot(null);
+    setSelectedStaff(null);
+  };
+
+
+  const calculateTotal = () => {
+    return selectedServices.reduce((sum, s) => {
+      const price = s.offeredPrice || s.sellingPrice || s.costPrice || 0;
+      return sum + price;
+    }, 0);
+  };
+
+  const handleConfirmBooking = async () => {
+    if (!isAuthenticated) {
+      Swal.fire({
+        title: 'Login Required',
+        text: 'Please log in or register to book an appointment.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#EC4899',
+        cancelButtonColor: '#6B7280',
+        confirmButtonText: 'Login Now',
+        borderRadius: '24px',
+        customClass: {
+          popup: 'rounded-3xl border border-gray-100 shadow-xl',
+          confirmButton: 'rounded-xl font-bold uppercase text-xs px-6 py-3 text-white cursor-pointer shadow-md shadow-primary/20',
+          cancelButton: 'rounded-xl font-bold uppercase text-xs px-6 py-3 cursor-pointer'
+        }
+      }).then((result) => {
+        if (result.isConfirmed) {
+          navigate('/auth?redirect=/booking');
+        }
+      });
+      return;
+    }
+
+    if (!selectedResult || selectedServices.length === 0 || !selectedSlot) {
+      toast.error("Missing booking selection details.");
+      return;
+    }
+
+    const serviceId = selectedServices[0]._id;
+    const staffId = selectedStaff?._id || selectedSlot?.availableStaff?.[0]?._id;
+    if (!staffId) {
+      toast.error("No stylist/staff available for the selected slot.");
+      return;
+    }
+
+    const serviceAddress = [selectedResult.provider?.address, selectedResult.provider?.city].filter(Boolean).join(', ') || 'Delhi';
+
+    const payload = {
+      serviceId,
+      staffId,
+      bookingDate: selectedDate,
+      slotStartTime: selectedSlot.startTime,
+      serviceAddress
+    };
+
+    setBookingConfirmLoading(true);
+    try {
+      const response = await createBooking(payload);
+      const unpacked = response?.data?.data ?? response?.data ?? response;
       
-      {/* Search Header */}
-      <div className="bg-white border-b border-gray-100 py-16">
-        <div className="container mx-auto px-4 max-w-3xl text-center">
-          <h1 className="text-3xl lg:text-5xl font-black text-gray-900 uppercase  mb-4">
-            Book Your Service
+      if (response.success || unpacked?.success) {
+        const salonName = selectedResult.provider?.businessName || 'Beauty Lounge';
+        const total = calculateTotal();
+        const serviceTitles = selectedServices.map(s => s.title).join(', ');
+        const staffName = selectedStaff ? selectedStaff.name : (selectedSlot?.availableStaff?.find(st => st._id === staffId)?.name || 'Any Available Stylist');
+
+        Swal.fire({
+          title: 'Appointment Booked!',
+          html: `
+            <div class="text-left text-xs space-y-3 font-outfit uppercase tracking-wider text-gray-600">
+              <p><strong class="text-gray-800">Salon:</strong> ${salonName}</p>
+              <p><strong class="text-gray-800">Services:</strong> ${serviceTitles}</p>
+              <p><strong class="text-gray-800">Stylist:</strong> ${staffName}</p>
+              <p><strong class="text-gray-800">Schedule:</strong> ${selectedDate} at ${selectedSlot.startTime}</p>
+              <p><strong class="text-gray-800">Amount Due:</strong> ₹${total} (Pay after service)</p>
+            </div>
+          `,
+          icon: 'success',
+          confirmButtonColor: '#EC4899',
+          confirmButtonText: 'Great, Thank You!',
+          background: '#FFFFFF',
+          color: '#1F2937',
+          borderRadius: '24px',
+          customClass: {
+            popup: 'rounded-3xl border border-gray-100 shadow-xl',
+            confirmButton: 'rounded-xl font-bold uppercase text-xs px-6 py-3 text-white cursor-pointer shadow-md shadow-primary/20'
+          }
+        });
+
+        // Reset selection state
+        setSelectedResult(null);
+        setSelectedServices([]);
+        setSelectedSlot(null);
+        setSelectedStaff(null);
+        setSlots([]);
+      } else {
+        Swal.fire({
+          title: 'Booking Failed',
+          text: response.message || 'Failed to create booking. Please try again.',
+          icon: 'error',
+          confirmButtonColor: '#EC4899',
+          borderRadius: '24px',
+          customClass: {
+            popup: 'rounded-3xl border border-gray-100 shadow-xl',
+            confirmButton: 'rounded-xl font-bold uppercase text-xs px-6 py-3 text-white cursor-pointer shadow-md'
+          }
+        });
+      }
+    } catch (err) {
+      console.error("Booking API execution error:", err);
+      toast.error("Something went wrong while confirming your booking.");
+    } finally {
+      setBookingConfirmLoading(false);
+    }
+  };  return (
+    <div className="bg-gray-50 min-h-screen font-outfit text-gray-800 pb-24 lg:pb-12 text-left">
+      
+      {/* Premium Header Banner */}
+      <div className="bg-gradient-to-r from-pink-500 via-rose-500 to-purple-600 py-16 px-4 shadow-md text-white text-center">
+        <div className="max-w-[1600px] mx-auto space-y-4">
+          <span className="text-[10px] font-black tracking-widest bg-white/20 px-3 py-1 rounded-full uppercase">
+            Instantly Confirmed Appointments
+          </span>
+          <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tight">
+            Book Beauty Services
           </h1>
-          <p className="text-xs lg:text-sm text-gray-500 font-bold uppercase  mb-8">
-            Professional beauty services at your doorstep or our nearest lounge.
+          <p className="text-xs md:text-sm text-white/80 font-bold uppercase tracking-wider">
+            Discover nearby salons, select premium stylists & pay after service.
           </p>
+        </div>
+      </div>
+
+      {/* Geolocation Search Form block */}
+      <BookingSearchForm
+        city={city}
+        setCity={setCity}
+        maxDistanceKm={maxDistanceKm}
+        setMaxDistanceKm={setMaxDistanceKm}
+        searchingLocation={searchingLocation}
+        detectLocation={detectLocation}
+        handleSearchClick={handleSearchClick}
+        loading={loading}
+      />
+
+      {/* Main Content Layout Grid (1600px Max Width Container) */}
+      <div className="max-w-[1600px] mx-auto px-4 py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 xl:gap-12 items-start">
           
-          <div className="flex flex-col sm:flex-row bg-gray-50 p-2.5 rounded-2xl gap-2.5 border border-gray-100 max-w-2xl mx-auto shadow-inner">
-            <div className="flex-grow relative">
-              <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-primary" size={18} />
-              <input 
-                type="text" 
-                placeholder="Your Location" 
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                className="w-full pl-11 pr-4 py-3.5 bg-white border border-gray-100 rounded-xl font-bold text-xs uppercase  outline-none shadow-sm focus:border-primary/20 transition-all text-gray-700" 
+          {/* LEFT COLUMN: Open, comprehensive listings */}
+          <div className="lg:col-span-2 space-y-12">
+            
+            {/* Section 1: Lounge selection */}
+            <LoungeSelection
+              loading={loading}
+              searchResults={searchResults}
+              selectedResult={selectedResult}
+              setSelectedResult={setSelectedResult}
+              setSelectedServices={setSelectedServices}
+              setSelectedSlot={setSelectedSlot}
+              setSelectedStaff={setSelectedStaff}
+              setSlots={setSlots}
+              servicesRef={servicesRef}
+            />
+
+            {/* Section 2: Services Catalogue & Stylist Preferences */}
+            <div className="space-y-6">
+              <ServicesCatalog
+                selectedResult={selectedResult}
+                selectedServices={selectedServices}
+                handleToggleService={handleToggleService}
+                servicesRef={servicesRef}
+              />
+              
+              <StylistSelector
+                slotsLoading={slotsLoading}
+                slots={slots}
+                selectedStaff={selectedStaff}
+                setSelectedStaff={setSelectedStaff}
               />
             </div>
-            <button className="bg-primary hover:bg-primary-hover text-white px-8 py-3.5 rounded-xl font-black uppercase text-[10px]  flex items-center justify-center gap-2 transition-all shadow-md shadow-primary/20 cursor-pointer">
-              <Search size={14} /> Find Salons
-            </button>
-          </div>
-        </div>
-      </div>
 
-      {/* Main Grid Container */}
-      <div className="container mx-auto px-4 max-w-[1600px] py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 xl:gap-12">
-          
-          {/* Salon Listing */}
-          <div className="lg:col-span-2 space-y-8">
-            <div className="flex items-center justify-between border-b border-gray-100 pb-4">
-              <h2 className="text-lg font-black uppercase  text-gray-800 flex items-center gap-2.5">
-                Nearby Salons 
-                <span className="bg-primary/10 text-primary text-[9px] font-black  px-2.5 py-1 rounded-lg uppercase">
-                  Top Rated
-                </span>
-              </h2>
-            </div>
+            {/* Section 3: Schedule Date & Slots */}
+            <DateTimeSlotSelector
+              selectedResult={selectedResult}
+              selectedServices={selectedServices}
+              selectedDate={selectedDate}
+              setSelectedDate={setSelectedDate}
+              selectedSlot={selectedSlot}
+              setSelectedSlot={setSelectedSlot}
+              selectedStaff={selectedStaff}
+              setSelectedStaff={setSelectedStaff}
+              slots={slots}
+              slotsLoading={slotsLoading}
+              scheduleRef={scheduleRef}
+            />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {salons.map((salon) => {
-                const isSelected = selectedSalon?.id === salon.id;
-                return (
-                  <div 
-                    key={salon.id} 
-                    className={`bg-white rounded-2xl overflow-hidden border transition-all duration-300 group ${
-                      isSelected 
-                        ? 'border-primary shadow-xl ring-2 ring-primary/5 bg-primary/[0.01]' 
-                        : 'border-gray-100 shadow-sm hover:shadow-md hover:border-gray-200'
-                    }`}
-                  >
-                    <div className="relative h-48 overflow-hidden bg-gray-50">
-                      <img 
-                        src={salon.image} 
-                        alt={salon.name} 
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
-                      />
-                      <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-lg flex items-center gap-1 shadow-sm">
-                        <span className="text-[10px] font-black text-gray-800">{salon.rating}</span>
-                        <Star size={10} className="fill-yellow-400 text-yellow-400" />
-                      </div>
-                    </div>
-                    <div className="p-6 text-left">
-                      <div className="flex items-center justify-between mb-2">
-                        <h3 className="text-base font-extrabold text-gray-800 uppercase  truncate max-w-[170px]">
-                          {salon.name}
-                        </h3>
-                        <span className="text-[9px] font-black text-primary uppercase  flex items-center gap-1 bg-primary/5 px-2 py-0.5 rounded-md">
-                          <Navigation size={9} /> {salon.distance}
-                        </span>
-                      </div>
-                      <p className="text-gray-400 text-[10px] font-black uppercase mb-6 flex items-center gap-1.5">
-                        <MapPin size={12} className="text-gray-300" /> {salon.location}
-                      </p>
-                      
-                      <button 
-                        onClick={() => setSelectedSalon(salon)}
-                        className={`w-full py-3 rounded-xl font-black uppercase text-[10px]  transition-all cursor-pointer ${
-                          isSelected 
-                            ? 'bg-primary text-white shadow-md shadow-primary/10' 
-                            : 'border-2 border-primary/25 hover:border-primary text-primary hover:bg-primary hover:text-white'
-                        }`}
-                      >
-                        {isSelected ? 'Selected Salon' : 'Select Salon'}
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
           </div>
 
-          {/* Booking Summary / Slot Picker */}
-          <div className="space-y-8">
-            <div className="bg-white rounded-2xl p-6 lg:p-8 border border-gray-100 shadow-xl sticky top-[100px] lg:top-[120px] text-left">
-              <h2 className="text-sm font-black uppercase  text-gray-800 mb-6 pb-3 border-b border-gray-50 flex items-center gap-2">
-                <CalendarIcon size={16} className="text-primary" /> Select Slot
-              </h2>
-              
-              {/* Salon info if selected */}
-              {selectedSalon && (
-                <div className="mb-6 p-4 bg-gray-50 border border-gray-100 rounded-xl">
-                  <span className="text-[8px] font-black text-gray-400 uppercase  block mb-1">Selected Location</span>
-                  <p className="text-xs font-black text-gray-800 uppercase  truncate">{selectedSalon.name}</p>
-                  <p className="text-[9px] font-bold text-gray-500 uppercase  mt-0.5">{selectedSalon.location}</p>
-                </div>
-              )}
-
-              {/* Date Picker */}
-              <div className="space-y-3 mb-6">
-                <span className="text-[10px] font-black text-gray-400 uppercase  block">
-                  Choose Date
-                </span>
-                <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-                  {[15, 16, 17, 18, 19].map((d) => (
-                    <button 
-                      key={d} 
-                      onClick={() => setSelectedDate(`2024-05-${d}`)}
-                      className={`flex-shrink-0 w-14 h-18 rounded-xl flex flex-col items-center justify-center gap-0.5 transition-all cursor-pointer ${
-                        selectedDate === `2024-05-${d}` 
-                          ? 'bg-primary text-white shadow-lg shadow-primary/20 scale-105' 
-                          : 'bg-gray-50 text-gray-400 hover:bg-gray-100 hover:text-gray-600'
-                      }`}
-                    >
-                      <span className="text-[8px] font-black uppercase ">May</span>
-                      <span className="text-lg font-black">{d}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Time Slot Grid */}
-              <div className="space-y-3 mb-6">
-                <span className="text-[10px] font-black text-gray-400 uppercase  block">
-                  Available Slots
-                </span>
-                <div className="grid grid-cols-3 gap-2">
-                  {slots.map((slot) => (
-                    <button 
-                      key={slot}
-                      onClick={() => setSelectedSlot(slot)}
-                      className={`py-2.5 px-1 rounded-lg text-[9px] font-black uppercase border-2 transition-all cursor-pointer text-center ${
-                        selectedSlot === slot 
-                          ? 'bg-primary border-primary text-white shadow-md shadow-primary/10' 
-                          : 'bg-white border-gray-100 text-gray-400 hover:border-gray-200 hover:text-gray-600'
-                      }`}
-                    >
-                      {slot}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Confirmation Indicator */}
-              <div className="space-y-4 mb-6">
-                <div className="flex items-center gap-3 p-3.5 bg-green-50/50 border border-green-100/50 rounded-xl">
-                  <ShieldCheck className="text-green-600" size={18} />
-                  <div className="flex flex-col">
-                    <span className="text-[9px] font-black text-green-600 uppercase  leading-none mb-0.5">
-                      Instant Confirmation
-                    </span>
-                    <span className="text-[8px] font-bold text-green-600/70 uppercase ">
-                      Pay after service
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <button 
-                onClick={handleBooking}
-                className="w-full bg-primary hover:bg-primary-hover text-white py-4 rounded-xl font-black uppercase text-xs  shadow-lg shadow-primary/20 flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:shadow-none cursor-pointer" 
-                disabled={!selectedSlot || !selectedSalon}
-              >
-                Confirm Booking <ChevronRight size={14} />
-              </button>
-            </div>
+          {/* RIGHT COLUMN: Sticky Checkout Card (Displays selection and final checkout action) */}
+          <div className="space-y-6">
+            <BookingSummary
+              selectedResult={selectedResult}
+              selectedServices={selectedServices}
+              selectedDate={selectedDate}
+              selectedSlot={selectedSlot}
+              selectedStaff={selectedStaff}
+              calculateTotal={calculateTotal}
+              handleConfirmBooking={handleConfirmBooking}
+              bookingConfirmLoading={bookingConfirmLoading}
+            />
           </div>
 
         </div>
       </div>
+
     </div>
   );
 };

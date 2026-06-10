@@ -23,7 +23,7 @@ const DistributorDashboard = () => {
     <div className="flex min-h-screen bg-gray-50">
       {/* Sidebar */}
       <div className="w-64 bg-white border-r border-gray-200 hidden lg:flex flex-col">
-        <div className="p-6 border-b border-gray-100">
+        <div className="h-24 px-6 border-b border-gray-100 flex items-center justify-between">
           <span className="text-2xl font-bold text-primary uppercase">WAKEUP DISTRO</span>
         </div>
         <nav className="flex-1 p-4 space-y-2">

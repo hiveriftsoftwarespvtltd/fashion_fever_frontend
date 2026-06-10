@@ -12,11 +12,17 @@ const apiClient = axios.create({
 apiClient.interceptors.request.use(
   (config) => {
     try {
+      if (config.skipAuth || config.headers?.skipAuth) {
+        if (config.headers?.skipAuth) {
+          delete config.headers.skipAuth;
+        }
+        return config;
+      }
       const sessionStr = localStorage.getItem('user_session');
       if (sessionStr) {
         const session = JSON.parse(sessionStr);
         const token = session?.token || session?.access_token;
-        
+
         if (token) {
           config.headers.Authorization = `Bearer ${token}`;
         }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import {
@@ -46,6 +46,12 @@ import AdminDashboard from "./components/AdminDashboard";
 import SendInvitationModal from "./components/SendInvitationModal";
 import InfluencerCommissions from "./components/InfluencerCommissions";
 import VendorPayouts from "./components/VendorPayouts";
+import SubscriptionPlans from "./components/SubscriptionPlans";
+import ServiceCategories from "./components/ServiceCategories";
+import ServiceProviders from "./components/ServiceProviders";
+import HomeContentList from "./components/HomeContentList";
+import CreateHomeContentModal from "./components/CreateHomeContentModal";
+import HomeContentDetailsModal from "./components/HomeContentDetailsModal";
 
 import { toast } from '../../utils/toast';
 import {
@@ -79,7 +85,9 @@ import {
   getAnalyticsGraph,
   getTopVendorsGraph,
   getAllInfluencerCommissionSlabs,
-  deleteInfluencerCommissionSlab
+  deleteInfluencerCommissionSlab,
+  getHomeContents,
+  getHomeContentsPublic
 } from '../../api/adminService';
 import { useTheme } from '../../context/ThemeContext';
 
@@ -87,6 +95,13 @@ const AdminPanel = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = searchParams.get('tab') || 'dashboard';
   const { isDarkMode, toggleTheme } = useTheme();
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    if (containerRef.current) {
+      containerRef.current.scrollTo(0, 0);
+    }
+  }, [activeTab]);
 
   const [dataList, setDataList] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -123,6 +138,9 @@ const AdminPanel = () => {
   const [activeMonthlyMetric, setActiveMonthlyMetric] = useState('revenue');
   const [isOverviewLoading, setIsOverviewLoading] = useState(true);
   const [isSendLinkOpen, setIsSendLinkOpen] = useState(false);
+  const [showHomeContentModal, setShowHomeContentModal] = useState(false);
+  const [editingHomeContent, setEditingHomeContent] = useState(null);
+  const [selectedHomeContentId, setSelectedHomeContentId] = useState(null);
 
   const fetchOverview = async () => {
     setIsOverviewLoading(true);
@@ -241,11 +259,13 @@ const AdminPanel = () => {
         response = await getAllOrders({ page: pagination.page, limit: pagination.limit, search: filters.search });
       } else if (activeTab === 'products') {
         response = await getAllProducts({ page: pagination.page, limit: pagination.limit, search: filters.search });
+      } else if (activeTab === 'home-content') {
+        response = await getHomeContentsPublic({ page: pagination.page, limit: pagination.limit, search: filters.search });
       }
 
       if (response && response.success) {
         let list;
-        if (activeTab === 'categories' || activeTab === 'orders' || activeTab === 'products') {
+        if (activeTab === 'categories' || activeTab === 'orders' || activeTab === 'products' || activeTab === 'home-content') {
           list = response.data?.data || response.data || [];
         } else {
           list = response.data?.users || response.data?.vendors || response.data?.influencers || response.data?.coupons || response.data?.data || response.data || [];
@@ -265,7 +285,7 @@ const AdminPanel = () => {
   };
 
   useEffect(() => {
-    if (['users', 'vendors', 'pending', 'influencers', 'commission-slabs', 'coupons', 'categories', 'orders', 'products'].includes(activeTab)) fetchData();
+    if (['users', 'vendors', 'pending', 'influencers', 'commission-slabs', 'coupons', 'categories', 'orders', 'products', 'home-content'].includes(activeTab)) fetchData();
   }, [activeTab, pagination.page, filters.role]);
 
   const handleDeleteConfirm = async () => {
@@ -905,6 +925,21 @@ const AdminPanel = () => {
         slabId={selectedSlabId}
         onClose={() => setSelectedSlabId(null)}
       />
+      <CreateHomeContentModal
+        isOpen={showHomeContentModal || !!editingHomeContent}
+        onClose={() => {
+          setShowHomeContentModal(false);
+          setEditingHomeContent(null);
+        }}
+        onSuccess={fetchData}
+        editData={editingHomeContent}
+      />
+      <HomeContentDetailsModal
+        isOpen={!!selectedHomeContentId}
+        id={selectedHomeContentId}
+        onClose={() => setSelectedHomeContentId(null)}
+        isDarkMode={isDarkMode}
+      />
 
       {/* Sidebar */}
       <AdminSidebar
@@ -917,8 +952,11 @@ const AdminPanel = () => {
       />
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col min-h-screen min-w-0 h-screen overflow-y-auto">
-        <header className={`h-20 flex items-center justify-between px-6 lg:px-10 border-b sticky top-0 z-[1000] ${isDarkMode ? 'bg-gray-950/90 backdrop-blur-xl border-white/5' : 'bg-white/80 backdrop-blur-xl border-gray-100'}`}>
+      <div 
+        ref={containerRef}
+        className="flex-1 flex flex-col min-h-screen min-w-0 h-screen overflow-y-scroll"
+      >
+        <header className={`h-24 flex-shrink-0 flex items-center justify-between px-6 lg:px-10 border-b sticky top-0 z-[1000] ${isDarkMode ? 'bg-gray-950/90 backdrop-blur-xl border-white/5' : 'bg-white/80 backdrop-blur-xl border-gray-100'}`}>
           <div className="flex items-center gap-4 flex-1">
             <button onClick={() => setIsSidebarOpen(true)} className="lg:hidden p-2 hover:bg-gray-100 dark:hover:bg-white/5 rounded-xl transition-colors">
               <Menu size={20} className={isDarkMode ? 'text-gray-400' : 'text-gray-600'} />
@@ -934,9 +972,10 @@ const AdminPanel = () => {
           </div>
         </header>
 
-        <main className="p-4 lg:p-10 space-y-6 lg:space-y-10">
-          {(activeTab === 'users' || activeTab === 'vendors' || activeTab === 'pending' || activeTab === 'influencers' || activeTab === 'commission-slabs' || activeTab === 'coupons' || activeTab === 'categories' || activeTab === 'orders' || activeTab === 'products') && (
-            <div className="space-y-6 lg:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <main className="p-4 lg:p-10 space-y-6 lg:space-y-10 flex-grow">
+          {/* Shared directories block */}
+          <div className={['users', 'vendors', 'pending', 'influencers', 'commission-slabs', 'coupons', 'categories', 'orders', 'products'].includes(activeTab) ? 'block animate-in fade-in duration-300' : 'hidden'}>
+            <div className="space-y-6 lg:space-y-8">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                   <h2 className={`text-lg lg:text-3xl font-bold uppercase transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>{activeTab.replace('-', ' ')} Directory</h2>
@@ -1067,21 +1106,56 @@ const AdminPanel = () => {
                 <button onClick={() => setPagination(p => ({ ...p, page: p.page + 1 }))} disabled={dataList.length < pagination.limit} className={`p-4 rounded-2xl disabled:opacity-30 shadow-sm transition-all ${isDarkMode ? 'bg-gray-800 text-white hover:bg-primary' : 'bg-white text-gray-600 hover:bg-primary hover:text-white border border-gray-100'}`}><ChevronRight size={20} /></button>
               </div>
             </div>
-          )}
+          </div>
 
-          {activeTab === 'vendor-payouts' && (
+          {/* Vendor Payouts */}
+          <div className={activeTab === 'vendor-payouts' ? 'block animate-in fade-in duration-300' : 'hidden'}>
             <VendorPayouts isDarkMode={isDarkMode} />
-          )}
+          </div>
 
-          {activeTab === 'influencer-commissions' && (
+          {/* Influencer Commissions */}
+          <div className={activeTab === 'influencer-commissions' ? 'block animate-in fade-in duration-300' : 'hidden'}>
             <InfluencerCommissions isDarkMode={isDarkMode} />
-          )}
+          </div>
 
-          {activeTab === 'beauty-services' && (
+          {/* Beauty Services (Subscription Plans) */}
+          <div className={activeTab === 'beauty-services' ? 'block animate-in fade-in duration-300' : 'hidden'}>
+            <SubscriptionPlans isDarkMode={isDarkMode} />
+          </div>
+
+          {/* Service Manager */}
+          <div className={activeTab === 'subscription-plans' ? 'block animate-in fade-in duration-300' : 'hidden'}>
             <AdminServiceManager isDarkMode={isDarkMode} />
-          )}
+          </div>
 
-          {activeTab === 'dashboard' && (
+          {/* Service Categories */}
+          <div className={activeTab === 'service-categories' ? 'block animate-in fade-in duration-300' : 'hidden'}>
+            <ServiceCategories isDarkMode={isDarkMode} />
+          </div>
+
+          {/* Service Providers */}
+          <div className={activeTab === 'service-providers' ? 'block animate-in fade-in duration-300' : 'hidden'}>
+            <ServiceProviders isDarkMode={isDarkMode} />
+          </div>
+
+          {/* Home Content Manager */}
+          <div className={activeTab === 'home-content' ? 'block animate-in fade-in duration-300' : 'hidden'}>
+            <HomeContentList
+              isDarkMode={isDarkMode}
+              homeContents={dataList}
+              loading={loading}
+              onCreateTrigger={() => setShowHomeContentModal(true)}
+              onEditTrigger={(item) => {
+                setEditingHomeContent(item);
+                setShowHomeContentModal(true);
+              }}
+              onViewTrigger={(item) => setSelectedHomeContentId(item._id)}
+              onDeleteSuccess={fetchData}
+            />
+          </div>
+
+          {/* Dashboard Overview */}
+          <div className={activeTab === 'dashboard' ? 'block animate-in fade-in duration-300' : 'hidden'}>
             <AdminDashboard
               isOverviewLoading={isOverviewLoading}
               overviewData={overviewData}
@@ -1102,7 +1176,7 @@ const AdminPanel = () => {
               setActiveMonthlyMetric={setActiveMonthlyMetric}
               fetchMonthlyData={fetchMonthlyData}
             />
-          )}
+          </div>
         </main>
       </div>
 

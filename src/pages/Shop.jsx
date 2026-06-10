@@ -20,6 +20,8 @@ const Shop = () => {
   const [wishlist, setWishlist] = useState([]);
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
   const [hoveredProduct, setHoveredProduct] = useState(null);
+  const [freeShippingOnly, setFreeShippingOnly] = useState(false);
+  const [availableBrands, setAvailableBrands] = useState(['Wakeup Luxe', 'Skin Glow', 'Natural Flow', 'Hair Care+', 'Beauty Base', 'Lakme']);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -33,7 +35,7 @@ const Shop = () => {
   // Reset page to 1 when any filter changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [localSearch, activeCategory, selectedPrices]);
+  }, [localSearch, activeCategory, selectedPrices, selectedBrands, freeShippingOnly]);
 
   // Lock body scroll when mobile filter is open
   useEffect(() => {
@@ -46,8 +48,7 @@ const Shop = () => {
   }, [isMobileFilterOpen]);
 
   const categories = ['All', 'Makeup', 'Skincare', 'Haircare', 'Fragrance', 'Tools', 'Natural'];
-  const staticBrands = ['Wakeup Luxe', 'Skin Glow', 'Natural Flow', 'Hair Care+', 'Beauty Base'];
-  const brands = Array.from(new Set([...staticBrands, ...products.map(p => p.brand).filter(Boolean)]));
+  const brands = availableBrands;
 
   const priceRanges = [
     { label: 'Under ₹500', min: 0, max: 500 },
@@ -88,6 +89,16 @@ const Shop = () => {
           }
         }
 
+        // 4. Brand Filter mapping
+        if (selectedBrands.length > 0) {
+          params.brand = selectedBrands[0];
+        }
+
+        // 5. Shipping Filter mapping (Only filter if free shipping checkbox is active)
+        if (freeShippingOnly) {
+          params.is_shipping_apply = false;
+        }
+
         const response = await getProducts(params);
         if (isMounted) {
           if (response.success) {
@@ -113,6 +124,12 @@ const Shop = () => {
             const apiPagesCount = response.data?.totalPages || response.data?.pages || response.data?.data?.totalPages || response.data?.data?.pages;
             const pagesCount = apiPagesCount || (totalItems ? Math.ceil(totalItems / 10) : 1);
             setTotalPages(pagesCount || 1);
+
+            // Extract dynamic brands if no brand filter is selected, so the sidebar list doesn't shrink
+            if (selectedBrands.length === 0) {
+              const fetchedBrands = rawProducts.map(p => p.brand || p.vendorId?.businessName).filter(Boolean);
+              setAvailableBrands(prev => Array.from(new Set([...prev, ...fetchedBrands])));
+            }
 
             // Map raw backend products to existing component layout schema
             const mapped = rawProducts.map(p => {
@@ -146,7 +163,7 @@ const Shop = () => {
 
     fetchFilteredProducts();
     return () => { isMounted = false; };
-  }, [localSearch, activeCategory, selectedPrices, currentPage]);
+  }, [localSearch, activeCategory, selectedPrices, selectedBrands, freeShippingOnly, currentPage]);
 
   // Toggle Wishlist
   const toggleWishlist = (productId) => {
@@ -181,11 +198,13 @@ const Shop = () => {
     setSelectedBrands([]);
     setSelectedPrices([]);
     setBrandSearch('');
+    setFreeShippingOnly(false);
   };
 
   // Filter & Sort Logic (Local Brand Filter over fetched products)
   const filteredProducts = products.filter(product => {
-    const matchesBrand = selectedBrands.length === 0 || selectedBrands.includes(product.brand);
+    const matchesBrand = selectedBrands.length === 0 || 
+      selectedBrands.some(b => b.toLowerCase() === product.brand?.toLowerCase());
     return matchesBrand;
   });
 
@@ -203,7 +222,7 @@ const Shop = () => {
         <h2 className="text-lg font-bold uppercase  text-gray-900 flex items-center gap-2">
           <SlidersHorizontal size={20} className="text-primary" /> Filters
         </h2>
-        {(activeCategory !== 'All' || selectedBrands.length > 0 || selectedPrices.length > 0) && (
+        {(activeCategory !== 'All' || selectedBrands.length > 0 || selectedPrices.length > 0 || freeShippingOnly) && (
           <button 
             onClick={clearAllFilters}
             className="text-[10px] font-semibold text-primary hover:text-white hover:bg-primary px-3 py-1.5 rounded-lg uppercase  transition-all"
@@ -293,6 +312,25 @@ const Shop = () => {
             </label>
           ))}
         </div>
+      </div>
+
+      {/* Shipping */}
+      <div className="space-y-4 pt-6 border-t border-gray-100">
+        <h3 className="text-xs font-bold uppercase text-gray-400">Shipping</h3>
+        <label className="flex items-center gap-3 cursor-pointer group">
+          <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-all ${freeShippingOnly ? 'bg-primary border-primary' : 'border-gray-200 bg-gray-50 group-hover:border-primary/50'}`}>
+            {freeShippingOnly && <Check size={12} className="text-white" />}
+          </div>
+          <input
+            type="checkbox"
+            checked={freeShippingOnly}
+            onChange={() => setFreeShippingOnly(!freeShippingOnly)}
+            className="hidden"
+          />
+          <span className={`text-xs font-bold uppercase transition-colors ${freeShippingOnly ? 'text-gray-900' : 'text-gray-500 group-hover:text-gray-900'}`}>
+            Free Shipping Only
+          </span>
+        </label>
       </div>
     </div>
   );

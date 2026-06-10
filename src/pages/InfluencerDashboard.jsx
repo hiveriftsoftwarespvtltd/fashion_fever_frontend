@@ -36,7 +36,7 @@ const InfluencerDashboard = () => {
     <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar */}
       <div className="w-64 bg-white border-r border-gray-200 hidden lg:flex flex-col">
-        <div className="p-6 border-b border-gray-100">
+        <div className="h-24 px-6 border-b border-gray-100 flex items-center justify-between">
           <span className="text-2xl font-bold text-primary uppercase">WAKEUP CREATOR</span>
         </div>
         <nav className="flex-1 p-4 space-y-2">
@@ -57,7 +57,7 @@ const InfluencerDashboard = () => {
 
       <div className="flex-1 flex flex-col">
         {/* Header */}
-        <header className="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-8">
+        <header className="bg-white border-b border-gray-200 h-24 flex-shrink-0 flex items-center justify-between px-8">
           <div className="flex items-center gap-2">
             <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-[10px] font-bold uppercase">Influencer Tier: Diamond</span>
           </div>

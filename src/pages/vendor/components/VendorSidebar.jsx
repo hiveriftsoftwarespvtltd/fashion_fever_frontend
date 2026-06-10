@@ -9,7 +9,10 @@ import {
   X
 } from 'lucide-react';
 
+import { useTheme } from '../../../context/ThemeContext';
+
 const VendorSidebar = ({ activeTab, setActiveTab, isSidebarOpen, setIsSidebarOpen, vendorData, handleLogout }) => {
+  const { isDarkMode } = useTheme();
   const navItems = [
     { id: 'overview', icon: <LayoutDashboard size={18} />, label: 'Overview' },
     { id: 'products', icon: <Package size={18} />, label: 'Products' },
@@ -30,11 +33,12 @@ const VendorSidebar = ({ activeTab, setActiveTab, isSidebarOpen, setIsSidebarOpe
 
       {/* Sidebar */}
       <div className={`
-     fixed lg:static inset-y-0 left-0 w-64 bg-white border-r border-gray-200 z-[101] 
-     flex flex-col transition-transform duration-300 transform
+     fixed lg:static inset-y-0 left-0 w-64 z-[101] 
+     flex flex-col transition-transform duration-300 transform border-r
      ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+     ${isDarkMode ? 'bg-gray-950 border-white/5' : 'bg-white border-gray-200'}
    `}>
-        <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+        <div className={`h-24 px-6 border-b flex items-center justify-between ${isDarkMode ? 'border-white/5' : 'border-gray-100'}`}>
           <span className="text-2xl font-bold text-primary uppercase truncate block">
             {vendorData?.businessName || 'V-DASH'}
           </span>
@@ -47,16 +51,26 @@ const VendorSidebar = ({ activeTab, setActiveTab, isSidebarOpen, setIsSidebarOpe
             <button
               key={item.id}
               onClick={() => { setActiveTab(item.id); setIsSidebarOpen(false); }}
-              className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${activeTab === item.id ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-gray-500 hover:bg-gray-100'}`}
+              className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                activeTab === item.id 
+                  ? 'bg-primary text-white shadow-lg shadow-primary/20' 
+                  : isDarkMode
+                  ? 'text-gray-400 hover:bg-white/5 hover:text-white'
+                  : 'text-gray-500 hover:bg-gray-100'
+              }`}
             >
               {item.icon} {item.label}
             </button>
           ))}
         </nav>
-        <div className="p-4 border-t border-gray-100">
+        <div className={`p-4 border-t ${isDarkMode ? 'border-white/5' : 'border-gray-100'}`}>
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold text-red-500 hover:bg-red-50 transition-all"
+            className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
+              isDarkMode 
+                ? 'text-red-400 hover:bg-red-500/10' 
+                : 'text-red-500 hover:bg-red-50'
+            }`}
           >
             <LogOut size={18} /> Logout
           </button>

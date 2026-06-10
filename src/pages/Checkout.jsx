@@ -37,6 +37,7 @@ const Checkout = () => {
   const [promoInput, setPromoInput] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState(null); // { code, discount, type, value }
   const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
+  const [orderNotes, setOrderNotes] = useState('Please deliver fast');
   
   // Local Controlled Address Form State - Fully mapped to API body
   const [shippingForm, setShippingForm] = useState({
@@ -271,7 +272,7 @@ const Checkout = () => {
         addressId: selectedAddressId,
         paymentMethod: "CashOnDelivery",
         couponCode: appliedCoupon?.code || null,
-        notes: "Please deliver fast",
+        notes: orderNotes,
         items: orderItems
       };
 
@@ -752,6 +753,16 @@ const Checkout = () => {
                   <div className="p-4 bg-gray-50 border border-gray-100 rounded-2xl text-[10px] text-gray-500 font-bold uppercase leading-relaxed">
                     ⚠️ We currently support only Cash on Delivery (COD) for all locations. Please ensure you have the exact final amount ready at the time of delivery.
                   </div>
+
+                  <div className="space-y-1.5 mt-4">
+                    <label className="text-[9px] font-black text-gray-400 uppercase">Order Delivery Notes</label>
+                    <textarea 
+                      value={orderNotes}
+                      onChange={(e) => setOrderNotes(e.target.value)}
+                      placeholder="e.g. Please deliver fast / Ring the bell / Leave at gate" 
+                      className="w-full px-4 py-3 bg-gray-50/70 border border-gray-100 focus:bg-white rounded-xl font-bold text-xs outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all text-gray-700 h-20 resize-none" 
+                    />
+                  </div>
                 </div>
 
                 <div className="flex gap-3 pt-4 border-t border-gray-50">
@@ -798,6 +809,15 @@ const Checkout = () => {
                       <p className="text-gray-800 mt-0.5">{paymentMethod === 'card' ? 'Secure Credit Card' : 'Cash on Delivery (COD)'}</p>
                     </div>
                   </div>
+                  {orderNotes && (
+                    <div className="flex items-start gap-3 border-t border-gray-100 pt-3 mt-3">
+                      <ShoppingBag size={16} className="text-primary flex-shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-[9px] font-black text-gray-400 uppercase">Delivery Instructions / Notes</p>
+                        <p className="text-gray-800 mt-0.5 italic">"{orderNotes}"</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex gap-3 pt-2">

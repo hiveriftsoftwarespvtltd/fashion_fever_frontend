@@ -113,7 +113,9 @@ const CreateCategoryModal = ({ isOpen, onClose, onSuccess, initialData = null })
 
       let res;
       if (initialData) {
-        res = await updateCategory(initialData._id, dataToSend);
+        const catId = initialData._id || initialData.id;
+        console.log("Submitting PUT request to updateCategory with ID:", catId, "and formData entries:", Object.fromEntries(dataToSend.entries()));
+        res = await updateCategory(catId, dataToSend);
       } else {
         res = await createCategory(dataToSend);
       }

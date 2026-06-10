@@ -34,6 +34,8 @@ const Auth = () => {
   const roles = [
     { id: 'user', name: 'User' },
     { id: 'vendor', name: 'Vendor' },
+    { id: 'service_provider', name: 'Service Provider' },
+    { id: 'distributor', name: 'Distributor' },
   ];
 
   const handleSubmit = async (e) => {
@@ -144,6 +146,7 @@ const Auth = () => {
             }
             else if (role === 'influencer') navigate('/influencer/dashboard');
             else if (role === 'distributor') navigate('/distributor/dashboard');
+            else if (role === 'service_provider') navigate('/service-provider/dashboard');
             else navigate('/');
           }, 1500);
         } else {
