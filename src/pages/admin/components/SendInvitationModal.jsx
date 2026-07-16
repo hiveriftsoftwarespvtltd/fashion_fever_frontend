@@ -63,7 +63,7 @@ const SendInvitationModal = ({ isOpen, onClose, isDarkMode }) => {
               <h2 className={`text-xl font-black uppercase ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
                 Send Invitation Link
               </h2>
-              <p className="text-[10px] font-bold text-gray-400 uppercase mt-1">
+              <p className="text-sm font-bold text-gray-400 uppercase mt-1">
                 Invitation link will be emailed directly
               </p>
             </div>
@@ -79,7 +79,7 @@ const SendInvitationModal = ({ isOpen, onClose, isDarkMode }) => {
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Name */}
             <div className="space-y-2">
-              <label className={`text-[10px] font-black uppercase tracking-wider ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+              <label className={`text-sm font-black uppercase tracking-wider ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                 Influencer Name
               </label>
               <div className="relative">
@@ -103,7 +103,7 @@ const SendInvitationModal = ({ isOpen, onClose, isDarkMode }) => {
 
             {/* Email */}
             <div className="space-y-2">
-              <label className={`text-[10px] font-black uppercase tracking-wider ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+              <label className={`text-sm font-black uppercase tracking-wider ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                 Email Address
               </label>
               <div className="relative">
@@ -128,7 +128,7 @@ const SendInvitationModal = ({ isOpen, onClose, isDarkMode }) => {
             {/* Info Banner */}
             <div className={`flex items-start gap-3 p-4 rounded-2xl border ${isDarkMode ? 'bg-primary/5 border-primary/20' : 'bg-primary/5 border-primary/15'}`}>
               <Sparkles size={14} className="text-primary mt-0.5 flex-shrink-0" />
-              <p className="text-[10px] font-bold text-primary/80 leading-relaxed uppercase">
+              <p className="text-sm font-bold text-primary/80 leading-relaxed uppercase">
                 A secure invitation link will be sent to the email. The link expires in 7 days.
               </p>
             </div>

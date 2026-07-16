@@ -11,6 +11,21 @@ const BookingSummary = ({
   handleConfirmBooking,
   bookingConfirmLoading
 }) => {
+  // Helper to format ISO time string to only time (e.g. 03:30 AM)
+  const formatSlotTime = (isoString) => {
+    if (!isoString) return '';
+    try {
+      const date = new Date(isoString);
+      return date.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      });
+    } catch (e) {
+      return isoString;
+    }
+  };
+
   return (
     <>
       {/* Desktop Sticky Booking Summary Panel */}
@@ -52,7 +67,7 @@ const BookingSummary = ({
               {selectedServices.map(s => {
                 const price = s.offeredPrice || s.sellingPrice || s.costPrice || 0;
                 return (
-                  <div key={s._id} className="flex justify-between items-center gap-2 text-[10px] font-black uppercase">
+                  <div key={s._id} className="flex justify-between items-center gap-2 text-sm font-black uppercase">
                     <span className="text-gray-600 truncate flex-1">{s.title}</span>
                     <span className="text-gray-800 font-extrabold flex-shrink-0">₹{price}</span>
                   </div>
@@ -70,7 +85,7 @@ const BookingSummary = ({
         {selectedResult && selectedServices.length > 0 && (
           <div className="space-y-2">
             <span className="text-[9px] font-black uppercase text-gray-400 block">3. Slot & Stylist</span>
-            <div className="p-4 bg-gray-50 border border-gray-150 rounded-2xl space-y-2 text-[10px] font-black uppercase text-gray-600">
+            <div className="p-4 bg-gray-50 border border-gray-150 rounded-2xl space-y-2 text-sm font-black uppercase text-gray-600">
               <div className="flex items-center gap-2">
                 <CalendarIcon size={12} className="text-primary flex-shrink-0" />
                 <span>{selectedDate}</span>
@@ -78,7 +93,7 @@ const BookingSummary = ({
 
               <div className="flex items-center gap-2">
                 <Clock size={12} className="text-primary flex-shrink-0" />
-                <span>{selectedSlot ? `${selectedSlot.startTime} - ${selectedSlot.endTime}` : 'Choose Time Slot'}</span>
+                <span>{selectedSlot ? `${formatSlotTime(selectedSlot.startTime)} - ${formatSlotTime(selectedSlot.endTime)}` : 'Choose Time Slot'}</span>
               </div>
 
               <div className="flex items-center gap-2">
@@ -137,7 +152,7 @@ const BookingSummary = ({
             type="button"
             onClick={handleConfirmBooking}
             disabled={!selectedSlot || bookingConfirmLoading}
-            className="bg-primary hover:bg-primary/95 text-white px-6 py-3.5 rounded-2xl font-black uppercase text-[10px] shadow-md shadow-primary/25 flex items-center gap-1 cursor-pointer disabled:opacity-50"
+            className="bg-primary hover:bg-primary/95 text-white px-6 py-3.5 rounded-2xl font-black uppercase text-sm shadow-md shadow-primary/25 flex items-center gap-1 cursor-pointer disabled:opacity-50"
           >
             {bookingConfirmLoading ? (
               <>

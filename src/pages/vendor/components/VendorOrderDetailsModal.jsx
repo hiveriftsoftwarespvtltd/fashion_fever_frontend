@@ -116,7 +116,7 @@ const VendorOrderDetailsModal = ({ isOpen, onClose, order, onUpdate }) => {
               </div>
               <div>
                 <h2 className={`text-lg font-bold leading-tight ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{currentOrder.orderNumber}</h2>
-                <p className="text-[10px] font-bold text-gray-400 uppercase mt-0.5 flex items-center gap-1">
+                <p className="text-sm font-bold text-gray-400 uppercase mt-0.5 flex items-center gap-1">
                   <Calendar size={10} /> {isDateValid ? dateObj.toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' }) : 'N/A'}
                 </p>
               </div>
@@ -133,7 +133,7 @@ const VendorOrderDetailsModal = ({ isOpen, onClose, order, onUpdate }) => {
             <div className={`p-4 rounded-2xl border ${
               isDarkMode ? 'border-green-500/20 bg-green-500/5' : 'border-green-100 bg-green-50/20'
             }`}>
-              <p className="text-[10px] font-bold text-green-500 uppercase mb-1 flex items-center gap-1">
+              <p className="text-sm font-bold text-green-500 uppercase mb-1 flex items-center gap-1">
                 <Landmark size={10} /> Vendor Payout
               </p>
               <span className={`text-lg font-extrabold ${isDarkMode ? 'text-green-400' : 'text-green-600'}`}>
@@ -143,7 +143,7 @@ const VendorOrderDetailsModal = ({ isOpen, onClose, order, onUpdate }) => {
             <div className={`p-4 rounded-2xl border ${
               isDarkMode ? 'border-purple-500/20 bg-purple-500/5' : 'border-purple-100 bg-purple-50/20'
             }`}>
-              <p className="text-[10px] font-bold text-purple-500 uppercase mb-1 flex items-center gap-1">
+              <p className="text-sm font-bold text-purple-500 uppercase mb-1 flex items-center gap-1">
                 <Tag size={10} /> Commission Rate
               </p>
               <span className={`text-base font-bold ${isDarkMode ? 'text-purple-400' : 'text-purple-600'}`}>
@@ -156,7 +156,7 @@ const VendorOrderDetailsModal = ({ isOpen, onClose, order, onUpdate }) => {
             <div className={`p-4 rounded-2xl border ${
               isDarkMode ? 'border-white/5 bg-gray-950/40' : 'border-gray-100 bg-gray-50/50'
             }`}>
-              <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Order Status</p>
+              <p className="text-sm font-bold text-gray-400 uppercase mb-1">Order Status</p>
               <span className={`px-2.5 py-1 rounded-full text-xs font-bold uppercase border ${getOrderStatusColor(currentOrder.orderStatus)}`}>
                 {currentOrder.orderStatus || 'Pending'}
               </span>
@@ -169,7 +169,7 @@ const VendorOrderDetailsModal = ({ isOpen, onClose, order, onUpdate }) => {
             <div className={`p-5 rounded-3xl border ${
               isDarkMode ? 'border-white/5 bg-gray-950/20' : 'border-gray-100 bg-gray-50/30'
             }`}>
-              <p className="text-[10px] font-bold text-gray-400 uppercase mb-3 flex items-center gap-1">
+              <p className="text-sm font-bold text-gray-400 uppercase mb-3 flex items-center gap-1">
                 <MapPin size={12} /> Shipping Address
               </p>
               {currentOrder.shippingAddress ? (
@@ -178,7 +178,7 @@ const VendorOrderDetailsModal = ({ isOpen, onClose, order, onUpdate }) => {
                   <p>{currentOrder.shippingAddress.line1}</p>
                   {currentOrder.shippingAddress.line2 && <p>{currentOrder.shippingAddress.line2}</p>}
                   <p>{currentOrder.shippingAddress.city}, {currentOrder.shippingAddress.state} - {currentOrder.shippingAddress.pincode}</p>
-                  <p className="uppercase font-bold text-[10px] text-primary tracking-wider mt-1">{currentOrder.shippingAddress.country || 'India'}</p>
+                  <p className="uppercase font-bold text-sm text-primary tracking-wider mt-1">{currentOrder.shippingAddress.country || 'India'}</p>
                 </div>
               ) : (
                 <p className="text-xs text-gray-400">No shipping address recorded.</p>
@@ -190,7 +190,7 @@ const VendorOrderDetailsModal = ({ isOpen, onClose, order, onUpdate }) => {
               isDarkMode ? 'border-white/5 bg-gray-950/20' : 'border-gray-100 bg-gray-50/30'
             }`}>
               <div>
-                <p className="text-[10px] font-bold text-gray-400 uppercase mb-3 flex items-center gap-1">
+                <p className="text-sm font-bold text-gray-400 uppercase mb-3 flex items-center gap-1">
                   <ShieldCheck size={12} /> Customer Identity
                 </p>
                 {currentOrder.userId ? (
@@ -198,7 +198,7 @@ const VendorOrderDetailsModal = ({ isOpen, onClose, order, onUpdate }) => {
                     <p className={`text-sm font-bold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
                       {typeof currentOrder.userId === 'object' ? (currentOrder.userId.name || 'User') : 'User'}
                     </p>
-                    <p className={`text-[10px] uppercase font-mono ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                    <p className={`text-sm uppercase font-mono ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
                       {typeof currentOrder.userId === 'object' ? currentOrder.userId.email : currentOrder.userId}
                     </p>
                     {typeof currentOrder.userId === 'object' && currentOrder.userId.role && (
@@ -215,7 +215,7 @@ const VendorOrderDetailsModal = ({ isOpen, onClose, order, onUpdate }) => {
               </div>
               <div className={`mt-4 pt-4 border-t flex justify-between items-center text-xs ${isDarkMode ? 'border-white/5' : 'border-gray-100'}`}>
                 <span className="font-bold text-gray-400 uppercase text-[9px]">Payment Status</span>
-                <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                <span className={`px-2 py-0.5 rounded text-sm font-bold uppercase ${
                   currentOrder.paymentStatus === 'paid' 
                     ? (isDarkMode ? 'bg-green-500/10 text-green-400' : 'bg-green-50 text-green-500') 
                     : (isDarkMode ? 'bg-amber-500/10 text-amber-400' : 'bg-amber-50 text-amber-500')
@@ -228,7 +228,7 @@ const VendorOrderDetailsModal = ({ isOpen, onClose, order, onUpdate }) => {
 
           {/* Order Items Table */}
           <div>
-            <p className="text-[10px] font-bold text-gray-400 uppercase mb-3">Order Items</p>
+            <p className="text-sm font-bold text-gray-400 uppercase mb-3">Order Items</p>
             <div className={`border rounded-2xl overflow-hidden shadow-sm ${
               isDarkMode ? 'border-white/5 bg-gray-950' : 'border-gray-100 bg-white'
             }`}>
@@ -334,7 +334,7 @@ const VendorOrderDetailsModal = ({ isOpen, onClose, order, onUpdate }) => {
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1.5">Order Status</label>
+                <label className="text-sm font-bold text-gray-400 uppercase block mb-1.5">Order Status</label>
                 <select
                   value={orderStatus}
                   onChange={(e) => setOrderStatus(e.target.value)}
@@ -350,7 +350,7 @@ const VendorOrderDetailsModal = ({ isOpen, onClose, order, onUpdate }) => {
               </div>
 
               <div>
-                <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1.5">Payment Status</label>
+                <label className="text-sm font-bold text-gray-400 uppercase block mb-1.5">Payment Status</label>
                 <select
                   value={paymentStatus}
                   onChange={(e) => setPaymentStatus(e.target.value)}
@@ -367,7 +367,7 @@ const VendorOrderDetailsModal = ({ isOpen, onClose, order, onUpdate }) => {
             {/* Tracking ID input (only show if status is shipped or delivered) */}
             {(orderStatus === 'shipped' || orderStatus === 'delivered') && (
               <div className="animate-in slide-in-from-top-2 duration-150">
-                <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1.5">Tracking ID</label>
+                <label className="text-sm font-bold text-gray-400 uppercase block mb-1.5">Tracking ID</label>
                 <input
                   type="text"
                   placeholder="Enter courier tracking ID..."
@@ -383,7 +383,7 @@ const VendorOrderDetailsModal = ({ isOpen, onClose, order, onUpdate }) => {
             {/* Cancellation Reason input (only show if status is cancelled) */}
             {orderStatus === 'cancelled' && (
               <div className="animate-in slide-in-from-top-2 duration-150">
-                <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1.5">Cancellation Reason</label>
+                <label className="text-sm font-bold text-gray-400 uppercase block mb-1.5">Cancellation Reason</label>
                 <textarea
                   placeholder="Reason for cancellation..."
                   value={cancellationReason}
@@ -399,7 +399,7 @@ const VendorOrderDetailsModal = ({ isOpen, onClose, order, onUpdate }) => {
             <button
               onClick={handleUpdateStatus}
               disabled={updating}
-              className="w-full py-2.5 bg-primary hover:bg-primary/95 disabled:bg-gray-300 text-white rounded-xl font-bold text-[10px] uppercase tracking-wider transition-all shadow-md shadow-primary/10 hover:opacity-95 active:opacity-90 cursor-pointer text-center"
+              className="w-full py-2.5 bg-primary hover:bg-primary/95 disabled:bg-gray-300 text-white rounded-xl font-bold text-sm uppercase tracking-wider transition-all shadow-md shadow-primary/10 hover:opacity-95 active:opacity-90 cursor-pointer text-center"
             >
               {updating ? 'Saving Changes...' : 'Save Order & Payout Status'}
             </button>

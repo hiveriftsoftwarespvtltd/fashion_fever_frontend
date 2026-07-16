@@ -1,5 +1,5 @@
 import React from 'react';
-import { IndianRupee, Percent, TrendingUp, Clock, Eye } from 'lucide-react';
+import { IndianRupee, Percent, TrendingUp, Clock, Eye, Wallet } from 'lucide-react';
 
 const VendorEarnings = ({
   isDarkMode,
@@ -18,7 +18,7 @@ const VendorEarnings = ({
         <div className={`p-6 rounded-[28px] border transition-all duration-300 relative overflow-hidden backdrop-blur-xl ${
           isDarkMode ? 'bg-gray-900 border-white/5 shadow-xl text-white' : 'bg-white border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.02)] text-gray-800'
         }`}>
-          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Net Earnings</p>
+          <p className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">Net Earnings</p>
           <span className={`text-xl font-extrabold ${isDarkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
             {formatCurrency(overviewData?.netProfit || 0)}
           </span>
@@ -28,7 +28,7 @@ const VendorEarnings = ({
         <div className={`p-6 rounded-[28px] border transition-all duration-300 relative overflow-hidden backdrop-blur-xl ${
           isDarkMode ? 'bg-gray-900 border-white/5 shadow-xl text-white' : 'bg-white border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.02)] text-gray-800'
         }`}>
-          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Commission Deducted</p>
+          <p className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">Commission Deducted</p>
           <span className={`text-xl font-extrabold ${isDarkMode ? 'text-indigo-400' : 'text-indigo-600'}`}>
             {formatCurrency((overviewData?.totalRevenue || 0) - (overviewData?.netProfit || 0))}
           </span>
@@ -38,7 +38,7 @@ const VendorEarnings = ({
         <div className={`p-6 rounded-[28px] border transition-all duration-300 relative overflow-hidden backdrop-blur-xl ${
           isDarkMode ? 'bg-gray-900 border-white/5 shadow-xl text-white' : 'bg-white border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.02)] text-gray-800'
         }`}>
-          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Gross Revenue</p>
+          <p className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">Gross Revenue</p>
           <span className="text-xl font-extrabold text-primary">
             {formatCurrency(overviewData?.totalRevenue || 0)}
           </span>
@@ -48,13 +48,14 @@ const VendorEarnings = ({
         <div className={`p-6 rounded-[28px] border transition-all duration-300 relative overflow-hidden backdrop-blur-xl ${
           isDarkMode ? 'bg-gray-900 border-white/5 shadow-xl text-white' : 'bg-white border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.02)] text-gray-800'
         }`}>
-          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Pending Payouts</p>
+          <p className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">Pending Payouts</p>
           <span className={`text-xl font-extrabold ${isDarkMode ? 'text-amber-400' : 'text-amber-600'}`}>
             {formatCurrency(overviewData?.pendingPayout || 0)}
           </span>
           <div className="absolute right-4 bottom-4 text-amber-500/20"><Clock size={28} /></div>
         </div>
       </div>
+
 
       {/* Sales Performance API block */}
       <div className={`p-6 md:p-8 rounded-[32px] border text-left transition-all duration-300 ${
@@ -75,7 +76,7 @@ const VendorEarnings = ({
         {salesPerformanceLoading ? (
           <div className="py-12 flex flex-col items-center justify-center gap-3">
             <div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
-            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Hydrating sales performance analytics...</p>
+            <p className="text-sm font-bold text-gray-400 uppercase tracking-wider">Hydrating sales performance analytics...</p>
           </div>
         ) : salesPerformance.length === 0 ? (
           <div className="py-12 flex flex-col items-center justify-center text-center gap-3">
@@ -124,7 +125,7 @@ const VendorEarnings = ({
         <div className={`p-6 border-b flex justify-between items-center ${isDarkMode ? 'border-white/5' : 'border-gray-50'}`}>
           <div>
             <h3 className={`text-base font-extrabold uppercase ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>Earnings Ledger</h3>
-            <p className="text-[10px] text-gray-400 font-bold uppercase mt-1">Detailed Payout Breakdown per Customer Order</p>
+            <p className="text-sm text-gray-400 font-bold uppercase mt-1">Detailed Payout Breakdown per Customer Order</p>
           </div>
           <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${isDarkMode ? 'bg-green-500/10 text-green-400' : 'bg-green-50 text-green-600'}`}>
             Active Ledger
@@ -159,7 +160,7 @@ const VendorEarnings = ({
                     <td className="px-6 py-4">
                       <div className="flex flex-col">
                         <span className={`font-bold text-sm ${isDarkMode ? 'text-gray-250' : 'text-gray-800'}`}>{order.orderNumber}</span>
-                        <span className={`text-[10px] font-mono ${isDarkMode ? 'text-gray-550' : 'text-gray-400'}`}>{order.userId?.name || 'User'}</span>
+                        <span className={`text-sm font-mono ${isDarkMode ? 'text-gray-550' : 'text-gray-400'}`}>{order.userId?.name || 'User'}</span>
                       </div>
                     </td>
                     <td className={`px-6 py-4 text-sm font-bold ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>₹{grandTotalAmt.toLocaleString()}</td>

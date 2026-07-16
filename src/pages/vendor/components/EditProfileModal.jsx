@@ -21,6 +21,9 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onSuccess }) => {
     address: initialData?.address || '',
     phone: initialData?.phone || '',
     email: initialData?.email || '',
+    vendorPincode: initialData?.vendorPincode || '',
+    city: initialData?.city || '',
+    state: initialData?.state || '',
     logo: null,
     banner: null
   });
@@ -36,6 +39,9 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onSuccess }) => {
         address: initialData.address || '',
         phone: initialData.phone || '',
         email: initialData.email || '',
+        vendorPincode: initialData.vendorPincode || '',
+        city: initialData.city || '',
+        state: initialData.state || '',
         logo: null,
         banner: null
       });
@@ -154,6 +160,42 @@ const EditProfileModal = ({ isOpen, onClose, initialData, onSuccess }) => {
                 isDarkMode ? 'bg-gray-950 border-white/5 text-gray-200' : 'bg-gray-50 border-gray-100 text-gray-700'
               }`}
             />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-gray-400 uppercase">Pincode</label>
+              <input
+                type="text"
+                value={editForm.vendorPincode}
+                onChange={(e) => setEditForm({ ...editForm, vendorPincode: e.target.value })}
+                className={`w-full px-4 py-2 border rounded-lg text-xs font-bold outline-none focus:ring-2 focus:ring-primary/10 transition-all ${
+                  isDarkMode ? 'bg-gray-955 border-white/5 text-gray-200' : 'bg-gray-50 border-gray-100 text-gray-700'
+                }`}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-gray-400 uppercase">City</label>
+              <input
+                type="text"
+                value={editForm.city}
+                onChange={(e) => setEditForm({ ...editForm, city: e.target.value })}
+                className={`w-full px-4 py-2 border rounded-lg text-xs font-bold outline-none focus:ring-2 focus:ring-primary/10 transition-all ${
+                  isDarkMode ? 'bg-gray-955 border-white/5 text-gray-200' : 'bg-gray-50 border-gray-100 text-gray-700'
+                }`}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-gray-400 uppercase">State</label>
+              <input
+                type="text"
+                value={editForm.state}
+                onChange={(e) => setEditForm({ ...editForm, state: e.target.value })}
+                className={`w-full px-4 py-2 border rounded-lg text-xs font-bold outline-none focus:ring-2 focus:ring-primary/10 transition-all ${
+                  isDarkMode ? 'bg-gray-955 border-white/5 text-gray-200' : 'bg-gray-50 border-gray-100 text-gray-700'
+                }`}
+              />
+            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-6">

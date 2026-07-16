@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Loader2, X, Camera, Video, TicketPercent, Pencil, Trash2 } from 'lucide-react';
 import { toast } from '../../../utils/toast';
-import { getInfluencerById, deleteCoupon } from '../../../api/adminService';
+import { 
+  getInfluencerById, 
+  deleteCoupon,
+  getInfluencerWalletBalance,
+  getInfluencerWalletTransactions
+} from '../../../api/adminService';
 import { useTheme } from '../../../context/ThemeContext';
 
 /**
@@ -11,6 +16,8 @@ import { useTheme } from '../../../context/ThemeContext';
 const InfluencerDetailsModal = ({ influencerId, onClose, onEditCoupon, onRefresh }) => {
   const { isDarkMode } = useTheme();
   const [influencer, setInfluencer] = useState(null);
+  const [wallet, setWallet] = useState(null);
+  const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -18,12 +25,26 @@ const InfluencerDetailsModal = ({ influencerId, onClose, onEditCoupon, onRefresh
       if (!influencerId) return;
       setLoading(true);
       try {
-        const response = await getInfluencerById(influencerId);
-        if (response.success) {
-          const data = response.data?.data || response.data;
+        const [influRes, walletRes, txRes] = await Promise.all([
+          getInfluencerById(influencerId),
+          getInfluencerWalletBalance(influencerId),
+          getInfluencerWalletTransactions(influencerId)
+        ]);
+
+        if (influRes.success) {
+          const data = influRes.data?.data || influRes.data;
           setInfluencer(data);
         } else {
-          toast.error(response.message || 'Failed to load details');
+          toast.error(influRes.message || 'Failed to load details');
+        }
+
+        if (walletRes.success) {
+          setWallet(walletRes.data);
+        }
+
+        if (txRes.success) {
+          const list = txRes.data?.data ?? txRes.data ?? [];
+          setTransactions(Array.isArray(list) ? list : []);
         }
       } catch (err) {
         console.error('Modal fetch error:', err);
@@ -87,7 +108,7 @@ const InfluencerDetailsModal = ({ influencerId, onClose, onEditCoupon, onRefresh
                 <div>
                   <h2 className={`text-2xl font-bold leading-tight ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>{influencer.name}</h2>
                   <p className="text-xs font-bold text-primary uppercase mt-1">Professional Influencer</p>
-                  <p className="text-[10px] font-bold text-gray-400 uppercase mt-0.5">{influencer.userId?.email}</p>
+                  <p className="text-sm font-bold text-gray-400 uppercase mt-0.5">{influencer.userId?.email}</p>
                 </div>
               </div>
               <button onClick={onClose} className={`p-2.5 rounded-xl transition-all ${isDarkMode ? 'hover:bg-white/5 text-gray-500' : 'hover:bg-gray-50 text-gray-400'}`}>
@@ -97,49 +118,49 @@ const InfluencerDetailsModal = ({ influencerId, onClose, onEditCoupon, onRefresh
             {/* Stats */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
-                <h3 className="text-[10px] font-bold uppercase text-gray-400">Financial Performance</h3>
+                <h3 className="text-sm font-bold uppercase text-gray-400">Financial Performance</h3>
                 <div className="grid grid-cols-2 gap-3">
                   <div className={`p-4 rounded-2xl ${isDarkMode ? 'bg-gray-900/50' : 'bg-gray-50'}`}>
-                    <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Commission</p>
+                    <p className="text-sm font-bold text-gray-400 uppercase mb-1">Commission</p>
                     <p className="text-lg font-bold text-primary">{influencer.commissionRate}%</p>
                   </div>
                   <div className={`p-4 rounded-2xl ${isDarkMode ? 'bg-gray-900/50' : 'bg-gray-50'}`}>
-                    <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Followers</p>
+                    <p className="text-sm font-bold text-gray-400 uppercase mb-1">Followers</p>
                     <p className="text-lg font-bold">{influencer.followers?.toLocaleString()}</p>
                   </div>
                   <div className={`p-4 rounded-2xl ${isDarkMode ? 'bg-gray-900/50' : 'bg-gray-50'}`}>
-                    <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Total Sales</p>
+                    <p className="text-sm font-bold text-gray-400 uppercase mb-1">Total Sales</p>
                     <p className="text-lg font-bold">₹{influencer.totalSales?.toLocaleString()}</p>
                   </div>
                   <div className={`p-4 rounded-2xl ${isDarkMode ? 'bg-gray-900/50' : 'bg-gray-50'}`}>
-                    <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Total Earnings</p>
+                    <p className="text-sm font-bold text-gray-400 uppercase mb-1">Total Earnings</p>
                     <p className="text-lg font-bold text-green-500">₹{influencer.totalCommissionEarned?.toLocaleString()}</p>
                   </div>
                   <div className={`p-4 rounded-2xl ${isDarkMode ? 'bg-gray-900/50' : 'bg-gray-50'}`}>
-                    <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Pending</p>
+                    <p className="text-sm font-bold text-gray-400 uppercase mb-1">Pending</p>
                     <p className="text-lg font-bold text-orange-500">₹{influencer.pendingCommission?.toLocaleString() || 0}</p>
                   </div>
                   <div className={`p-4 rounded-2xl ${isDarkMode ? 'bg-gray-900/50' : 'bg-gray-50'}`}>
-                    <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Paid</p>
+                    <p className="text-sm font-bold text-gray-400 uppercase mb-1">Paid</p>
                     <p className="text-lg font-bold text-blue-500">₹{influencer.paidCommission?.toLocaleString() || 0}</p>
                   </div>
                 </div>
               </div>
               {/* Bio & Social */}
               <div className="space-y-4">
-                <h3 className="text-[10px] font-bold uppercase text-gray-400">Profile Information</h3>
+                <h3 className="text-sm font-bold uppercase text-gray-400">Profile Information</h3>
                 <div className={`p-4 rounded-2xl min-h-[100px] ${isDarkMode ? 'bg-gray-900/50' : 'bg-gray-50'}`}>
-                  <p className="text-[10px] font-bold text-gray-400 uppercase mb-2">Biography</p>
+                  <p className="text-sm font-bold text-gray-400 uppercase mb-2">Biography</p>
                   <p className="text-xs font-medium leading-relaxed opacity-80">{influencer.bio || 'No biography provided.'}</p>
                 </div>
                 <div className="flex gap-2">
                   {influencer.instagram && (
-                    <a href={influencer.instagram.startsWith('http') ? influencer.instagram : `https://${influencer.instagram}`} target="_blank" rel="noreferrer" className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-pink-500/10 text-pink-500 text-[10px] font-bold uppercase transition-all hover:bg-pink-500 hover:text-white">
+                    <a href={influencer.instagram.startsWith('http') ? influencer.instagram : `https://${influencer.instagram}`} target="_blank" rel="noreferrer" className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-pink-500/10 text-pink-500 text-sm font-bold uppercase transition-all hover:bg-pink-500 hover:text-white">
                       <Camera size={14} /> Instagram
                     </a>
                   )}
                   {influencer.youtube && (
-                    <a href={influencer.youtube.startsWith('http') ? influencer.youtube : `https://${influencer.youtube}`} target="_blank" rel="noreferrer" className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-red-500/10 text-red-500 text-[10px] font-bold uppercase transition-all hover:bg-red-500 hover:text-white">
+                    <a href={influencer.youtube.startsWith('http') ? influencer.youtube : `https://${influencer.youtube}`} target="_blank" rel="noreferrer" className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-red-500/10 text-red-500 text-sm font-bold uppercase transition-all hover:bg-red-500 hover:text-white">
                       <Video size={14} /> YouTube
                     </a>
                   )}
@@ -149,14 +170,14 @@ const InfluencerDetailsModal = ({ influencerId, onClose, onEditCoupon, onRefresh
             {/* Coupons */}
             <div className="mt-8 space-y-4">
               <div className="flex justify-between items-center">
-                <h3 className="text-[10px] font-bold uppercase text-gray-400">Assigned Coupons ({influencer.coupons?.length || 0})</h3>
+                <h3 className="text-sm font-bold uppercase text-gray-400">Assigned Coupons ({influencer.coupons?.length || 0})</h3>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {influencer.coupons?.length > 0 ? (
                   influencer.coupons.map((coupon, idx) => (
                     <div key={idx} className={`group p-4 rounded-2xl border transition-all ${isDarkMode ? 'bg-gray-900/40 border-white/5 hover:border-primary/50' : 'bg-gray-50 border-gray-100 hover:border-primary/30'}`}>
                       <div className="flex justify-between items-start mb-2">
-                        <span className="px-2 py-1 rounded bg-primary/10 text-primary text-[10px] font-bold uppercase">{coupon.code}</span>
+                        <span className="px-2 py-1 rounded bg-primary/10 text-primary text-sm font-bold uppercase">{coupon.code}</span>
                         <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-all">
                           <button onClick={() => onEditCoupon(coupon)} title="Edit Coupon" className="p-1.5 rounded-lg bg-primary text-white transition-all hover:scale-110"><Pencil size={12} /></button>
                           <button onClick={() => handleDeleteCoupon(coupon._id)} title="Delete Coupon" className="p-1.5 rounded-lg bg-red-500 text-white transition-all hover:scale-110"><Trash2 size={12} /></button>
@@ -165,20 +186,105 @@ const InfluencerDetailsModal = ({ influencerId, onClose, onEditCoupon, onRefresh
                       <div className="flex justify-between items-end">
                         <div>
                           <p className={`text-sm font-bold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>{coupon.type === 'percentage' ? `${coupon.value}% OFF` : `₹${coupon.value} OFF`}</p>
-                          <p className="text-[10px] font-bold text-gray-400 uppercase mt-0.5">Exp: {new Date(coupon.expiresAt).toLocaleDateString()}</p>
+                          <p className="text-sm font-bold text-gray-400 uppercase mt-0.5">Exp: {new Date(coupon.expiresAt).toLocaleDateString()}</p>
                         </div>
-                        <span className={`text-[10px] font-bold uppercase ${coupon.isActive ? 'text-green-500' : 'text-red-5'}`}>{coupon.isActive ? 'Active' : 'Expired'}</span>
+                        <span className={`text-sm font-bold uppercase ${coupon.isActive ? 'text-green-500' : 'text-red-5'}`}>{coupon.isActive ? 'Active' : 'Expired'}</span>
                       </div>
                     </div>
                   ))
                 ) : (
                   <div className={`col-span-full py-8 text-center rounded-2xl border-2 border-dashed ${isDarkMode ? 'border-white/5 text-gray-600' : 'border-gray-100 text-gray-400'}`}>
                     <TicketPercent size={24} className="mx-auto mb-2 opacity-20" />
-                    <p className="text-[10px] font-bold uppercase">No coupons generated yet</p>
+                    <p className="text-sm font-bold uppercase">No coupons generated yet</p>
                   </div>
                 )}
               </div>
             </div>
+
+            {/* Wallet Summary Card */}
+            {wallet && (
+              <div className={`mt-8 p-5 rounded-2xl border text-left transition-colors duration-300 ${
+                isDarkMode ? 'bg-gray-900/40 border-white/5' : 'bg-emerald-50/10 border-emerald-100/50'
+              }`}>
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-sm font-black uppercase text-gray-400 tracking-wider">
+                    Influencer Wallet Summary
+                  </span>
+                  <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase ${
+                    isDarkMode ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-emerald-100 text-emerald-800'
+                  }`}>
+                    Active Balance
+                  </span>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="flex flex-col">
+                    <span className="text-[8px] font-black text-gray-400 uppercase">Liquid Balance</span>
+                    <span className={`text-sm font-black ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                      ₹{(wallet.balance || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                  </div>
+                  <div className="flex flex-col border-l border-gray-100 dark:border-white/5 pl-3">
+                    <span className="text-[8px] font-black text-gray-400 uppercase">Total Earnings</span>
+                    <span className="text-sm font-bold text-emerald-500">
+                      ₹{(wallet.totalEarnings || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Transactions History Ledger */}
+            <div className="mt-8 space-y-3">
+              <div className="flex items-center justify-between border-b pb-2 border-gray-100 dark:border-white/5">
+                <span className="text-sm font-black uppercase text-gray-400 tracking-wider">
+                  Transaction Audit Ledger
+                </span>
+                <span className="text-[9px] text-gray-400 font-bold uppercase">
+                  {(transactions || []).length} Records
+                </span>
+              </div>
+              
+              {(!transactions || transactions.length === 0) ? (
+                <div className="py-6 text-center text-xs font-bold text-gray-400 uppercase italic">
+                  No transactions recorded for this wallet.
+                </div>
+              ) : (
+                <div className="space-y-2 max-h-56 overflow-y-auto pr-1 scrollbar-thin">
+                  {transactions.map((tx) => (
+                    <div 
+                      key={tx._id}
+                      className={`p-3 rounded-xl border flex items-center justify-between gap-3 text-xs transition-all ${
+                        isDarkMode 
+                          ? 'bg-gray-900/20 border-white/5 hover:border-white/10' 
+                          : 'bg-gray-50/50 border-gray-100 hover:border-gray-200 shadow-sm'
+                      }`}
+                    >
+                      <div className="flex flex-col gap-0.5 max-w-[70%] text-left">
+                        <span className={`font-bold ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>
+                          {tx.description || tx.reason || 'Transaction'}
+                        </span>
+                        <span className="text-[8px] text-gray-400 font-bold uppercase">
+                          {new Date(tx.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      </div>
+                      
+                      <div className="text-right flex flex-col items-end gap-0.5 flex-shrink-0">
+                        <span className={`font-black text-xs ${
+                          tx.type === 'CREDIT' ? 'text-emerald-500' : 'text-rose-500'
+                        }`}>
+                          {tx.type === 'CREDIT' ? '+' : '-'}₹{(tx.amount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </span>
+                        <span className="text-[8px] text-gray-400 font-mono font-bold uppercase">
+                          Bal: ₹{(tx.balanceAfterTransaction || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
             <button onClick={onClose} className="w-full mt-10 py-4 bg-primary text-white rounded-2xl font-bold text-xs uppercase shadow-xl shadow-primary/20 hover:opacity-95 active:opacity-90 transition-all">
               Dismiss Profile
             </button>

@@ -140,7 +140,7 @@ const CreateSubscriptionPlanModal = ({ isOpen, onClose, onSuccess, initialData =
                 <h2 className={`text-xl font-bold uppercase ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
                   {initialData ? 'Update Subscription Plan' : 'Create Subscription Plan'}
                 </h2>
-                <p className="text-[10px] font-bold text-gray-400 uppercase mt-1">
+                <p className="text-sm font-bold text-gray-400 uppercase mt-1">
                   {initialData ? `Modify configuration for: ${initialData.label || initialData.name}` : 'Configure a new service subscription plan for vendors'}
                 </p>
               </div>
@@ -155,19 +155,19 @@ const CreateSubscriptionPlanModal = ({ isOpen, onClose, onSuccess, initialData =
               
               {/* Plan Name */}
               <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase text-gray-400">Plan Name (System key)</label>
+                <label className="text-sm font-bold uppercase text-gray-400">Plan Name (System key)</label>
                 <input required name="name" value={formData.name} onChange={handleChange} placeholder="e.g. standard" className={`w-full px-5 py-4 rounded-2xl text-sm font-medium outline-none border transition-all ${isDarkMode ? 'bg-gray-900 border-gray-700 text-white focus:border-primary/50' : 'bg-gray-50 border-gray-100 text-gray-800 focus:bg-white focus:border-primary/30'}`} />
               </div>
 
               {/* Display Label */}
               <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase text-gray-400">Display Label</label>
+                <label className="text-sm font-bold uppercase text-gray-400">Display Label</label>
                 <input required name="label" value={formData.label} onChange={handleChange} placeholder="e.g. Standard Tier" className={`w-full px-5 py-4 rounded-2xl text-sm font-medium outline-none border transition-all ${isDarkMode ? 'bg-gray-900 border-gray-700 text-white focus:border-primary/50' : 'bg-gray-50 border-gray-100 text-gray-800 focus:bg-white focus:border-primary/30'}`} />
               </div>
 
               {/* Price */}
               <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase text-gray-400">Price (₹)</label>
+                <label className="text-sm font-bold uppercase text-gray-400">Price (₹)</label>
                 <div className="relative">
                   <div className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400">
                     <DollarSign size={16} />
@@ -178,7 +178,7 @@ const CreateSubscriptionPlanModal = ({ isOpen, onClose, onSuccess, initialData =
 
               {/* Duration in Days */}
               <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase text-gray-400">Duration (Days, -1 for Lifetime)</label>
+                <label className="text-sm font-bold uppercase text-gray-400">Duration (Days, -1 for Lifetime)</label>
                 <div className="relative">
                   <div className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400">
                     <Calendar size={16} />
@@ -189,25 +189,25 @@ const CreateSubscriptionPlanModal = ({ isOpen, onClose, onSuccess, initialData =
 
               {/* Max Services */}
               <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase text-gray-400">Max Services Allowed</label>
+                <label className="text-sm font-bold uppercase text-gray-400">Max Services Allowed</label>
                 <input required type="number" min="1" name="maxServices" value={formData.maxServices} onChange={handleChange} placeholder="e.g. 10" className={`w-full px-5 py-4 rounded-2xl text-sm font-medium outline-none border transition-all ${isDarkMode ? 'bg-gray-900 border-gray-700 text-white focus:border-primary/50' : 'bg-gray-50 border-gray-100 text-gray-800 focus:bg-white focus:border-primary/30'}`} />
               </div>
 
               {/* Max Staff */}
               <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase text-gray-400">Max Staff Accounts</label>
+                <label className="text-sm font-bold uppercase text-gray-400">Max Staff Accounts</label>
                 <input required type="number" min="1" name="maxStaff" value={formData.maxStaff} onChange={handleChange} placeholder="e.g. 5" className={`w-full px-5 py-4 rounded-2xl text-sm font-medium outline-none border transition-all ${isDarkMode ? 'bg-gray-900 border-gray-700 text-white focus:border-primary/50' : 'bg-gray-50 border-gray-100 text-gray-800 focus:bg-white focus:border-primary/30'}`} />
               </div>
 
               {/* Monthly Lead Limit */}
               <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase text-gray-400">Monthly Lead Limit</label>
+                <label className="text-sm font-bold uppercase text-gray-400">Monthly Lead Limit</label>
                 <input required type="number" min="0" name="monthlyLeadLimit" value={formData.monthlyLeadLimit} onChange={handleChange} placeholder="e.g. 50" className={`w-full px-5 py-4 rounded-2xl text-sm font-medium outline-none border transition-all ${isDarkMode ? 'bg-gray-900 border-gray-700 text-white focus:border-primary/50' : 'bg-gray-50 border-gray-100 text-gray-800 focus:bg-white focus:border-primary/30'}`} />
               </div>
 
               {/* Commission Percentage */}
               <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase text-gray-400">Commission Percentage (%)</label>
+                <label className="text-sm font-bold uppercase text-gray-400">Commission Percentage (%)</label>
                 <div className="relative">
                   <div className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400">
                     <Percent size={14} />
@@ -218,13 +218,13 @@ const CreateSubscriptionPlanModal = ({ isOpen, onClose, onSuccess, initialData =
 
               {/* Priority Rank */}
               <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase text-gray-400">Priority Rank (Sorting order)</label>
+                <label className="text-sm font-bold uppercase text-gray-400">Priority Rank (Sorting order)</label>
                 <input required type="number" min="1" name="priorityRank" value={formData.priorityRank} onChange={handleChange} placeholder="e.g. 1" className={`w-full px-5 py-4 rounded-2xl text-sm font-medium outline-none border transition-all ${isDarkMode ? 'bg-gray-900 border-gray-700 text-white focus:border-primary/50' : 'bg-gray-50 border-gray-100 text-gray-800 focus:bg-white focus:border-primary/30'}`} />
               </div>
 
               {/* Active Toggle */}
               <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase text-gray-400">Plan Status</label>
+                <label className="text-sm font-bold uppercase text-gray-400">Plan Status</label>
                 <div className="flex items-center gap-3 h-14">
                   <button
                     type="button"
@@ -244,7 +244,7 @@ const CreateSubscriptionPlanModal = ({ isOpen, onClose, onSuccess, initialData =
 
             {/* Feature Flags Grid */}
             <div className={`p-5 rounded-3xl border space-y-4 ${isDarkMode ? 'bg-gray-900/30 border-white/5' : 'bg-gray-50 border-gray-100'}`}>
-              <p className="text-[10px] font-black uppercase text-gray-400 tracking-wider">Features Included</p>
+              <p className="text-sm font-black uppercase text-gray-400 tracking-wider">Features Included</p>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 
@@ -261,7 +261,7 @@ const CreateSubscriptionPlanModal = ({ isOpen, onClose, onSuccess, initialData =
                   }`}
                 >
                   <Star size={18} className={formData.featuredListing ? 'fill-primary' : ''} />
-                  <span className="text-[10px] font-black uppercase">Featured Listing</span>
+                  <span className="text-sm font-black uppercase">Featured Listing</span>
                 </button>
 
                 {/* Priority Support */}
@@ -277,7 +277,7 @@ const CreateSubscriptionPlanModal = ({ isOpen, onClose, onSuccess, initialData =
                   }`}
                 >
                   <Award size={18} />
-                  <span className="text-[10px] font-black uppercase">Priority Support</span>
+                  <span className="text-sm font-black uppercase">Priority Support</span>
                 </button>
 
                 {/* Analytics Access */}
@@ -293,7 +293,7 @@ const CreateSubscriptionPlanModal = ({ isOpen, onClose, onSuccess, initialData =
                   }`}
                 >
                   <Zap size={18} />
-                  <span className="text-[10px] font-black uppercase">Analytics Access</span>
+                  <span className="text-sm font-black uppercase">Analytics Access</span>
                 </button>
 
               </div>

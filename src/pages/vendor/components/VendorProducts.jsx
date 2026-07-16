@@ -1,5 +1,5 @@
-import React from 'react';
-import { Plus, Eye, Edit, Trash2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { Plus, Eye, Edit, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const VendorProducts = ({
   isDarkMode,
@@ -11,6 +11,68 @@ const VendorProducts = ({
   onEditProduct,
   onDeleteProduct
 }) => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 10;
+
+  // Reset page to 1 if products list length changes (e.g., deleted or added)
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [products.length]);
+
+  // Sort: Last added item at the top of the table (sorted by createdAt descending / fallback to _id)
+  const sortedProducts = React.useMemo(() => {
+    return [...products].sort((a, b) => {
+      const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      if (dateB !== dateA) {
+        return dateB - dateA;
+      }
+      return (b._id || '').toString().localeCompare((a._id || '').toString());
+    });
+  }, [products]);
+
+  // Pagination logic
+  const totalPages = Math.ceil(sortedProducts.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const paginatedProducts = sortedProducts.slice(startIndex, endIndex);
+
+  // Generate page numbers with ellipses for a clean UI
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisible = 5;
+    
+    if (totalPages <= maxVisible) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      pages.push(1);
+      
+      let start = Math.max(2, currentPage - 1);
+      let end = Math.min(totalPages - 1, currentPage + 1);
+      
+      if (currentPage <= 2) {
+        end = 4;
+      } else if (currentPage >= totalPages - 1) {
+        start = totalPages - 3;
+      }
+      
+      if (start > 2) {
+        pages.push('...');
+      }
+      
+      for (let i = start; i <= end; i++) {
+        pages.push(i);
+      }
+      
+      if (end < totalPages - 1) {
+        pages.push('...');
+      }
+      
+      pages.push(totalPages);
+    }
+    return pages;
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -38,7 +100,7 @@ const VendorProducts = ({
             <tbody className={`divide-y ${isDarkMode ? 'divide-white/5' : 'divide-gray-50'}`}>
               {productsLoading ? (
                 <tr><td colSpan="5" className="p-10 text-center font-bold text-gray-400">Loading products...</td></tr>
-              ) : products.map((product) => (
+              ) : paginatedProducts.map((product) => (
                 <tr key={product._id} className={`${isDarkMode ? 'hover:bg-white/5' : 'hover:bg-gray-50/50'} transition-colors`}>
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
@@ -84,12 +146,76 @@ const VendorProducts = ({
                   </td>
                 </tr>
               ))}
-              {products.length === 0 && !productsLoading && (
+              {sortedProducts.length === 0 && !productsLoading && (
                 <tr><td colSpan="5" className="p-10 text-center font-bold text-gray-400">No products found.</td></tr>
               )}
             </tbody>
           </table>
         </div>
+        
+        {/* Pagination Section */}
+        {totalPages > 1 && (
+          <div className={`px-6 py-4 flex items-center justify-between border-t transition-colors duration-300 ${isDarkMode ? 'border-white/5 bg-gray-950/20' : 'border-gray-100 bg-gray-50/50'}`}>
+            <div className="text-xs font-bold text-gray-400 uppercase">
+              Showing {startIndex + 1} to {Math.min(endIndex, sortedProducts.length)} of {sortedProducts.length} products
+            </div>
+            
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className={`p-2 rounded-xl transition-all cursor-pointer ${
+                  currentPage === 1
+                    ? 'text-gray-500 opacity-40 cursor-not-allowed'
+                    : isDarkMode
+                      ? 'text-gray-300 hover:bg-white/5 hover:text-white'
+                      : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                }`}
+              >
+                <ChevronLeft size={16} />
+              </button>
+
+              {getPageNumbers().map((page, index) => {
+                if (page === '...') {
+                  return (
+                    <span key={`ellipsis-${index}`} className="px-2 text-xs font-bold text-gray-500">
+                      ...
+                    </span>
+                  );
+                }
+                return (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`px-3 py-1.5 rounded-xl font-bold text-xs transition-all cursor-pointer ${
+                      currentPage === page
+                        ? 'bg-primary text-white shadow-md shadow-primary/20'
+                        : isDarkMode
+                          ? 'text-gray-400 hover:bg-white/5 hover:text-white'
+                          : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                    }`}
+                  >
+                    {page}
+                  </button>
+                );
+              })}
+
+              <button
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+                className={`p-2 rounded-xl transition-all cursor-pointer ${
+                  currentPage === totalPages
+                    ? 'text-gray-500 opacity-40 cursor-not-allowed'
+                    : isDarkMode
+                      ? 'text-gray-300 hover:bg-white/5 hover:text-white'
+                      : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                }`}
+              >
+                <ChevronRight size={16} />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

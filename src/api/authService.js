@@ -218,4 +218,89 @@ export const getUserOrders = async () => {
   }
 };
 
+/** Get requested roles status */
+export const getRequestedRoles = async () => {
+  try {
+    const response = await apiClient.get('/user/requested-roles');
+    return response.data;
+  } catch (error) {
+    console.error('Get requested roles error:', error);
+    return error.response?.data || { success: false, message: 'Failed to fetch requested roles', statusCode: 500 };
+  }
+};
+
+/** Apply for roles */
+export const applyForRoles = async (payload) => {
+  try {
+    const response = await apiClient.post('/user/apply-for-roles', payload);
+    return response.data;
+  } catch (error) {
+    console.error('Apply for roles error:', error);
+    return error.response?.data || { success: false, message: 'Failed to apply for roles', statusCode: 500 };
+  }
+};
+
+/** Raise a support ticket */
+export const raiseTicket = async (formData) => {
+  try {
+    const response = await apiClient.post('/ticket/raise-a-ticket', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Raise ticket error:', error);
+    return error.response?.data || { success: false, message: 'Failed to submit support ticket', statusCode: 500 };
+  }
+};
+
+/** Get logged-in user tickets */
+export const getUserTickets = async () => {
+  try {
+    const response = await apiClient.get('/ticket/my-tickets');
+    return response.data;
+  } catch (error) {
+    console.error('Get user tickets error:', error);
+    return error.response?.data || { success: false, message: 'Failed to fetch tickets history', statusCode: 500 };
+  }
+};
+
+/** Update support ticket status */
+export const updateTicketStatus = async (ticketId, payload) => {
+  try {
+    const response = await apiClient.put(`/ticket/update-status/${ticketId}`, payload);
+    return response.data;
+  } catch (error) {
+    console.error('Update ticket status error:', error);
+    return error.response?.data || { success: false, message: 'Failed to update ticket status', statusCode: 500 };
+  }
+};
+
+/** Edit support ticket details with full modification */
+export const editTicket = async (ticketId, formData) => {
+  try {
+    const response = await apiClient.put(`/ticket/update/${ticketId}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Edit ticket error:', error);
+    return error.response?.data || { success: false, message: 'Failed to update support ticket', statusCode: 500 };
+  }
+};
+
+/** Delete support ticket using DELETE method */
+export const deleteTicket = async (ticketId) => {
+  try {
+    const response = await apiClient.delete(`/ticket/delete/${ticketId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Delete ticket error:', error);
+    return error.response?.data || { success: false, message: 'Failed to delete support ticket', statusCode: 500 };
+  }
+};
+
 

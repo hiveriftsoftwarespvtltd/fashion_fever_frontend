@@ -153,7 +153,7 @@ const CreateCategoryModal = ({ isOpen, onClose, onSuccess, initialData = null })
                 <h2 className={`text-xl font-bold uppercase ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
                   {initialData ? 'Update Category' : 'Create Category'}
                 </h2>
-                <p className="text-[10px] font-bold text-gray-400 uppercase mt-1">
+                <p className="text-sm font-bold text-gray-400 uppercase mt-1">
                   {initialData ? `Modify Details for: ${initialData.name}` : 'Add a new product category to the system'}
                 </p>
               </div>
@@ -168,7 +168,7 @@ const CreateCategoryModal = ({ isOpen, onClose, onSuccess, initialData = null })
               
               {/* Category Image Upload */}
               <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase text-gray-400">Category Cover Image</label>
+                <label className="text-sm font-bold uppercase text-gray-400">Category Cover Image</label>
                 <div className="flex items-center gap-4">
                   <div className={`w-20 h-20 rounded-2xl overflow-hidden border flex items-center justify-center ${isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-100 shadow-sm'}`}>
                     {imagePreview ? (
@@ -190,31 +190,31 @@ const CreateCategoryModal = ({ isOpen, onClose, onSuccess, initialData = null })
 
               {/* Name */}
               <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase text-gray-400">Category Name</label>
+                <label className="text-sm font-bold uppercase text-gray-400">Category Name</label>
                 <input required name="name" value={formData.name} onChange={handleChange} placeholder="e.g. skincare" className={`w-full px-5 py-4 rounded-2xl text-sm font-medium outline-none border transition-all ${isDarkMode ? 'bg-gray-900 border-gray-700 text-white focus:border-primary/50' : 'bg-gray-50 border-gray-100 text-gray-800 focus:bg-white focus:border-primary/30'}`} />
               </div>
 
               {/* Grid for Label and Slug */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold uppercase text-gray-400">Display Label</label>
+                  <label className="text-sm font-bold uppercase text-gray-400">Display Label</label>
                   <input required name="label" value={formData.label} onChange={handleChange} placeholder="e.g. Skin Care" className={`w-full px-5 py-4 rounded-2xl text-sm font-medium outline-none border transition-all ${isDarkMode ? 'bg-gray-900 border-gray-700 text-white focus:border-primary/50' : 'bg-gray-50 border-gray-100 text-gray-800 focus:bg-white focus:border-primary/30'}`} />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold uppercase text-gray-400">URL Slug</label>
+                  <label className="text-sm font-bold uppercase text-gray-400">URL Slug</label>
                   <input required name="slug" value={formData.slug} onChange={handleChange} placeholder="e.g. skincare" className={`w-full px-5 py-4 rounded-2xl text-sm font-medium outline-none border transition-all ${isDarkMode ? 'bg-gray-900 border-gray-700 text-white focus:border-primary/50' : 'bg-gray-50 border-gray-100 text-gray-800 focus:bg-white focus:border-primary/30'}`} />
                 </div>
               </div>
 
               {/* Tags */}
               <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase text-gray-400">Tags (Comma Separated)</label>
+                <label className="text-sm font-bold uppercase text-gray-400">Tags (Comma Separated)</label>
                 <input name="tags" value={formData.tags} onChange={handleChange} placeholder="e.g. skincare, beauty, organic" className={`w-full px-5 py-4 rounded-2xl text-sm font-medium outline-none border transition-all ${isDarkMode ? 'bg-gray-900 border-gray-700 text-white focus:border-primary/50' : 'bg-gray-50 border-gray-100 text-gray-800 focus:bg-white focus:border-primary/30'}`} />
               </div>
 
               {/* Description */}
               <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase text-gray-400">Description</label>
+                <label className="text-sm font-bold uppercase text-gray-400">Description</label>
                 <textarea required name="description" value={formData.description} onChange={handleChange} rows="3" placeholder="Category overview..." className={`w-full px-5 py-4 rounded-2xl text-sm font-medium outline-none border transition-all resize-none ${isDarkMode ? 'bg-gray-900 border-gray-700 text-white focus:border-primary/50' : 'bg-gray-50 border-gray-100 text-gray-800 focus:bg-white focus:border-primary/30'}`}></textarea>
               </div>
 

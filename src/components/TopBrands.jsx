@@ -1,73 +1,77 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, Palette, Droplets } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { getPublicBrands } from '../api/productService';
 
-// ── Makeup images ─────────────────────────────────────────────────
+// ── Fallback images if API returns no brands ────────────────────────
 import m1 from '../assets/1makeup.png';
 import m2 from '../assets/2makeup.png';
 import m3 from '../assets/3makeup.png';
 import m4 from '../assets/4makeup.png';
-import m5 from '../assets/5makeup.png';
-import m6 from '../assets/6makeup.png';
-import m7 from '../assets/7makeup.png';
-import m8 from '../assets/8makeup.png';
-
-// ── Skincare images ───────────────────────────────────────────────
 import s1 from '../assets/1skincare.png';
 import s2 from '../assets/2skincare.png';
 import s3 from '../assets/3skincare.png';
 import s4 from '../assets/4skincare.png';
-import s5 from '../assets/5skincare.png';
-import s6 from '../assets/6skincare.png';
-import s7 from '../assets/7skincare.png';
-import s8 from '../assets/8skincare.png';
-
-const TABS = [
-  {
-    key: 'makeup',
-    icon: Palette,
-    label: 'Makeup',
-    items: [
-      { img: m1, name: 'Lipstick' },
-      { img: m2, name: 'Foundation' },
-      { img: m3, name: 'Eye Palette' },
-      { img: m4, name: 'Blush' },
-      { img: m5, name: 'Mascara' },
-      { img: m6, name: 'Highlighter' },
-      { img: m7, name: 'Lip Liner' },
-      { img: m8, name: 'Concealer' },
-    ],
-  },
-  {
-    key: 'skincare',
-    icon: Droplets,
-    label: 'Skincare',
-    items: [
-      { img: s1, name: 'Moisturizer' },
-      { img: s2, name: 'Serum' },
-      { img: s3, name: 'Sunscreen' },
-      { img: s4, name: 'Face Wash' },
-      { img: s5, name: 'Toner' },
-      { img: s6, name: 'Eye Cream' },
-      { img: s7, name: 'Face Mask' },
-      { img: s8, name: 'Scrub' },
-    ],
-  },
-];
 
 // Speed in pixels per frame (at 60fps ≈ 0.7px/frame = ~42px/s — slow & smooth)
 const SPEED = 0.7;
 
 const TopBrands = () => {
-  const navigate              = useNavigate();
-  const [activeTab, setActiveTab] = useState('makeup');
-  const containerRef          = useRef(null);
-  const isPausedRef           = useRef(false);
-  const rafRef                = useRef(null);
+  const navigate = useNavigate();
+  const [brands, setBrands] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const containerRef = useRef(null);
+  const isPausedRef = useRef(false);
+  const rafRef = useRef(null);
 
-  const tab     = TABS.find((t) => t.key === activeTab);
-  const items   = tab.items;
-  // Triple the items — we scroll from set 1 to set 2 then loop back
+  useEffect(() => {
+    const fetchBrands = async () => {
+      try {
+        const response = await getPublicBrands();
+        if (response.success) {
+          const payload = response.data ?? response;
+          if (Array.isArray(payload)) {
+            // Deduplicate by brand name and map images correctly (both string and object schemas)
+            const uniqueBrandsMap = {};
+            payload.forEach(item => {
+              if (item.brand) {
+                const bName = item.brand.trim().toLowerCase();
+                if (!uniqueBrandsMap[bName]) {
+                  const imgUrl = typeof item.image === 'string' 
+                    ? item.image 
+                    : (item.image?.url || 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=600&h=800&fit=crop');
+                  uniqueBrandsMap[bName] = {
+                    name: item.brand,
+                    img: imgUrl,
+                    totalProducts: item.totalProducts
+                  };
+                }
+              }
+            });
+            const uniqueBrands = Object.values(uniqueBrandsMap);
+            setBrands(uniqueBrands);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch top brands:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchBrands();
+  }, []);
+
+  const items = brands.length > 0 ? brands : [
+    { img: m1, name: 'Lipstick' },
+    { img: m2, name: 'Foundation' },
+    { img: s1, name: 'Moisturizer' },
+    { img: s2, name: 'Serum' },
+    { img: m3, name: 'Eye Palette' },
+    { img: s3, name: 'Sunscreen' },
+    { img: m4, name: 'Blush' },
+    { img: s4, name: 'Face Wash' }
+  ];
+
   const tripled = [...items, ...items, ...items];
 
   // ── How many cards visible ──────────────────────────────────────
@@ -82,12 +86,11 @@ const TopBrands = () => {
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
-    // Small delay to let layout settle
     const id = setTimeout(() => {
       el.scrollLeft = getSetW();
     }, 50);
     return () => clearTimeout(id);
-  }, [activeTab]); // eslint-disable-line
+  }, [brands]); // eslint-disable-line
 
   // ── RAF auto-scroll loop ────────────────────────────────────────
   useEffect(() => {
@@ -98,7 +101,6 @@ const TopBrands = () => {
       if (!isPausedRef.current) {
         el.scrollLeft += SPEED;
         const setW = getSetW();
-        // Seamless loop: past the 2nd copy → jump back to 1st copy
         if (setW > 0 && el.scrollLeft >= setW * 2) {
           el.scrollLeft -= setW;
         }
@@ -110,7 +112,7 @@ const TopBrands = () => {
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
-  }, [activeTab]); // eslint-disable-line
+  }, [brands]); // eslint-disable-line
 
   // ── Touch events — pause RAF while user swipes ──────────────────
   useEffect(() => {
@@ -119,7 +121,6 @@ const TopBrands = () => {
 
     const onTouchStart = () => { isPausedRef.current = true; };
     const onTouchEnd   = () => {
-      // Resume after a short settle delay
       setTimeout(() => { isPausedRef.current = false; }, 1000);
     };
 
@@ -162,28 +163,14 @@ const TopBrands = () => {
               Trending Now
             </p>
             <h2 className="text-2xl md:text-[28px] font-black text-gray-900 leading-tight">
-              Top Brand 
+              Top Brands
             </h2>
           </div>
 
           <div className="flex gap-2">
-            {TABS.map((t) => {
-              const Icon = t.icon;
-              return (
-                <button
-                  key={t.key}
-                  onClick={() => setActiveTab(t.key)}
-                  className={`flex items-center gap-1.5 px-5 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wide border transition-all duration-200 ${
-                    activeTab === t.key
-                      ? 'bg-primary text-white border-primary shadow-sm shadow-primary/30'
-                      : 'text-gray-500 border-gray-200 hover:border-primary hover:text-primary bg-white'
-                  }`}
-                >
-                  <Icon className="w-3.5 h-3.5" />
-                  {t.label}
-                </button>
-              );
-            })}
+            <span className="px-4 py-1.5 bg-primary/10 text-primary rounded-full text-sm font-bold uppercase tracking-wider">
+              Luxe Labels
+            </span>
           </div>
         </div>
       </div>
@@ -236,18 +223,26 @@ const TopBrands = () => {
 const Card = ({ item, onClick }) => (
   <div
     onClick={onClick}
-    className="group cursor-pointer flex flex-col items-center gap-2.5"
+    className="group cursor-pointer flex flex-col items-center rounded-3xl bg-white border border-gray-100/60 shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:shadow-[0_12px_30px_rgba(255,45,85,0.06)] hover:border-primary/20 hover:-translate-y-1 transition-all duration-500 w-full overflow-hidden"
   >
-    <div className="w-full aspect-square rounded-2xl overflow-hidden bg-gray-50 border border-gray-100 shadow-sm group-hover:shadow-md group-hover:border-primary/25 transition-all duration-300">
+    <div className="w-full aspect-[16/9] bg-gray-50 flex items-center justify-center transition-all duration-500">
       <img
         src={item.img}
         alt={item.name}
-        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+        className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+        onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=300&h=200&fit=crop'; }}
       />
     </div>
-    <span className="text-[11px] sm:text-xs font-semibold text-gray-700 text-center leading-tight group-hover:text-primary transition-colors duration-200 pb-1">
-      {item.name}
-    </span>
+    <div className="text-center w-full px-3 pb-4 pt-3">
+      <span className="text-xs font-extrabold uppercase tracking-wider text-gray-800 group-hover:text-primary transition-colors duration-300 block truncate">
+        {item.name}
+      </span>
+      {item.totalProducts !== undefined && (
+        <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest block mt-0.5">
+          {item.totalProducts} Products
+        </span>
+      )}
+    </div>
   </div>
 );
 

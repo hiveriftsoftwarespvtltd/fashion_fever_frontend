@@ -199,7 +199,7 @@ const Payments = () => {
 
                     <form onSubmit={handleAddCardSubmit} className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       <div className="sm:col-span-2">
-                        <label className="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Card Number</label>
+                        <label className="text-sm font-bold text-gray-400 uppercase mb-1 block">Card Number</label>
                         <input 
                           type="text"
                           maxLength={19}
@@ -211,7 +211,7 @@ const Payments = () => {
                       </div>
 
                       <div>
-                        <label className="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Card Brand</label>
+                        <label className="text-sm font-bold text-gray-400 uppercase mb-1 block">Card Brand</label>
                         <select 
                           value={cardForm.brand}
                           onChange={e => setCardForm(f => ({ ...f, brand: e.target.value }))}
@@ -224,7 +224,7 @@ const Payments = () => {
                       </div>
 
                       <div className="sm:col-span-2">
-                        <label className="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Cardholder Name</label>
+                        <label className="text-sm font-bold text-gray-400 uppercase mb-1 block">Cardholder Name</label>
                         <input 
                           type="text"
                           value={cardForm.holder}
@@ -237,7 +237,7 @@ const Payments = () => {
                       <div>
                         <div className="grid grid-cols-2 gap-3">
                           <div>
-                            <label className="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Expiry</label>
+                            <label className="text-sm font-bold text-gray-400 uppercase mb-1 block">Expiry</label>
                             <input 
                               type="text"
                               maxLength={5}
@@ -248,7 +248,7 @@ const Payments = () => {
                             />
                           </div>
                           <div>
-                            <label className="text-[10px] font-bold text-gray-400 uppercase mb-1 block">CVV</label>
+                            <label className="text-sm font-bold text-gray-400 uppercase mb-1 block">CVV</label>
                             <input 
                               type="password"
                               maxLength={3}
@@ -300,7 +300,7 @@ const Payments = () => {
                           {/* Holographic chip simulation */}
                           <div className="flex items-start justify-between">
                             <div className="w-10 h-8 rounded-lg bg-yellow-400/80 border border-yellow-300 shadow flex items-center justify-center overflow-hidden">
-                              <span className="text-[10px] text-yellow-800 font-mono font-bold tracking-tight">CHIP</span>
+                              <span className="text-sm text-yellow-800 font-mono font-bold tracking-tight">CHIP</span>
                             </div>
                             <span className="text-sm font-bold italic tracking-wider">{card.brand}</span>
                           </div>
@@ -389,7 +389,7 @@ const Payments = () => {
                   <p className="text-xs font-bold text-gray-800 uppercase flex items-center gap-1">
                     <Lock size={12} className="text-green-600" /> PCI-DSS Compliant Encryption
                   </p>
-                  <p className="text-[10px] text-gray-400 font-bold uppercase leading-relaxed max-w-xl">
+                  <p className="text-sm text-gray-400 font-bold uppercase leading-relaxed max-w-xl">
                     Your full card details are securely encrypted on merchant token vault storage. We strictly follow PCI-DSS certification tier guidelines.
                   </p>
                 </div>

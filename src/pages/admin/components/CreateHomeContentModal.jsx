@@ -200,7 +200,7 @@ const CreateHomeContentModal = ({ isOpen, onClose, onSuccess, editData }) => {
                 <h2 className={`text-xl font-bold uppercase ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
                   {editData ? 'Edit Homepage Content' : 'Add Homepage Content'}
                 </h2>
-                <p className="text-[10px] font-bold text-gray-400 uppercase mt-1">
+                <p className="text-sm font-bold text-gray-400 uppercase mt-1">
                   {editData ? 'Modify promotional banners, slides and redirect triggers' : 'Upload promotional banners, slides and redirect triggers'}
                 </p>
               </div>
@@ -217,7 +217,7 @@ const CreateHomeContentModal = ({ isOpen, onClose, onSuccess, editData }) => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 {/* Computer Image */}
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold uppercase text-gray-400">Desktop Cover Image (Required)</label>
+                  <label className="text-sm font-bold uppercase text-gray-400">Desktop Cover Image (Required)</label>
                   <div className="flex items-center gap-4">
                     <div className={`w-20 h-20 rounded-2xl overflow-hidden border flex flex-shrink-0 items-center justify-center ${isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-100 shadow-sm'}`}>
                       {compPreview ? (
@@ -239,7 +239,7 @@ const CreateHomeContentModal = ({ isOpen, onClose, onSuccess, editData }) => {
 
                 {/* Mobile Image */}
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold uppercase text-gray-400">Mobile Cover Image (Optional)</label>
+                  <label className="text-sm font-bold uppercase text-gray-400">Mobile Cover Image (Optional)</label>
                   <div className="flex items-center gap-4">
                     <div className={`w-20 h-20 rounded-2xl overflow-hidden border flex flex-shrink-0 items-center justify-center ${isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-100 shadow-sm'}`}>
                       {mobPreview ? (
@@ -263,18 +263,18 @@ const CreateHomeContentModal = ({ isOpen, onClose, onSuccess, editData }) => {
               {/* Text configurations */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold uppercase text-gray-400">Title</label>
+                  <label className="text-sm font-bold uppercase text-gray-400">Title</label>
                   <input required name="title" value={formData.title} onChange={handleChange} placeholder="e.g. Welcome Offer" className={`w-full px-4 py-3 rounded-2xl text-xs font-medium outline-none border transition-all ${isDarkMode ? 'bg-gray-900 border-gray-700 text-white focus:border-primary/50' : 'bg-gray-50 border-gray-100 text-gray-800 focus:bg-white focus:border-primary/30'}`} />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold uppercase text-gray-400">Sub Title</label>
+                  <label className="text-sm font-bold uppercase text-gray-400">Sub Title</label>
                   <input name="subTitle" value={formData.subTitle} onChange={handleChange} placeholder="e.g. Get 50% Off Today" className={`w-full px-4 py-3 rounded-2xl text-xs font-medium outline-none border transition-all ${isDarkMode ? 'bg-gray-900 border-gray-700 text-white focus:border-primary/50' : 'bg-gray-50 border-gray-100 text-gray-800 focus:bg-white focus:border-primary/30'}`} />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold uppercase text-gray-400">Content Type</label>
+                  <label className="text-sm font-bold uppercase text-gray-400">Content Type</label>
                   <select name="contentType" value={formData.contentType} onChange={handleChange} className={`w-full px-4 py-3 rounded-2xl text-xs font-bold outline-none border transition-all ${isDarkMode ? 'bg-gray-900 border-gray-700 text-white focus:border-primary/50' : 'bg-gray-50 border-gray-100 text-gray-800 focus:bg-white focus:border-primary/30'}`}>
                     <option value="BANNER">BANNER</option>
                     <option value="SLIDER">SLIDER</option>
@@ -283,7 +283,7 @@ const CreateHomeContentModal = ({ isOpen, onClose, onSuccess, editData }) => {
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold uppercase text-gray-400">Page Number / Placement</label>
+                  <label className="text-sm font-bold uppercase text-gray-400">Page Number / Placement</label>
                   <input name="page" value={formData.page} onChange={handleChange} placeholder="e.g. 1" className={`w-full px-4 py-3 rounded-2xl text-xs font-medium outline-none border transition-all ${isDarkMode ? 'bg-gray-900 border-gray-700 text-white focus:border-primary/50' : 'bg-gray-50 border-gray-100 text-gray-800 focus:bg-white focus:border-primary/30'}`} />
                 </div>
               </div>
@@ -291,7 +291,7 @@ const CreateHomeContentModal = ({ isOpen, onClose, onSuccess, editData }) => {
               {/* Redirect bindings */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold uppercase text-gray-400">Redirect Type</label>
+                  <label className="text-sm font-bold uppercase text-gray-400">Redirect Type</label>
                   <select name="redirectType" value={formData.redirectType} onChange={handleChange} className={`w-full px-4 py-3 rounded-2xl text-xs font-bold outline-none border transition-all ${isDarkMode ? 'bg-gray-900 border-gray-700 text-white focus:border-primary/50' : 'bg-gray-50 border-gray-100 text-gray-800 focus:bg-white focus:border-primary/30'}`}>
                     <option value="NONE">NONE</option>
                     <option value="PRODUCT">PRODUCT</option>
@@ -300,11 +300,11 @@ const CreateHomeContentModal = ({ isOpen, onClose, onSuccess, editData }) => {
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold uppercase text-gray-400">Redirect Product/Category ID</label>
+                  <label className="text-sm font-bold uppercase text-gray-400">Redirect Product/Category ID</label>
                   <input name="redirectId" value={formData.redirectId} onChange={handleChange} placeholder="e.g. 6a27a66af..." className={`w-full px-4 py-3 rounded-2xl text-xs font-medium outline-none border transition-all ${isDarkMode ? 'bg-gray-900 border-gray-700 text-white focus:border-primary/50' : 'bg-gray-50 border-gray-100 text-gray-800 focus:bg-white focus:border-primary/30'}`} />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold uppercase text-gray-400">Redirect External URL</label>
+                  <label className="text-sm font-bold uppercase text-gray-400">Redirect External URL</label>
                   <input name="redirectUrl" value={formData.redirectUrl} onChange={handleChange} placeholder="e.g. https://google.com" className={`w-full px-4 py-3 rounded-2xl text-xs font-medium outline-none border transition-all ${isDarkMode ? 'bg-gray-900 border-gray-700 text-white focus:border-primary/50' : 'bg-gray-50 border-gray-100 text-gray-800 focus:bg-white focus:border-primary/30'}`} />
                 </div>
               </div>
@@ -312,18 +312,18 @@ const CreateHomeContentModal = ({ isOpen, onClose, onSuccess, editData }) => {
               {/* Color styling */}
               <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
                 <div className="space-y-2 col-span-2">
-                  <label className="text-[10px] font-bold uppercase text-gray-400">Labels (Comma Separated)</label>
+                  <label className="text-sm font-bold uppercase text-gray-400">Labels (Comma Separated)</label>
                   <input name="labels" value={formData.labels} onChange={handleChange} placeholder="e.g. Summer, Sale, MakeUp" className={`w-full px-4 py-3 rounded-2xl text-xs font-medium outline-none border transition-all ${isDarkMode ? 'bg-gray-900 border-gray-700 text-white focus:border-primary/50' : 'bg-gray-50 border-gray-100 text-gray-800 focus:bg-white focus:border-primary/30'}`} />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold uppercase text-gray-400">BG Color</label>
+                  <label className="text-sm font-bold uppercase text-gray-400">BG Color</label>
                   <div className="flex gap-2">
                     <input type="color" name="backgroundColor" value={formData.backgroundColor} onChange={handleChange} className="w-8 h-8 rounded-lg border-none cursor-pointer p-0" />
                     <input name="backgroundColor" value={formData.backgroundColor} onChange={handleChange} className={`w-full px-3 py-1.5 rounded-xl text-xs outline-none border ${isDarkMode ? 'bg-gray-900 border-gray-700 text-white' : 'bg-gray-50 border-gray-100 text-gray-800'}`} />
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold uppercase text-gray-400">Text Color</label>
+                  <label className="text-sm font-bold uppercase text-gray-400">Text Color</label>
                   <div className="flex gap-2">
                     <input type="color" name="textColor" value={formData.textColor} onChange={handleChange} className="w-8 h-8 rounded-lg border-none cursor-pointer p-0" />
                     <input name="textColor" value={formData.textColor} onChange={handleChange} className={`w-full px-3 py-1.5 rounded-xl text-xs outline-none border ${isDarkMode ? 'bg-gray-900 border-gray-700 text-white' : 'bg-gray-50 border-gray-100 text-gray-800'}`} />
@@ -334,15 +334,15 @@ const CreateHomeContentModal = ({ isOpen, onClose, onSuccess, editData }) => {
               {/* Order & Dates */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold uppercase text-gray-400">Display Order</label>
+                  <label className="text-sm font-bold uppercase text-gray-400">Display Order</label>
                   <input type="number" name="displayOrder" value={formData.displayOrder} onChange={handleChange} min="0" className={`w-full px-4 py-3 rounded-2xl text-xs font-medium outline-none border transition-all ${isDarkMode ? 'bg-gray-900 border-gray-700 text-white focus:border-primary/50' : 'bg-gray-50 border-gray-100 text-gray-800 focus:bg-white focus:border-primary/30'}`} />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold uppercase text-gray-400">Start Date</label>
+                  <label className="text-sm font-bold uppercase text-gray-400">Start Date</label>
                   <input type="date" name="startDate" value={formData.startDate} onChange={handleChange} className={`w-full px-4 py-3 rounded-2xl text-xs font-medium outline-none border transition-all ${isDarkMode ? 'bg-gray-900 border-gray-700 text-white focus:border-primary/50' : 'bg-gray-50 border-gray-100 text-gray-800 focus:bg-white focus:border-primary/30'}`} />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold uppercase text-gray-400">End Date</label>
+                  <label className="text-sm font-bold uppercase text-gray-400">End Date</label>
                   <input type="date" name="endDate" value={formData.endDate} onChange={handleChange} className={`w-full px-4 py-3 rounded-2xl text-xs font-medium outline-none border transition-all ${isDarkMode ? 'bg-gray-900 border-gray-700 text-white focus:border-primary/50' : 'bg-gray-50 border-gray-100 text-gray-800 focus:bg-white focus:border-primary/30'}`} />
                 </div>
               </div>
@@ -350,7 +350,7 @@ const CreateHomeContentModal = ({ isOpen, onClose, onSuccess, editData }) => {
               {/* Description & Action Button */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold uppercase text-gray-400">Button Text</label>
+                  <label className="text-sm font-bold uppercase text-gray-400">Button Text</label>
                   <input name="buttonText" value={formData.buttonText} onChange={handleChange} placeholder="e.g. Shop Now" className={`w-full px-4 py-3 rounded-2xl text-xs font-medium outline-none border transition-all ${isDarkMode ? 'bg-gray-900 border-gray-700 text-white focus:border-primary/50' : 'bg-gray-50 border-gray-100 text-gray-800 focus:bg-white focus:border-primary/30'}`} />
                 </div>
                 <div className="flex gap-8 items-center pt-5">
@@ -367,7 +367,7 @@ const CreateHomeContentModal = ({ isOpen, onClose, onSuccess, editData }) => {
 
               {/* Description */}
               <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase text-gray-400">Description Overview</label>
+                <label className="text-sm font-bold uppercase text-gray-400">Description Overview</label>
                 <textarea name="description" value={formData.description} onChange={handleChange} rows="2" placeholder="Banner body description..." className={`w-full px-4 py-3 rounded-2xl text-xs font-medium outline-none border transition-all resize-none ${isDarkMode ? 'bg-gray-900 border-gray-700 text-white focus:border-primary/50' : 'bg-gray-50 border-gray-100 text-gray-800 focus:bg-white focus:border-primary/30'}`}></textarea>
               </div>
 

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {
-  X, LayoutDashboard, Scissors, Calendar, UserCheck, LogOut, ChevronDown, Sparkles, Users, Clock
+  X, LayoutDashboard, Scissors, Calendar, UserCheck, LogOut, ChevronDown, Sparkles, Users, Clock, Wallet, ClipboardList, Landmark
 } from 'lucide-react';
 
 const ServiceProviderSidebar = ({
@@ -66,7 +66,7 @@ const ServiceProviderSidebar = ({
             </div>
             <div>
               <p className="text-xs font-black uppercase text-primary tracking-widest leading-none">Wakeup</p>
-              <p className={`text-[10px] font-bold uppercase tracking-wider leading-tight mt-0.5 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+              <p className={`text-sm font-bold uppercase tracking-wider leading-tight mt-0.5 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
                 Provider Panel
               </p>
             </div>
@@ -87,6 +87,9 @@ const ServiceProviderSidebar = ({
           <NavItem id="services" label="My Services" icon={<Scissors size={16} />} />
           <NavItem id="staff" label="Manage Staff" icon={<Users size={16} />} />
           <NavItem id="availability" label="Work Availability" icon={<Clock size={16} />} />
+          <NavItem id="wallet" label="My Wallet" icon={<Wallet size={16} />} />
+          <NavItem id="leads" label="Customer Leads" icon={<ClipboardList size={16} />} />
+          <NavItem id="payout" label="Bank Details" icon={<Landmark size={16} />} />
           <NavItem id="profile" label="Business Profile" icon={<UserCheck size={16} />} />
         </nav>
 

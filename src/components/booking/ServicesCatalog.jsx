@@ -29,7 +29,7 @@ const ServicesCatalog = ({
               <p className="text-xs font-black text-primary uppercase">Catalog for {selectedResult.provider.businessName}</p>
               <p className="text-[9px] text-gray-500 font-bold uppercase mt-0.5">Click items to add or remove them from your booking appointment</p>
             </div>
-            <span className="text-[10px] font-black text-white bg-primary px-3 py-1 rounded-full uppercase shadow-md shadow-primary/20">
+            <span className="text-sm font-black text-white bg-primary px-3 py-1 rounded-full uppercase shadow-md shadow-primary/20">
               {selectedResult.services?.length || 0} Available
             </span>
           </div>

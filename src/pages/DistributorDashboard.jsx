@@ -59,7 +59,7 @@ const DistributorDashboard = () => {
                <div className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                      <div className="space-y-2">
-                        <label className="text-[10px] font-bold text-gray-400 uppercase">Select Product</label>
+                        <label className="text-sm font-bold text-gray-400 uppercase">Select Product</label>
                         <select className="w-full p-4 bg-gray-50 border-none rounded-xl text-sm font-bold outline-none">
                            <option>Velvet Matte Lipstick (Pack of 50)</option>
                            <option>Hydrating Serum (Pack of 100)</option>
@@ -67,7 +67,7 @@ const DistributorDashboard = () => {
                         </select>
                      </div>
                      <div className="space-y-2">
-                        <label className="text-[10px] font-bold text-gray-400 uppercase">Quantity</label>
+                        <label className="text-sm font-bold text-gray-400 uppercase">Quantity</label>
                         <input type="number" placeholder="Min 50 units" className="w-full p-4 bg-gray-50 border-none rounded-xl text-sm font-bold outline-none" />
                      </div>
                   </div>
@@ -104,7 +104,7 @@ const DistributorDashboard = () => {
                   <div className="p-3 bg-green-50 text-green-600 rounded-xl"><Truck size={24} /></div>
                   <div>
                      <p className="text-xs font-bold text-gray-900 uppercase">Priority Shipping</p>
-                     <p className="text-[10px] font-bold text-gray-400 uppercase">Distributors get 48h delivery</p>
+                     <p className="text-sm font-bold text-gray-400 uppercase">Distributors get 48h delivery</p>
                   </div>
                </div>
             </div>
@@ -114,17 +114,17 @@ const DistributorDashboard = () => {
              <div className="p-8 border-b border-gray-50">
                 <div className="flex items-center gap-2 text-orange-500 mb-2">
                    <AlertCircle size={18} />
-                   <span className="text-[10px] font-bold uppercase">Low Stock Notifications</span>
+                   <span className="text-sm font-bold uppercase">Low Stock Notifications</span>
                 </div>
                 <h2 className="text-lg font-bold uppercase">Pre-Order Status</h2>
              </div>
              <table className="w-full text-left">
                 <thead className="bg-gray-50">
                    <tr>
-                      <th className="px-8 py-4 text-[10px] font-bold text-gray-400 uppercase">Product</th>
-                      <th className="px-8 py-4 text-[10px] font-bold text-gray-400 uppercase">Estimated Restock</th>
-                      <th className="px-8 py-4 text-[10px] font-bold text-gray-400 uppercase">My Pre-orders</th>
-                      <th className="px-8 py-4 text-[10px] font-bold text-gray-400 uppercase">Action</th>
+                      <th className="px-8 py-4 text-sm font-bold text-gray-400 uppercase">Product</th>
+                      <th className="px-8 py-4 text-sm font-bold text-gray-400 uppercase">Estimated Restock</th>
+                      <th className="px-8 py-4 text-sm font-bold text-gray-400 uppercase">My Pre-orders</th>
+                      <th className="px-8 py-4 text-sm font-bold text-gray-400 uppercase">Action</th>
                    </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
@@ -139,7 +139,7 @@ const DistributorDashboard = () => {
                         <td className="px-8 py-6 text-sm font-bold text-gray-900">15 May 2024</td>
                         <td className="px-8 py-6 text-sm font-bold text-primary">250 Units</td>
                         <td className="px-8 py-6">
-                           <button className="text-[10px] font-bold uppercase text-primary hover:underline">Update Qty</button>
+                           <button className="text-sm font-bold uppercase text-primary hover:underline">Update Qty</button>
                         </td>
                      </tr>
                    ))}

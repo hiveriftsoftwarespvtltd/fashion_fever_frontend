@@ -1,4 +1,5 @@
 import React from 'react'
+import InstaStories from '../components/InstaStories'
 import Hero from '../components/Hero'
 import TopBrands from '../components/TopBrands'
 import HeroPromotion from '../components/HeroPromotion'
@@ -14,16 +15,21 @@ import MoreBeautyToLove from '../components/MoreBeautyToLove'
 import BeautyBFF from '../components/BeautyBFF'
 import BuyingGuides from '../components/BuyingGuides'
 import ProductSection from '../components/ProductSection'
+import TopSellingProducts from '../components/TopSellingProducts'
+import TopTrendingProducts from '../components/TopTrendingProducts'
 
 const Home = () => {
  return (
  <div className="w-full flex flex-col overflow-x-hidden">
+  <InstaStories />
   <Hero />
   <TopBrands />
   <ProductSection />
+  <TopSellingProducts />
+  <TopTrendingProducts />
   <Promotions />
-  <BrandBanners />
-  <LastChance />
+  {/* <BrandBanners /> */}
+  {/* <LastChance /> */}
   <BirthdayCarousel />
   <FeatureBanner />
   <FinalPromo />

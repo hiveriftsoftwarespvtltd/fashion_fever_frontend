@@ -6,7 +6,11 @@ import apiClient from './apiClient';
  */
 export const registerVendor = async (formData) => {
   try {
-    const response = await apiClient.post('/vendor', formData);
+    const response = await apiClient.post('/vendor', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
     return response.data;
   } catch (error) {
     console.error('Vendor registration error:', error);
@@ -140,6 +144,7 @@ export const createProduct = async (data) => {
     formData.append('status', data.status || 'ACTIVE');
     formData.append('hasVariants', data.hasVariants || false);
     formData.append('isShippingApply', data.isShippingApply !== undefined ? data.isShippingApply : true);
+    formData.append('brand', data.brand || 'ponds');
 
     // Variants Handling
     if (data.variants && data.variants.length > 0) {
@@ -226,6 +231,7 @@ export const updateProduct = async (id, data) => {
     formData.append('metaDescription', data.metaDescription || '');
     formData.append('status', data.status || 'ACTIVE');
     formData.append('isShippingApply', data.isShippingApply !== undefined ? data.isShippingApply : true);
+    formData.append('brand', data.brand || 'ponds');
 
     if (data.variants && data.variants.length > 0) {
       data.variants.forEach((variant, vIdx) => {
@@ -397,7 +403,11 @@ export const deleteCategory = async (categoryId) => {
  */
 export const editVendorDetails = async (formData) => {
   try {
-    const response = await apiClient.put('/vendor', formData);
+    const response = await apiClient.put('/vendor', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
     return response.data;
   } catch (error) {
     console.error('Edit vendor details error:', error);

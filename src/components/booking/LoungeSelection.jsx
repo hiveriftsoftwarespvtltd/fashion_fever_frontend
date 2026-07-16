@@ -24,13 +24,13 @@ const LoungeSelection = ({
       {loading ? (
         <div className="py-24 bg-white rounded-3xl border border-gray-100 flex flex-col items-center justify-center shadow-sm">
           <Loader2 size={36} className="animate-spin text-primary mb-3" />
-          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest animate-pulse">Scanning geographic grid...</span>
+          <span className="text-sm font-bold text-gray-400 uppercase tracking-widest animate-pulse">Scanning geographic grid...</span>
         </div>
       ) : searchResults.length === 0 ? (
         <div className="py-20 bg-white rounded-3xl border border-dashed border-gray-200 text-center shadow-sm">
           <Scissors size={40} className="mx-auto text-gray-300 mb-4" />
           <h3 className="text-sm font-black text-gray-400 uppercase">No Service Lounges Found</h3>
-          <p className="text-[10px] text-gray-400 font-bold uppercase mt-1">Try expanding your search radius or selecting a different city.</p>
+          <p className="text-sm text-gray-400 font-bold uppercase mt-1">Try expanding your search radius or selecting a different city.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -90,7 +90,7 @@ const LoungeSelection = ({
                     <h3 className="text-base font-extrabold text-gray-800 uppercase truncate">
                       {prov.businessName}
                     </h3>
-                    <p className="text-gray-400 text-[10px] font-bold uppercase mt-1 truncate">
+                    <p className="text-gray-400 text-sm font-bold uppercase mt-1 truncate">
                       {prov.address}, {prov.city}
                     </p>
                   </div>
@@ -99,7 +99,7 @@ const LoungeSelection = ({
                     <span className="text-[9px] font-black text-primary uppercase bg-primary/5 border border-primary/10 px-2 py-1 rounded-md inline-block">
                       {hasServices} Services
                     </span>
-                    <span className="text-[10px] font-black text-primary uppercase flex items-center gap-0.5">
+                    <span className="text-sm font-black text-primary uppercase flex items-center gap-0.5">
                       {isSelected ? (
                         <>Selected <Check size={12} /></>
                       ) : (

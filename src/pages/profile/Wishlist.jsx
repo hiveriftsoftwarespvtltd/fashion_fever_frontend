@@ -179,11 +179,11 @@ const Wishlist = () => {
                           
                           <div className="flex items-center gap-2 mb-1.5">
                              {item.variant?.salesPrice < item.variant?.price && (
-                               <span className="text-[10px] font-bold text-gray-400 line-through">₹{item.variant?.price}</span>
+                               <span className="text-sm font-bold text-gray-400 line-through">₹{item.variant?.price}</span>
                              )}
                              <span className="text-xs font-bold text-gray-900">₹{item.variant?.salesPrice || item.variant?.price || 0}</span>
                              {item.variant?.salesPrice < item.variant?.price && item.variant?.price > 0 && (
-                               <span className="text-[10px] font-bold text-green-600 bg-green-50 px-1.5 py-0.5 rounded uppercase">
+                               <span className="text-sm font-bold text-green-600 bg-green-50 px-1.5 py-0.5 rounded uppercase">
                                  {Math.round(((item.variant?.price - item.variant?.salesPrice) / item.variant?.price) * 100)}% Off
                                </span>
                              )}
@@ -195,7 +195,7 @@ const Wishlist = () => {
                                 <Star key={i} size={10} className={i < 4 ? "fill-gray-900 text-gray-900" : "text-gray-300"} />
                               ))}
                             </div>
-                            <span className="text-[10px] font-bold text-gray-400 ml-1">(120)</span>
+                            <span className="text-sm font-bold text-gray-400 ml-1">(120)</span>
                           </div>
 
                           <button 

@@ -135,7 +135,7 @@ const CreateServiceCategoryModal = ({ isOpen, onClose, onSuccess, initialData = 
                 <h2 className={`text-xl font-bold uppercase ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
                   {initialData ? 'Update Service Category' : 'Create Service Category'}
                 </h2>
-                <p className="text-[10px] font-bold text-gray-400 uppercase mt-1">
+                <p className="text-sm font-bold text-gray-400 uppercase mt-1">
                   {initialData ? `Modify details for: ${initialData.label || initialData.name}` : 'Add a new service category to the platform'}
                 </p>
               </div>
@@ -150,7 +150,7 @@ const CreateServiceCategoryModal = ({ isOpen, onClose, onSuccess, initialData = 
               
               {/* Category Image Upload */}
               <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase text-gray-400">Category Cover Image</label>
+                <label className="text-sm font-bold uppercase text-gray-400">Category Cover Image</label>
                 <div className="flex items-center gap-4">
                   <div className={`w-20 h-20 rounded-2xl overflow-hidden border flex items-center justify-center ${isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-100 shadow-sm'}`}>
                     {imagePreview ? (
@@ -172,26 +172,26 @@ const CreateServiceCategoryModal = ({ isOpen, onClose, onSuccess, initialData = 
 
               {/* Name */}
               <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase text-gray-400">Category Name</label>
+                <label className="text-sm font-bold uppercase text-gray-400">Category Name</label>
                 <input required name="name" value={formData.name} onChange={handleChange} placeholder="e.g. Manicure" className={`w-full px-5 py-4 rounded-2xl text-sm font-medium outline-none border transition-all ${isDarkMode ? 'bg-gray-900 border-gray-700 text-white focus:border-primary/50' : 'bg-gray-50 border-gray-100 text-gray-800 focus:bg-white focus:border-primary/30'}`} />
               </div>
 
               {/* Display Label */}
               <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase text-gray-400">Display Label</label>
+                <label className="text-sm font-bold uppercase text-gray-400">Display Label</label>
                 <input required name="label" value={formData.label} onChange={handleChange} placeholder="e.g. Manicure Services" className={`w-full px-5 py-4 rounded-2xl text-sm font-medium outline-none border transition-all ${isDarkMode ? 'bg-gray-900 border-gray-700 text-white focus:border-primary/50' : 'bg-gray-50 border-gray-100 text-gray-800 focus:bg-white focus:border-primary/30'}`} />
               </div>
 
               {/* Description */}
               <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase text-gray-400">Description</label>
+                <label className="text-sm font-bold uppercase text-gray-400">Description</label>
                 <textarea required name="description" value={formData.description} onChange={handleChange} rows="3" placeholder="Category overview..." className={`w-full px-5 py-4 rounded-2xl text-sm font-medium outline-none border transition-all resize-none ${isDarkMode ? 'bg-gray-900 border-gray-700 text-white focus:border-primary/50' : 'bg-gray-50 border-gray-100 text-gray-800 focus:bg-white focus:border-primary/30'}`}></textarea>
               </div>
 
               {/* Status Toggle (only in Edit mode) */}
               {initialData && (
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold uppercase text-gray-400">Category Status</label>
+                  <label className="text-sm font-bold uppercase text-gray-400">Category Status</label>
                   <div className="flex items-center gap-3">
                     <button
                       type="button"

@@ -12,17 +12,25 @@ import {
   Package,
   Menu,
   X,
-  ChevronDown
+  ChevronDown,
+  BookOpen,
+  ShieldCheck,
+  Headphones,
+  ClipboardList
 } from 'lucide-react';
 import { useUser } from '../../context/UserContext';
 
 const sidebarLinks = [
   { icon: <User size={18} />,        label: 'My Profile',       path: '/profile' },
+  { icon: <ShieldCheck size={18} />, label: 'Role Status',      path: '/requested-roles' },
+  { icon: <Headphones size={18} />,  label: 'Help & Support',   path: '/support' },
   { icon: <Package size={18} />,     label: 'My Orders',        path: '/orders' },
   { icon: <MapPin size={18} />,      label: 'My Addresses',     path: '/address' },
   { icon: <Ticket size={18} />,      label: 'My Coupons',       path: '/coupons' },
   { icon: <Wallet size={18} />,      label: 'My Wallet',        path: '/wallet' },
   { icon: <ShoppingBag size={18} />, label: 'My booking',       path: '/my-appointments' },
+  { icon: <ClipboardList size={18} />, label: 'Custom Requests', path: '/profile/service-leads' },
+  { icon: <BookOpen size={18} />,    label: 'My Learning',      path: '/my-learning' },
   { icon: <Heart size={18} />,       label: 'My Wishlist',      path: '/wishlist' },
   { icon: <CreditCard size={18} />,  label: 'My Saved Payment', path: '/payments' },
 ];
@@ -53,7 +61,7 @@ const UserSidebar = () => {
           {activeLink?.icon || <Menu size={18} />}
           <span>{activeLink?.label || 'Account Menu'}</span>
         </div>
-        <div className="flex items-center gap-2 text-gray-400 font-black text-[10px] uppercase">
+        <div className="flex items-center gap-2 text-gray-400 font-black text-sm uppercase">
           <span>{isOpen ? 'Close' : 'Menu'}</span>
           {isOpen ? <X size={14} className="text-primary stroke-[3]" /> : <ChevronDown size={14} className="stroke-[3]" />}
         </div>

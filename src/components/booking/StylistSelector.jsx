@@ -36,7 +36,7 @@ const StylistSelector = ({
         <h3 className="text-xs font-black uppercase tracking-wider text-gray-800">
           Prefer a Stylist / Therapist?
         </h3>
-        <p className="text-[10px] text-gray-455 font-bold uppercase mt-0.5">
+        <p className="text-sm text-gray-455 font-bold uppercase mt-0.5">
           Select a stylist, or choose "Any Stylist" for fastest slot allocation
         </p>
       </div>
@@ -73,7 +73,7 @@ const StylistSelector = ({
                   : 'border-gray-200 bg-white text-gray-500 hover:border-gray-300'
               }`}
             >
-              <div className="w-9 h-9 rounded-xl bg-gray-100 border border-gray-150 flex items-center justify-center text-primary font-black uppercase text-[10px]">
+              <div className="w-9 h-9 rounded-xl bg-gray-100 border border-gray-150 flex items-center justify-center text-primary font-black uppercase text-sm">
                 {staff.name?.substring(0, 2)}
               </div>
               <div className="text-left">

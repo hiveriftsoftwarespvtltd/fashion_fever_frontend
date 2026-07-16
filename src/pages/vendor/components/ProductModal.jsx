@@ -17,6 +17,7 @@ const ProductModal = ({ isOpen, onClose, isEditing, isViewing, productId, catego
   const [productForm, setProductForm] = useState({
     name: '',
     slug: '',
+    brand: 'ponds',
     description: '',
     categoryId: '',
     metaTitle: '',
@@ -49,7 +50,7 @@ const ProductModal = ({ isOpen, onClose, isEditing, isViewing, productId, catego
     const fetchProductDetails = async () => {
       if (!productId) {
         const freshForm = {
-          name: '', slug: '', description: '', categoryId: '', metaTitle: '', metaDescription: '', status: 'ACTIVE', hasVariants: false, isShippingApply: true, tags: '',
+          name: '', slug: '', brand: '', description: '', categoryId: '', metaTitle: '', metaDescription: '', status: 'ACTIVE', hasVariants: false, isShippingApply: true, tags: '',
           variants: [{ sku: '', salesPrice: '', costPrice: '', offeredPrice: '', stock: '', weight: '', length: '', width: '', height: '', attributes: { color: '', size: '' }, thumbnail: null, images: [] }]
         };
         setProductForm(freshForm);
@@ -67,6 +68,7 @@ const ProductModal = ({ isOpen, onClose, isEditing, isViewing, productId, catego
           const initialData = {
             name: fullProduct.name,
             slug: fullProduct.slug,
+            brand: fullProduct.brand || 'ponds',
             description: fullProduct.description,
             categoryId: fullProduct.categoryId?._id || fullProduct.categoryId,
             metaTitle: fullProduct.metaTitle || '',
@@ -291,7 +293,15 @@ const ProductModal = ({ isOpen, onClose, isEditing, isViewing, productId, catego
               <div className="flex items-start justify-between">
                 <div>
                   <h1 className={`text-3xl font-bold uppercase ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{productForm.name}</h1>
-                  <p className="text-xs font-bold text-gray-400 mt-1 uppercase">{categories.find(c => c._id === productForm.categoryId)?.name || 'Uncategorized'}</p>
+                  <div className="flex items-center gap-2 mt-1 flex-wrap">
+                    <span className="text-xs font-bold text-gray-400 uppercase">
+                      {categories.find(c => c._id === productForm.categoryId)?.name || 'Uncategorized'}
+                    </span>
+                    <span className="text-xs text-gray-400">•</span>
+                    <span className="text-xs font-bold text-primary uppercase">
+                      Brand: {productForm.brand || 'ponds'}
+                    </span>
+                  </div>
                 </div>
                 <span className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase ${
                   productForm.status === 'ACTIVE'
@@ -346,7 +356,7 @@ const ProductModal = ({ isOpen, onClose, isEditing, isViewing, productId, catego
                   <h3 className={`text-sm font-bold uppercase ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Inventory & Variants ({productForm.variants.length})</h3>
                   {isViewing && productForm.variants.length > 1 && (
                     <div className="flex items-center gap-2">
-                      <span className="text-[10px] font-bold text-gray-400 uppercase">Remove Variant:</span>
+                      <span className="text-sm font-bold text-gray-400 uppercase">Remove Variant:</span>
                       <select
                         onChange={async (e) => {
                           const idx = parseInt(e.target.value);
@@ -445,7 +455,7 @@ const ProductModal = ({ isOpen, onClose, isEditing, isViewing, productId, catego
             <form onSubmit={handleProductSubmit} className="space-y-8">
               <div className="space-y-4">
                 <h3 className={`text-sm font-bold uppercase border-l-4 border-primary pl-3 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Basic Information</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-1">
                     <label className="text-xs font-bold text-gray-400 uppercase">Product Name</label>
                     <input
@@ -454,6 +464,19 @@ const ProductModal = ({ isOpen, onClose, isEditing, isViewing, productId, catego
                       value={productForm.name}
                       onChange={(e) => setProductForm({ ...productForm, name: e.target.value })}
                       placeholder="e.g. Premium Silk Saree"
+                      className={`w-full px-4 py-2.5 border rounded-xl text-xs font-bold outline-none focus:ring-2 focus:ring-primary/10 transition-all ${
+                        isDarkMode ? 'bg-gray-950 border-white/5 text-gray-200' : 'bg-gray-50 border-gray-100 text-gray-700'
+                      }`}
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-gray-400 uppercase">Brand</label>
+                    <input
+                      type="text"
+                      required
+                      value={productForm.brand}
+                      onChange={(e) => setProductForm({ ...productForm, brand: e.target.value })}
+                      placeholder="e.g. ponds"
                       className={`w-full px-4 py-2.5 border rounded-xl text-xs font-bold outline-none focus:ring-2 focus:ring-primary/10 transition-all ${
                         isDarkMode ? 'bg-gray-950 border-white/5 text-gray-200' : 'bg-gray-50 border-gray-100 text-gray-700'
                       }`}
@@ -707,7 +730,7 @@ const ProductModal = ({ isOpen, onClose, isEditing, isViewing, productId, catego
                                   className="w-full h-full object-cover"
                                 />
                                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                  <span className="text-[10px] font-bold text-white uppercase bg-primary px-3 py-1.5 rounded-lg">Change</span>
+                                  <span className="text-sm font-bold text-white uppercase bg-primary px-3 py-1.5 rounded-lg">Change</span>
                                 </div>
                               </div>
                             ) : (

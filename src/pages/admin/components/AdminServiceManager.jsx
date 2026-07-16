@@ -133,7 +133,7 @@ const AdminServiceManager = ({ isDarkMode }) => {
       {/* Header section */}
       <div className="flex justify-between items-center">
         <div>
-          <span className="text-[10px] font-bold text-primary uppercase ">Salon & Artist Grid</span>
+          <span className="text-sm font-bold text-primary uppercase ">Salon & Artist Grid</span>
           <h2 className={`text-xl font-bold uppercase  ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Beauty Services</h2>
         </div>
         <button 
@@ -206,7 +206,7 @@ const AdminServiceManager = ({ isDarkMode }) => {
     <div className={`h-[1px] my-4 ${isDarkMode ? 'bg-white/5' : 'bg-gray-100'}`}></div>
     
     {/* Duration & Expert Details Row */}
-    <div className={`grid grid-cols-2 gap-2 text-[10px] font-bold uppercase  ${
+    <div className={`grid grid-cols-2 gap-2 text-sm font-bold uppercase  ${
       isDarkMode ? 'text-gray-400' : 'text-gray-500'
     }`}>
       <div className="flex items-center gap-1.5">
@@ -229,7 +229,7 @@ const AdminServiceManager = ({ isDarkMode }) => {
           ₹{srv.salesPrice}
         </span>
         {srv.price > srv.salesPrice && (
-          <span className={`text-[10px] line-through font-bold ${
+          <span className={`text-sm line-through font-bold ${
             isDarkMode ? 'text-gray-600' : 'text-gray-300'
           }`}>
             ₹{srv.price}
@@ -302,8 +302,8 @@ const AdminServiceManager = ({ isDarkMode }) => {
               </div>
               
               <div className="flex gap-3 pt-2">
-                <button type="button" onClick={() => setShowModal(false)} className={`flex-1 py-3.5 rounded-xl font-bold text-[10px] uppercase  cursor-pointer ${isDarkMode ? 'bg-white/5 text-gray-400 hover:bg-white/10' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}>Cancel</button>
-                <button type="submit" className="flex-1 py-3.5 bg-primary text-white rounded-xl font-bold text-[10px] uppercase  shadow-md shadow-primary/15 flex items-center justify-center cursor-pointer hover:opacity-95 active:opacity-90 transition-all">
+                <button type="button" onClick={() => setShowModal(false)} className={`flex-1 py-3.5 rounded-xl font-bold text-sm uppercase  cursor-pointer ${isDarkMode ? 'bg-white/5 text-gray-400 hover:bg-white/10' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}>Cancel</button>
+                <button type="submit" className="flex-1 py-3.5 bg-primary text-white rounded-xl font-bold text-sm uppercase  shadow-md shadow-primary/15 flex items-center justify-center cursor-pointer hover:opacity-95 active:opacity-90 transition-all">
                   {isEditing ? "Save Changes" : "Publish Service"}
                 </button>
               </div>

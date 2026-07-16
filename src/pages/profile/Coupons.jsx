@@ -259,7 +259,7 @@ const Coupons = () => {
                               </code>
                               <button 
                                 onClick={() => handleCopy(coupon.code)}
-                                className="flex items-center gap-1 bg-white hover:bg-primary hover:text-white border border-gray-200 hover:border-primary text-gray-700 text-[10px] font-bold uppercase px-4 py-2 rounded-lg transition-all shadow-sm cursor-pointer"
+                                className="flex items-center gap-1 bg-white hover:bg-primary hover:text-white border border-gray-200 hover:border-primary text-gray-700 text-sm font-bold uppercase px-4 py-2 rounded-lg transition-all shadow-sm cursor-pointer"
                               >
                                 {copiedCode === coupon.code ? (
                                   <>
@@ -284,7 +284,7 @@ const Coupons = () => {
               <div className="m-6 p-4 bg-gray-50 rounded-2xl border border-gray-100 flex gap-3 text-left">
                 <AlertCircle className="text-gray-400 flex-shrink-0" size={16} />
                 <div className="space-y-0.5">
-                  <p className="text-[10px] font-bold text-gray-600 uppercase">Coupon Usage Policy</p>
+                  <p className="text-sm font-bold text-gray-600 uppercase">Coupon Usage Policy</p>
                   <p className="text-[9px] text-gray-400 font-bold uppercase leading-relaxed max-w-xl">
                     Only one coupon code can be applied per checkout pipeline session. Certain rewards cannot be combined with sitewide promotions or sales.
                   </p>

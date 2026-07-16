@@ -149,7 +149,7 @@ const ServiceProviderAvailability = ({ isDarkMode, user, profileData }) => {
           <h2 className={`text-lg lg:text-3xl font-bold uppercase transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
             Work Availability
           </h2>
-          <p className="text-[10px] font-semibold uppercase text-gray-400 mt-1">
+          <p className="text-sm font-semibold uppercase text-gray-400 mt-1">
             Configure your active hours and resting days for booking scheduling
           </p>
         </div>
@@ -166,7 +166,7 @@ const ServiceProviderAvailability = ({ isDarkMode, user, profileData }) => {
             <h3 className={`text-sm font-black uppercase ${isDarkMode ? 'text-white' : 'text-gray-850'}`}>
               Weekly Work Availability
             </h3>
-            <p className="text-[10px] font-bold text-gray-400 uppercase mt-0.5">
+            <p className="text-sm font-bold text-gray-400 uppercase mt-0.5">
               Set your active operating hours and break times for bookings allocation
             </p>
           </div>

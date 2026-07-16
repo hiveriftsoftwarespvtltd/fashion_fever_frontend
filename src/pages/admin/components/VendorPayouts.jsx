@@ -145,7 +145,7 @@ const VendorPayouts = ({ isDarkMode }) => {
           <h2 className={`text-lg lg:text-3xl font-bold uppercase transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
             Vendor Payouts
           </h2>
-          <p className="text-[10px] font-semibold uppercase text-gray-400 mt-1">
+          <p className="text-sm font-semibold uppercase text-gray-400 mt-1">
             Oversee vendor performance, platform commissions, and cash payouts audit history
           </p>
         </div>
@@ -161,7 +161,7 @@ const VendorPayouts = ({ isDarkMode }) => {
             }`}
           >
             <div className="flex items-center justify-between mb-4">
-              <span className="text-[10px] font-black uppercase text-gray-400 tracking-wider">
+              <span className="text-sm font-black uppercase text-gray-400 tracking-wider">
                 {card.label}
               </span>
               <div className={`p-3 rounded-2xl ${card.color.split(' ')[1]} ${card.color.split(' ')[0]}`}>
@@ -187,7 +187,7 @@ const VendorPayouts = ({ isDarkMode }) => {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
           {/* Month Filter */}
           <div className="space-y-2 text-left">
-            <label className="text-[10px] font-black uppercase tracking-wider text-gray-400 flex items-center gap-1.5">
+            <label className="text-sm font-black uppercase tracking-wider text-gray-400 flex items-center gap-1.5">
               <Calendar size={11} className="text-primary" /> Select Month
             </label>
             <select
@@ -208,7 +208,7 @@ const VendorPayouts = ({ isDarkMode }) => {
 
           {/* Year Filter */}
           <div className="space-y-2 text-left">
-            <label className="text-[10px] font-black uppercase tracking-wider text-gray-400 flex items-center gap-1.5">
+            <label className="text-sm font-black uppercase tracking-wider text-gray-400 flex items-center gap-1.5">
               <Calendar size={11} className="text-primary" /> Select Year
             </label>
             <select
@@ -229,7 +229,7 @@ const VendorPayouts = ({ isDarkMode }) => {
 
           {/* Status Filter */}
           <div className="space-y-2 text-left">
-            <label className="text-[10px] font-black uppercase tracking-wider text-gray-400 flex items-center gap-1.5">
+            <label className="text-sm font-black uppercase tracking-wider text-gray-400 flex items-center gap-1.5">
               <Clock size={11} className="text-primary" /> Settlement Status
             </label>
             <select
@@ -250,7 +250,7 @@ const VendorPayouts = ({ isDarkMode }) => {
 
           {/* Page Limit */}
           <div className="space-y-2 text-left">
-            <label className="text-[10px] font-black uppercase tracking-wider text-gray-400 flex items-center gap-1.5">
+            <label className="text-sm font-black uppercase tracking-wider text-gray-400 flex items-center gap-1.5">
               <SlidersHorizontal size={11} className="text-primary" /> Payouts per page
             </label>
             <select
@@ -285,13 +285,13 @@ const VendorPayouts = ({ isDarkMode }) => {
           <div className="py-24 flex flex-col items-center justify-center text-center">
             <ShoppingBag size={48} className="text-gray-300 dark:text-gray-600 mb-4" />
             <p className={`text-sm font-black uppercase ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>No Vendor Payouts Found</p>
-            <p className="text-[10px] text-gray-400 font-bold uppercase mt-1">No sales exist for this month/year range</p>
+            <p className="text-sm text-gray-400 font-bold uppercase mt-1">No sales exist for this month/year range</p>
           </div>
         ) : (
           <div className="overflow-x-auto w-full">
             <table className="w-full border-collapse">
               <thead>
-                <tr className={`border-b text-left text-[10px] font-black uppercase tracking-wider ${
+                <tr className={`border-b text-left text-sm font-black uppercase tracking-wider ${
                   isDarkMode ? 'bg-gray-900/30 border-white/5 text-gray-400' : 'bg-gray-50/50 border-gray-100 text-gray-500'
                 }`}>
                   <th className="py-5 px-6">Brand / Vendor</th>
@@ -364,7 +364,7 @@ const VendorPayouts = ({ isDarkMode }) => {
                             ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]'
                             : 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]'
                         }`} />
-                        <span className="text-[10px] font-black uppercase text-gray-400 tracking-wider">
+                        <span className="text-sm font-black uppercase text-gray-400 tracking-wider">
                           {(item.status === 'settled' || item.payoutStatus === 'settled' || item.isVendorSettled === true || item.isVendorSettled === 'true') ? 'settled' : (item.status || item.payoutStatus || 'pending')}
                         </span>
                       </div>

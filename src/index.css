@@ -70,3 +70,15 @@ button {
 .swal2-container {
   z-index: 99999 !important;
 }
+
+/* Global scrollbar hiding rules */
+::-webkit-scrollbar {
+  display: none !important;
+}
+
+* {
+  -ms-overflow-style: none !important;
+  /* IE and Edge */
+  scrollbar-width: none !important;
+  /* Firefox */
+}

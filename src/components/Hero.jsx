@@ -139,7 +139,7 @@ const Hero = () => {
           <div className="w-full h-[220px] sm:h-[320px] md:h-[420px] lg:h-[600px] xl:h-[680px] rounded-2xl flex items-center justify-center bg-gray-100 dark:bg-gray-900 animate-pulse relative overflow-hidden">
             <div className="flex flex-col items-center gap-3">
               <div className="w-10 h-10 rounded-full border-2 border-primary/20 border-t-primary animate-spin" />
-              <span className="text-[10px] font-bold tracking-widest text-gray-400 uppercase">Curating offers...</span>
+              <span className="text-sm font-bold tracking-widest text-gray-400 uppercase">Curating offers...</span>
             </div>
           </div>
         </div>
@@ -245,7 +245,7 @@ const Hero = () => {
 
     
     <div className="absolute top-0 left-0 bg-white px-3 lg:px-4 py-1.5 lg:py-2 rounded-br-[16px] shadow-sm">
-     <span className="text-[10px] lg:text-[12px] font-bold text-black uppercase text-center block">
+     <span className="text-sm lg:text-[12px] font-bold text-black uppercase text-center block">
      {item === 1 ? 'Clinique' : item === 2 ? 'Carolina' : 'Milk'}
      </span>
     </div>

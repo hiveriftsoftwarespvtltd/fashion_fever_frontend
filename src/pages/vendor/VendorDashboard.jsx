@@ -14,12 +14,14 @@ import {
   getVendorCustomerDemographics,
   exportVendorOrders
 } from '../../api/vendorService';
+import { getVendorWalletBalance, getVendorWalletTransactions } from '../../api/walletService';
 import {
   Menu,
   Search,
   Sun,
   Moon,
-  Store
+  Store,
+  Wallet
 } from 'lucide-react';
 import { toast } from '../../utils/toast';
 import Swal from 'sweetalert2';
@@ -35,6 +37,8 @@ import VendorProducts from './components/VendorProducts';
 import VendorOrders from './components/VendorOrders';
 import VendorEarnings from './components/VendorEarnings';
 import VendorProfile from './components/VendorProfile';
+import VendorWallet from './components/VendorWallet';
+import PayoutBankDetails from '../../components/shared/PayoutBankDetails';
 
 const VendorDashboard = () => {
   const { isDarkMode, toggleTheme } = useTheme();
@@ -74,6 +78,10 @@ const VendorDashboard = () => {
   const [topCategoriesLoading, setTopCategoriesLoading] = useState(false);
   const [orderComparison, setOrderComparison] = useState(null);
   const [orderComparisonLoading, setOrderComparisonLoading] = useState(false);
+  const [vendorWallet, setVendorWallet] = useState(null);
+  const [walletLoading, setWalletLoading] = useState(false);
+  const [walletTransactions, setWalletTransactions] = useState([]);
+  const [walletTransactionsLoading, setWalletTransactionsLoading] = useState(false);
 
   const [salesPerformance, setSalesPerformance] = useState([]);
   const [salesPerformanceLoading, setSalesPerformanceLoading] = useState(false);
@@ -122,8 +130,15 @@ const VendorDashboard = () => {
     if (activeTab === 'orders' || activeTab === 'overview' || activeTab === 'earnings') {
       setOrdersLoading(true);
     }
+    // Always load wallet balance to keep the header indicator fresh
+    setWalletLoading(true);
+
     if (activeTab === 'earnings' || activeTab === 'overview') {
       setSalesPerformanceLoading(true);
+    }
+
+    if (activeTab === 'earnings' || activeTab === 'overview' || activeTab === 'wallet') {
+      setWalletTransactionsLoading(true);
     }
     if (activeTab === 'overview') {
       setOverviewLoading(true);
@@ -168,6 +183,19 @@ const VendorDashboard = () => {
       }
     }
 
+    // Unconditionally fetch wallet balance to keep header updated
+    try {
+      const response = await getVendorWalletBalance();
+      if (response.success) {
+        const payload = response.data ?? response;
+        setVendorWallet(payload);
+      }
+    } catch (error) {
+      console.error("Vendor wallet fetch error:", error);
+    } finally {
+      setWalletLoading(false);
+    }
+
     if (activeTab === 'earnings' || activeTab === 'overview') {
       try {
         const response = await getVendorSalesPerformance();
@@ -179,6 +207,20 @@ const VendorDashboard = () => {
         console.error("Sales performance fetch error:", error);
       } finally {
         setSalesPerformanceLoading(false);
+      }
+    }
+
+    if (activeTab === 'earnings' || activeTab === 'overview' || activeTab === 'wallet') {
+      try {
+        const response = await getVendorWalletTransactions();
+        if (response.success) {
+          const payload = response.data ?? response;
+          setWalletTransactions(Array.isArray(payload) ? payload : []);
+        }
+      } catch (error) {
+        console.error("Vendor wallet transactions fetch error:", error);
+      } finally {
+        setWalletTransactionsLoading(false);
       }
     }
 
@@ -367,7 +409,7 @@ const VendorDashboard = () => {
           }`}>
             <div className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-ping"></div>
             <div>
-              <p className="text-[10px] font-bold text-gray-400 uppercase ">Current Status</p>
+              <p className="text-sm font-bold text-gray-400 uppercase ">Current Status</p>
               <p className="text-sm font-extrabold text-amber-600 uppercase ">{vendorData.status || 'PENDING'}</p>
             </div>
           </div>
@@ -431,6 +473,20 @@ const VendorDashboard = () => {
               {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
             </button>
 
+            {/* Wallet Quick Indicator */}
+            <button
+              onClick={() => setActiveTab('wallet')}
+              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl border text-xs font-extrabold uppercase transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer ${
+                isDarkMode 
+                  ? 'bg-gray-900 text-emerald-400 border-white/5 shadow-xl hover:bg-gray-850 hover:text-emerald-300' 
+                  : 'bg-emerald-50 text-emerald-600 border-transparent hover:bg-emerald-100 hover:text-emerald-700'
+              }`}
+              title="View Wallet Ledger"
+            >
+              <Wallet size={15} className={walletLoading ? 'animate-pulse text-emerald-500' : 'text-emerald-500'} />
+              <span>{walletLoading ? '...' : formatCurrency(vendorWallet?.balance || 0)}</span>
+            </button>
+
             <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs uppercase border border-primary/20">
               {vendorData?.businessName?.charAt(0) || 'V'}
             </div>
@@ -457,6 +513,8 @@ const VendorDashboard = () => {
               formatCurrency={formatCurrency}
               customerDemographics={customerDemographics}
               customerDemographicsLoading={customerDemographicsLoading}
+              vendorWallet={vendorWallet}
+              walletLoading={walletLoading}
             />
           </div>
 
@@ -504,6 +562,28 @@ const VendorDashboard = () => {
                 setShowOrderModal(true);
               }}
               formatCurrency={formatCurrency}
+              vendorWallet={vendorWallet}
+              walletLoading={walletLoading}
+              walletTransactions={walletTransactions}
+              walletTransactionsLoading={walletTransactionsLoading}
+            />
+          </div>
+
+          <div className={activeTab === 'wallet' ? 'block animate-in fade-in duration-300' : 'hidden'}>
+            <VendorWallet
+              isDarkMode={isDarkMode}
+              vendorWallet={vendorWallet}
+              walletLoading={walletLoading}
+              walletTransactions={walletTransactions}
+              walletTransactionsLoading={walletTransactionsLoading}
+              formatCurrency={formatCurrency}
+            />
+          </div>
+          <div className={activeTab === 'payout' ? 'block animate-in fade-in duration-300' : 'hidden'}>
+            <PayoutBankDetails
+              isDarkMode={isDarkMode}
+              role="vendor"
+              ownerId={vendorData?._id}
             />
           </div>
 

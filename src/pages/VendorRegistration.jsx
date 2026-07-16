@@ -33,6 +33,9 @@ const VendorRegistration = () => {
     address: '',
     phone: '',
     email: '',
+    vendorPincode: '',
+    city: '',
+    state: '',
   });
   const [files, setFiles] = useState({
     logo: null,
@@ -225,6 +228,53 @@ const VendorRegistration = () => {
                   placeholder="Full business or office address..."
                 ></textarea>
               </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:col-span-2">
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-gray-400 uppercase flex items-center gap-2">
+                    <MapPin size={14} className="text-blue-500" /> Pincode
+                  </label>
+                  <input
+                    name="vendorPincode"
+                    type="text"
+                    required
+                    value={formData.vendorPincode}
+                    onChange={handleInputChange}
+                    className="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-blue-500/20 outline-none transition-all placeholder:text-gray-300"
+                    placeholder="e.g. 273001"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-gray-400 uppercase flex items-center gap-2">
+                    <MapPin size={14} className="text-blue-500" /> City
+                  </label>
+                  <input
+                    name="city"
+                    type="text"
+                    required
+                    value={formData.city}
+                    onChange={handleInputChange}
+                    className="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-blue-500/20 outline-none transition-all placeholder:text-gray-300"
+                    placeholder="e.g. Gorakhpur"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-gray-400 uppercase flex items-center gap-2">
+                    <MapPin size={14} className="text-blue-500" /> State
+                  </label>
+                  <input
+                    name="state"
+                    type="text"
+                    required
+                    value={formData.state}
+                    onChange={handleInputChange}
+                    className="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-blue-500/20 outline-none transition-all placeholder:text-gray-300"
+                    placeholder="e.g. Uttar Pradesh"
+                  />
+                </div>
+              </div>
             </div>
           </div>
 
@@ -265,7 +315,7 @@ const VendorRegistration = () => {
                           <Upload size={24} />
                         </div>
                         <p className="text-sm font-bold text-gray-400 text-center">Click to upload Logo</p>
-                        <p className="text-[10px] font-bold text-gray-300 mt-2 uppercase">PNG, JPG up to 5MB</p>
+                        <p className="text-sm font-bold text-gray-300 mt-2 uppercase">PNG, JPG up to 5MB</p>
                       </>
                     )}
                   </div>
@@ -299,7 +349,7 @@ const VendorRegistration = () => {
                           <Upload size={24} />
                         </div>
                         <p className="text-sm font-bold text-gray-400 text-center">Click to upload Banner</p>
-                        <p className="text-[10px] font-bold text-gray-300 mt-2 uppercase">Landscape orientation preferred</p>
+                        <p className="text-sm font-bold text-gray-300 mt-2 uppercase">Landscape orientation preferred</p>
                       </>
                     )}
                   </div>

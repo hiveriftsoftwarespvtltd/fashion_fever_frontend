@@ -120,7 +120,7 @@ const ServiceProviders = ({ isDarkMode }) => {
             <span className={`text-sm font-bold truncate ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>
               {prov.businessName}
             </span>
-            <span className="text-[10px] font-bold text-gray-400 uppercase truncate">
+            <span className="text-sm font-bold text-gray-400 uppercase truncate">
               Owner: {prov.userId?.name || '—'}
             </span>
           </div>
@@ -132,7 +132,7 @@ const ServiceProviders = ({ isDarkMode }) => {
       render: (prov) => (
         <div className="flex flex-col text-left">
           <span className={`text-xs font-bold ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>{prov.phone}</span>
-          <span className="text-[10px] font-bold text-gray-400 uppercase truncate max-w-[150px]">{prov.userId?.email || prov.email}</span>
+          <span className="text-sm font-bold text-gray-400 uppercase truncate max-w-[150px]">{prov.userId?.email || prov.email}</span>
         </div>
       )
     },
@@ -141,7 +141,7 @@ const ServiceProviders = ({ isDarkMode }) => {
       render: (prov) => (
         <div className="flex flex-col text-left">
           <span className={`text-xs font-bold ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>{prov.city}</span>
-          <span className="text-[10px] font-bold text-gray-400 uppercase">{prov.state}</span>
+          <span className="text-sm font-bold text-gray-400 uppercase">{prov.state}</span>
         </div>
       )
     },
@@ -150,7 +150,7 @@ const ServiceProviders = ({ isDarkMode }) => {
       render: (prov) => (
         <div className="flex flex-col text-left">
           <span className={`text-xs font-bold uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>{prov.providerType}</span>
-          <span className="text-[10px] font-bold text-gray-400 uppercase">{prov.experienceYears ?? 0} Years Exp</span>
+          <span className="text-sm font-bold text-gray-400 uppercase">{prov.experienceYears ?? 0} Years Exp</span>
         </div>
       )
     },
@@ -171,7 +171,7 @@ const ServiceProviders = ({ isDarkMode }) => {
       render: (prov) => (
         <div className="flex items-center gap-2">
           <div className={`w-1.5 h-1.5 rounded-full ${prov.isActive && !prov.isDeleted ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]' : 'bg-red-500'}`}></div>
-          <span className="text-[10px] font-semibold uppercase text-gray-400">{prov.isActive && !prov.isDeleted ? 'Active' : 'Banned'}</span>
+          <span className="text-sm font-semibold uppercase text-gray-400">{prov.isActive && !prov.isDeleted ? 'Active' : 'Banned'}</span>
         </div>
       )
     },
@@ -331,7 +331,7 @@ const ServiceProviders = ({ isDarkMode }) => {
             <button
               key={f.key}
               onClick={() => setFilterStatus(f.key)}
-              className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-wide transition-all duration-200 cursor-pointer ${
+              className={`px-4 py-2 rounded-xl text-sm font-black uppercase tracking-wide transition-all duration-200 cursor-pointer ${
                 filterStatus === f.key
                   ? 'bg-primary text-white shadow-lg shadow-primary/25'
                   : isDarkMode

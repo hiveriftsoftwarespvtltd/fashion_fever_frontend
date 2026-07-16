@@ -78,7 +78,7 @@ const ServiceProviderOverview = ({ isDarkMode, user, services = [], bookings = [
           : 'bg-gradient-to-br from-white via-pink-50/10 to-white border-gray-100 shadow-xl shadow-gray-150/40'
       }`}>
         <div className="relative z-10 space-y-2">
-          <span className="text-[10px] font-black text-primary uppercase tracking-widest bg-primary/10 px-3 py-1 rounded-full w-fit block">
+          <span className="text-sm font-black text-primary uppercase tracking-widest bg-primary/10 px-3 py-1 rounded-full w-fit block">
             Partner Portal
           </span>
           <h1 className={`text-2xl md:text-3xl font-black tracking-tight ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
@@ -103,7 +103,7 @@ const ServiceProviderOverview = ({ isDarkMode, user, services = [], bookings = [
             }`}
           >
             <div className="flex items-center justify-between mb-4">
-              <span className={`text-[10px] font-black uppercase tracking-wider ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+              <span className={`text-sm font-black uppercase tracking-wider ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                 {s.label}
               </span>
               <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${s.bg} ${s.color} border ${s.border}`}>
@@ -113,7 +113,7 @@ const ServiceProviderOverview = ({ isDarkMode, user, services = [], bookings = [
             <p className={`text-2xl md:text-3xl font-black ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
               {s.value}
             </p>
-            <p className={`text-[10px] font-semibold uppercase mt-1 ${isDarkMode ? 'text-gray-600' : 'text-gray-400'}`}>
+            <p className={`text-sm font-semibold uppercase mt-1 ${isDarkMode ? 'text-gray-600' : 'text-gray-400'}`}>
               {s.subtext}
             </p>
           </div>
@@ -140,7 +140,7 @@ const ServiceProviderOverview = ({ isDarkMode, user, services = [], bookings = [
               </div>
               <div className="flex items-center gap-2 bg-amber-500/10 text-amber-500 border border-amber-500/20 px-3 py-1.5 rounded-xl">
                 <Crown size={15} />
-                <span className="text-[10px] font-black uppercase tracking-wider">{subscription.name}</span>
+                <span className="text-sm font-black uppercase tracking-wider">{subscription.name}</span>
               </div>
             </div>
 
@@ -225,7 +225,7 @@ const ServiceProviderOverview = ({ isDarkMode, user, services = [], bookings = [
         {servicesLoading ? (
           <div className="flex flex-col items-center justify-center py-12 gap-3">
             <div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
-            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Loading Catalog Services...</p>
+            <p className="text-sm font-bold text-gray-400 uppercase tracking-widest">Loading Catalog Services...</p>
           </div>
         ) : services.length === 0 ? (
           <div className="text-center py-12 space-y-3">
@@ -290,7 +290,7 @@ const ServiceProviderOverview = ({ isDarkMode, user, services = [], bookings = [
                         </div>
                         <div className="flex items-end gap-1.5">
                           {service.costPrice > (service.offeredPrice || service.sellingPrice) && (
-                            <span className="text-[10px] text-gray-450 line-through font-semibold">
+                            <span className="text-sm text-gray-450 line-through font-semibold">
                               ₹{service.costPrice}
                             </span>
                           )}

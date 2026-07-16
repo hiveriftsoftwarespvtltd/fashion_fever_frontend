@@ -391,7 +391,7 @@ const ServiceProviderServices = ({ isDarkMode, services = [], setServices }) => 
           <h2 className={`text-lg lg:text-3xl font-bold uppercase transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
             My Services
           </h2>
-          <p className="text-[10px] font-semibold uppercase text-gray-400 mt-1">
+          <p className="text-sm font-semibold uppercase text-gray-400 mt-1">
             Manage your treatments catalogue, pricing lists, duration, and promotional media
           </p>
         </div>
@@ -441,10 +441,10 @@ const ServiceProviderServices = ({ isDarkMode, services = [], setServices }) => 
           <div className="py-24 flex flex-col items-center justify-center text-center">
             <Briefcase size={48} className="text-gray-300 dark:text-gray-600 mb-4" />
             <p className={`text-sm font-black uppercase ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>No Services Found</p>
-            <p className="text-[10px] text-gray-400 font-bold uppercase mt-1">Add a service to make it visible to clients</p>
+            <p className="text-sm text-gray-400 font-bold uppercase mt-1">Add a service to make it visible to clients</p>
             <button
               onClick={handleAddClick}
-              className="mt-6 px-4 py-2.5 bg-primary/10 text-primary border border-primary/20 rounded-xl text-[10px] font-black uppercase tracking-wider hover:bg-primary hover:text-white transition-all cursor-pointer"
+              className="mt-6 px-4 py-2.5 bg-primary/10 text-primary border border-primary/20 rounded-xl text-sm font-black uppercase tracking-wider hover:bg-primary hover:text-white transition-all cursor-pointer"
             >
               Create Service Now
             </button>
@@ -453,7 +453,7 @@ const ServiceProviderServices = ({ isDarkMode, services = [], setServices }) => 
           <div className="overflow-x-auto w-full">
             <table className="w-full border-collapse">
               <thead>
-                <tr className={`border-b text-left text-[10px] font-black uppercase tracking-wider ${
+                <tr className={`border-b text-left text-sm font-black uppercase tracking-wider ${
                   isDarkMode ? 'bg-gray-900/30 border-white/5 text-gray-400' : 'bg-gray-50/50 border-gray-100 text-gray-500'
                 }`}>
                   <th className="py-5 px-6">Service details</th>
@@ -463,6 +463,7 @@ const ServiceProviderServices = ({ isDarkMode, services = [], setServices }) => 
                   <th className="py-5 px-6 text-right">Selling Price</th>
                   <th className="py-5 px-6 text-right">Offered Price</th>
                   <th className="py-5 px-6 text-center">Type</th>
+                  <th className="py-5 px-6 text-center">Gender</th>
                   <th className="py-5 px-6 text-center">Status</th>
                   <th className="py-5 px-6 text-center">Actions</th>
                 </tr>
@@ -501,7 +502,7 @@ const ServiceProviderServices = ({ isDarkMode, services = [], setServices }) => 
                           <span className={`text-sm font-bold truncate ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>
                             {item.title}
                           </span>
-                          <span className="text-[10px] text-gray-400 font-medium line-clamp-1">
+                          <span className="text-sm text-gray-400 font-medium line-clamp-1">
                             {item.description}
                           </span>
                         </div>
@@ -556,6 +557,19 @@ const ServiceProviderServices = ({ isDarkMode, services = [], setServices }) => 
                           : 'bg-pink-500/10 text-pink-500 border border-pink-500/20'
                       }`}>
                         {item.serviceType || 'BOTH'}
+                      </span>
+                    </td>
+
+                    {/* Service Gender */}
+                    <td className="py-4 px-6 text-center">
+                      <span className={`px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider ${
+                        item.serviceGender === 'BOTH' 
+                          ? 'bg-purple-500/10 text-purple-500 border border-purple-500/20'
+                          : item.serviceGender === 'ONLY_MEN'
+                          ? 'bg-blue-500/10 text-blue-500 border border-blue-500/20'
+                          : 'bg-pink-500/10 text-pink-500 border border-pink-500/20'
+                      }`}>
+                        {item.serviceGender === 'ONLY_MEN' ? 'Men Only' : item.serviceGender === 'ONLY_WOMEN' ? 'Women Only' : 'Both'}
                       </span>
                     </td>
 
@@ -631,7 +645,7 @@ const ServiceProviderServices = ({ isDarkMode, services = [], setServices }) => 
                     <h2 className={`text-lg font-bold uppercase ${isDarkMode ? 'text-white' : 'text-gray-850'}`}>
                       {editingService ? 'Update Service Details' : 'Create New Service'}
                     </h2>
-                    <p className="text-[10px] font-bold text-gray-400 uppercase mt-0.5">
+                    <p className="text-sm font-bold text-gray-400 uppercase mt-0.5">
                       {editingService ? `Modify specifications for: ${editingService.title}` : 'Publish a new beauty or hair treatment to your catalogue'}
                     </p>
                   </div>
@@ -652,7 +666,7 @@ const ServiceProviderServices = ({ isDarkMode, services = [], setServices }) => 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Category Selection */}
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black uppercase tracking-wider text-gray-400 flex items-center gap-1.5">
+                    <label className="text-sm font-black uppercase tracking-wider text-gray-400 flex items-center gap-1.5">
                       <Tag size={11} className="text-primary" /> Service Category *
                     </label>
                     <select
@@ -677,7 +691,7 @@ const ServiceProviderServices = ({ isDarkMode, services = [], setServices }) => 
 
                   {/* Service Title */}
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black uppercase tracking-wider text-gray-400">
+                    <label className="text-sm font-black uppercase tracking-wider text-gray-400">
                       Service Title *
                     </label>
                     <input
@@ -698,7 +712,7 @@ const ServiceProviderServices = ({ isDarkMode, services = [], setServices }) => 
 
                 {/* Description */}
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-black uppercase tracking-wider text-gray-400">
+                  <label className="text-sm font-black uppercase tracking-wider text-gray-400">
                     Service Description *
                   </label>
                   <textarea
@@ -719,7 +733,7 @@ const ServiceProviderServices = ({ isDarkMode, services = [], setServices }) => 
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                   {/* Duration */}
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black uppercase tracking-wider text-gray-400 flex items-center gap-1">
+                    <label className="text-sm font-black uppercase tracking-wider text-gray-400 flex items-center gap-1">
                       <Clock size={11} /> Duration (Mins) *
                     </label>
                     <input
@@ -740,7 +754,7 @@ const ServiceProviderServices = ({ isDarkMode, services = [], setServices }) => 
 
                   {/* Cost Price */}
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black uppercase tracking-wider text-gray-400 flex items-center gap-1">
+                    <label className="text-sm font-black uppercase tracking-wider text-gray-400 flex items-center gap-1">
                       <IndianRupee size={11} /> Cost Price (₹) *
                     </label>
                     <input
@@ -761,7 +775,7 @@ const ServiceProviderServices = ({ isDarkMode, services = [], setServices }) => 
 
                   {/* Selling Price */}
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black uppercase tracking-wider text-gray-400 flex items-center gap-1">
+                    <label className="text-sm font-black uppercase tracking-wider text-gray-400 flex items-center gap-1">
                       <IndianRupee size={11} /> Selling Price (₹) *
                     </label>
                     <input
@@ -782,7 +796,7 @@ const ServiceProviderServices = ({ isDarkMode, services = [], setServices }) => 
 
                   {/* Offered Price */}
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black uppercase tracking-wider text-gray-400 flex items-center gap-1">
+                    <label className="text-sm font-black uppercase tracking-wider text-gray-400 flex items-center gap-1">
                       <IndianRupee size={11} /> Offered Price (₹) *
                     </label>
                     <input
@@ -805,7 +819,7 @@ const ServiceProviderServices = ({ isDarkMode, services = [], setServices }) => 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {/* Service Type */}
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black uppercase tracking-wider text-gray-400">
+                    <label className="text-sm font-black uppercase tracking-wider text-gray-400">
                       Service Type *
                     </label>
                     <select
@@ -827,7 +841,7 @@ const ServiceProviderServices = ({ isDarkMode, services = [], setServices }) => 
 
                   {/* Service Gender */}
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black uppercase tracking-wider text-gray-400">
+                    <label className="text-sm font-black uppercase tracking-wider text-gray-400">
                       Service Gender *
                     </label>
                     <select
@@ -850,7 +864,7 @@ const ServiceProviderServices = ({ isDarkMode, services = [], setServices }) => 
                   {/* Status Toggle (only in Edit mode) */}
                   {editingService ? (
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-black uppercase tracking-wider text-gray-400">
+                      <label className="text-sm font-black uppercase tracking-wider text-gray-400">
                         Service Status *
                       </label>
                       <div className="flex items-center gap-3">
@@ -870,7 +884,7 @@ const ServiceProviderServices = ({ isDarkMode, services = [], setServices }) => 
                   ) : (
                     /* Multiple Images Upload */
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-black uppercase tracking-wider text-gray-400 flex items-center gap-1">
+                      <label className="text-sm font-black uppercase tracking-wider text-gray-400 flex items-center gap-1">
                         <Upload size={11} /> Service Images
                       </label>
                       <div className="relative">
@@ -901,7 +915,7 @@ const ServiceProviderServices = ({ isDarkMode, services = [], setServices }) => 
                 {/* Edit Mode: Upload new images option */}
                 {editingService && (
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black uppercase tracking-wider text-gray-400 flex items-center gap-1">
+                    <label className="text-sm font-black uppercase tracking-wider text-gray-400 flex items-center gap-1">
                       <Upload size={11} /> Add New Images
                     </label>
                     <div className="relative">
@@ -1034,7 +1048,7 @@ const ServiceProviderServices = ({ isDarkMode, services = [], setServices }) => 
               ) : (
                 <div className="flex flex-col items-center justify-center text-gray-500 gap-2">
                   <ImageOff size={40} className="text-gray-600" />
-                  <span className="text-[10px] font-black uppercase tracking-wider">No Images Available</span>
+                  <span className="text-sm font-black uppercase tracking-wider">No Images Available</span>
                 </div>
               )}
               {/* Close Button on top of Image */}
@@ -1059,14 +1073,14 @@ const ServiceProviderServices = ({ isDarkMode, services = [], setServices }) => 
                 </div>
                 <div className="flex items-center gap-1.5">
                   <div className={`w-1.5 h-1.5 rounded-full ${viewingService.isActive ? 'bg-green-500' : 'bg-amber-500'}`} />
-                  <span className={`text-[10px] font-black uppercase ${viewingService.isActive ? 'text-green-500' : 'text-amber-500'}`}>
+                  <span className={`text-sm font-black uppercase ${viewingService.isActive ? 'text-green-500' : 'text-amber-500'}`}>
                     {viewingService.isActive ? 'Active' : 'Draft'}
                   </span>
                 </div>
               </div>
 
               {/* Grid Specifications */}
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-4 gap-4">
                 <div className={`p-4 rounded-2xl border ${isDarkMode ? 'bg-gray-900/50 border-white/5' : 'bg-gray-50 border-gray-100/50'}`}>
                   <p className="text-[9px] font-black text-gray-400 uppercase mb-1 flex items-center gap-1">
                     <Clock size={10} /> Duration
@@ -1077,11 +1091,20 @@ const ServiceProviderServices = ({ isDarkMode, services = [], setServices }) => 
                 </div>
                 
                 <div className={`p-4 rounded-2xl border ${isDarkMode ? 'bg-gray-900/50 border-white/5' : 'bg-gray-50 border-gray-100/50'}`}>
-                  <p className="text-[9px] font-black text-gray-400 uppercase mb-1">Target</p>
+                  <p className="text-[9px] font-black text-gray-400 uppercase mb-1">Type</p>
                   <p className={`text-xs font-black uppercase ${
                     viewingService.serviceType === 'BOTH' ? 'text-purple-500' : viewingService.serviceType === 'MALE' ? 'text-blue-500' : 'text-pink-500'
                   }`}>
                     {viewingService.serviceType || 'BOTH'}
+                  </p>
+                </div>
+
+                <div className={`p-4 rounded-2xl border ${isDarkMode ? 'bg-gray-900/50 border-white/5' : 'bg-gray-50 border-gray-100/50'}`}>
+                  <p className="text-[9px] font-black text-gray-400 uppercase mb-1">Gender</p>
+                  <p className={`text-xs font-black uppercase ${
+                    viewingService.serviceGender === 'BOTH' ? 'text-purple-500' : viewingService.serviceGender === 'ONLY_MEN' ? 'text-blue-500' : 'text-pink-500'
+                  }`}>
+                    {viewingService.serviceGender === 'ONLY_MEN' ? 'Men Only' : viewingService.serviceGender === 'ONLY_WOMEN' ? 'Women Only' : 'Both'}
                   </p>
                 </div>
 
@@ -1113,7 +1136,7 @@ const ServiceProviderServices = ({ isDarkMode, services = [], setServices }) => 
 
               {/* Description */}
               <div className="space-y-2">
-                <p className="text-[10px] font-black text-gray-400 uppercase">Service Description</p>
+                <p className="text-sm font-black text-gray-400 uppercase">Service Description</p>
                 <p className={`p-4 rounded-2xl text-xs leading-relaxed border ${
                   isDarkMode ? 'bg-gray-900/20 border-white/5 text-gray-450' : 'bg-gray-50 border-gray-100 text-gray-650'
                 }`}>

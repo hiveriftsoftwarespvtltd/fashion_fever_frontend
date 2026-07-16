@@ -144,7 +144,7 @@ export const CartProvider = ({ children }) => {
   };
 
   // Compute Totals
-  const cartTotal = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+  const cartTotal = Math.round(cart.reduce((acc, item) => acc + (item.price * item.qty), 0) * 100) / 100;
   const cartCount = cart.reduce((acc, item) => acc + item.qty, 0);
 
   return (

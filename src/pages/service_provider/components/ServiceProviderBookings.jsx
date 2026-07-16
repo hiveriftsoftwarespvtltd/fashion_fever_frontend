@@ -69,7 +69,7 @@ const ServiceProviderBookings = ({ isDarkMode, bookings = [], setBookings }) => 
             <span className={`text-sm font-bold truncate ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>
               {row.customerName}
             </span>
-            <span className="text-[10px] font-bold text-gray-400 uppercase truncate">
+            <span className="text-sm font-bold text-gray-400 uppercase truncate">
               Phone: {row.phone}
             </span>
           </div>
@@ -81,7 +81,7 @@ const ServiceProviderBookings = ({ isDarkMode, bookings = [], setBookings }) => 
       render: (row) => (
         <div className="flex flex-col text-left">
           <span className={`text-xs font-bold ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>{row.serviceName}</span>
-          <span className="text-[10px] font-bold text-primary uppercase">{row.category}</span>
+          <span className="text-sm font-bold text-primary uppercase">{row.category}</span>
         </div>
       )
     },
@@ -95,7 +95,7 @@ const ServiceProviderBookings = ({ isDarkMode, bookings = [], setBookings }) => 
               {new Date(row.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
             </span>
           </div>
-          <div className="flex items-center gap-1.5 text-[10px] font-bold text-gray-400 uppercase mt-0.5">
+          <div className="flex items-center gap-1.5 text-sm font-bold text-gray-400 uppercase mt-0.5">
             <Clock size={11} className="text-gray-400" />
             <span>{row.timeSlot}</span>
           </div>
@@ -149,7 +149,7 @@ const ServiceProviderBookings = ({ isDarkMode, bookings = [], setBookings }) => 
                 </button>
               </>
             ) : (
-              <span className={`text-[10px] font-bold text-gray-400 uppercase`}>No Actions</span>
+              <span className={`text-sm font-bold text-gray-400 uppercase`}>No Actions</span>
             )}
           </div>
         );
@@ -163,7 +163,7 @@ const ServiceProviderBookings = ({ isDarkMode, bookings = [], setBookings }) => 
       {/* Header section */}
       <div className="flex justify-between items-center">
         <div>
-          <span className="text-[10px] font-bold text-primary uppercase">Schedule Grid</span>
+          <span className="text-sm font-bold text-primary uppercase">Schedule Grid</span>
           <h2 className={`text-xl md:text-2xl font-bold uppercase ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Bookings & Schedule</h2>
         </div>
       </div>
@@ -197,7 +197,7 @@ const ServiceProviderBookings = ({ isDarkMode, bookings = [], setBookings }) => 
             <button
               key={f.key}
               onClick={() => setFilterStatus(f.key)}
-              className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-wide transition-all duration-200 cursor-pointer ${
+              className={`px-4 py-2 rounded-xl text-sm font-black uppercase tracking-wide transition-all duration-200 cursor-pointer ${
                 filterStatus === f.key
                   ? 'bg-primary text-white shadow-lg shadow-primary/25'
                   : isDarkMode

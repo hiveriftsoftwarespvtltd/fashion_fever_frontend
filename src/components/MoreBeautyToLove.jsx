@@ -1,37 +1,42 @@
 import React, { useRef } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import bannerImg from '../assets/banner.png';
+import wellnessneed1 from '../assets/wellnessneed1.png';
+import wellnessneed2 from '../assets/wellnessneed2.png';
+import wellnessneed3 from '../assets/wellnessneed3.png';
+import wellnessneed4 from '../assets/wellnessneed4.png';
 
 const MoreBeautyToLove = () => {
- const categoriesRef = useRef(null);
- const beautyGuidesRef = useRef(null);
+  const categoriesRef = useRef(null);
+  const beautyGuidesRef = useRef(null);
 
- const categories = [
-  "https://images-static.nykaa.com/uploads/346ed7f1-065a-4283-869f-45523e621137.jpg?tr=cm-pad_resize,w-150",
-  "https://images-static.nykaa.com/uploads/e44e176c-cade-486a-a19b-a23ded2337b2.jpg?tr=cm-pad_resize,w-150",
-  "https://images-static.nykaa.com/uploads/cbc2dfc3-91b7-483d-b2e0-2e3cb5776d25.jpg?tr=cm-pad_resize,w-150",
-  "https://images-static.nykaa.com/uploads/ba00dddf-858e-4242-aa0d-362415bd9613.jpg?tr=cm-pad_resize,w-150",
-  "https://images-static.nykaa.com/uploads/17541b73-5f5f-449e-91aa-c5606e59aeb5.png?tr=cm-pad_resize,w-150",
-  "https://images-static.nykaa.com/uploads/6da43d08-8c04-4f31-9f2d-a8c34b32cfc5.jpg?tr=cm-pad_resize,w-150",
-  "https://images-static.nykaa.com/uploads/b7a6e36e-be01-4a56-8aed-6cac82cdc74d.jpg?tr=cm-pad_resize,w-150",
-  "https://images-static.nykaa.com/uploads/844c2a89-2ae5-4e29-a1f8-6dad808da1d4.jpg?tr=cm-pad_resize,w-150",
-  "https://images-static.nykaa.com/uploads/ba00dddf-858e-4242-aa0d-362415bd9613.jpg?tr=cm-pad_resize,w-150"
- ];
+  const categories = [
+   "https://images-static.nykaa.com/uploads/346ed7f1-065a-4283-869f-45523e621137.jpg?tr=cm-pad_resize,w-150",
+   "https://images-static.nykaa.com/uploads/e44e176c-cade-486a-a19b-a23ded2337b2.jpg?tr=cm-pad_resize,w-150",
+   "https://images-static.nykaa.com/uploads/cbc2dfc3-91b7-483d-b2e0-2e3cb5776d25.jpg?tr=cm-pad_resize,w-150",
+   "https://images-static.nykaa.com/uploads/ba00dddf-858e-4242-aa0d-362415bd9613.jpg?tr=cm-pad_resize,w-150",
+   "https://images-static.nykaa.com/uploads/17541b73-5f5f-449e-91aa-c5606e59aeb5.png?tr=cm-pad_resize,w-150",
+   "https://images-static.nykaa.com/uploads/6da43d08-8c04-4f31-9f2d-a8c34b32cfc5.jpg?tr=cm-pad_resize,w-150",
+   "https://images-static.nykaa.com/uploads/b7a6e36e-be01-4a56-8aed-6cac82cdc74d.jpg?tr=cm-pad_resize,w-150",
+   "https://images-static.nykaa.com/uploads/844c2a89-2ae5-4e29-a1f8-6dad808da1d4.jpg?tr=cm-pad_resize,w-150",
+   "https://images-static.nykaa.com/uploads/ba00dddf-858e-4242-aa0d-362415bd9613.jpg?tr=cm-pad_resize,w-150"
+  ];
 
- const wellness = {
-  logo: "https://images-static.nykaa.com/uploads/0491871a-289b-449e-b830-4e0da1a0139b.png",
-  banners: [
-   "https://images-static.nykaa.com/uploads/5ec28d9e-dca0-4cd9-b45d-048d1a683f58.jpg?tr=cm-pad_resize,w-800",
-   "https://images-static.nykaa.com/uploads/3d4925f2-dc17-4a04-8107-5199befc8b55.jpg?tr=cm-pad_resize,w-800",
-   "https://images-static.nykaa.com/uploads/00b3a7c2-0b7b-4a33-9df0-eb57c4f910b6.jpg?tr=cm-pad_resize,w-800"
-  ],
-  grid: [
-   "https://images-static.nykaa.com/uploads/6e7d22f8-8ac0-416a-9150-51a86bc96233.jpg?tr=cm-pad_resize,w-300",
-   "https://images-static.nykaa.com/uploads/286760b8-5df4-4ab9-a7dc-9708836d1632.jpg?tr=cm-pad_resize,w-300",
-   "https://images-static.nykaa.com/uploads/2031db9c-3244-4a12-8669-596659651dda.jpg?tr=cm-pad_resize,w-300",
-   "https://images-static.nykaa.com/uploads/292e3e27-2aed-4b2c-b75a-a0f82011f921.jpg?tr=cm-pad_resize,w-300"
-  ]
- };
+  const wellness = {
+   logo: "https://images-static.nykaa.com/uploads/0491871a-289b-449e-b830-4e0da1a0139b.png",
+   banners: [
+    "https://images-static.nykaa.com/uploads/5ec28d9e-dca0-4cd9-b45d-048d1a683f58.jpg?tr=cm-pad_resize,w-800",
+    "https://images-static.nykaa.com/uploads/3d4925f2-dc17-4a04-8107-5199befc8b55.jpg?tr=cm-pad_resize,w-800",
+    "https://images-static.nykaa.com/uploads/00b3a7c2-0b7b-4a33-9df0-eb57c4f910b6.jpg?tr=cm-pad_resize,w-800"
+   ],
+   grid: [
+    wellnessneed1,
+    wellnessneed2,
+    wellnessneed3,
+    wellnessneed4
+   ]
+  };
 
  const beautyGuides = [
   { img: "https://images-static.nykaa.com/uploads/23b44191-454c-461c-9160-0666d8964361.jpg?tr=cm-pad_resize,w-300", title: "Makeup, Makeup Edit" },
@@ -67,9 +72,9 @@ const MoreBeautyToLove = () => {
        className="flex overflow-x-auto gap-4 md:gap-5 no-scrollbar pb-4 snap-x snap-mandatory md:justify-center"
       >
        {categories.map((img, index) => (
-        <div key={index} className="flex-shrink-0 w-[110px] md:w-[135px] snap-start cursor-pointer transition-transform hover:scale-105">
+        <Link to="/shop" key={index} className="block flex-shrink-0 w-[110px] md:w-[135px] snap-start cursor-pointer transition-transform hover:scale-105">
          <img src={img} alt={`Category ${index + 1}`} className="w-full h-auto rounded-2xl shadow-sm border border-gray-50" />
-        </div>
+        </Link>
        ))}
       </div>
       <button onClick={() => scroll(categoriesRef, 'right')} className="absolute -right-4 md:-right-6 top-1/2 -translate-y-1/2 z-10 bg-white p-2 rounded-full shadow-lg border border-gray-100 hidden md:flex items-center justify-center hover:bg-gray-50 transition-all opacity-0 group-hover:opacity-100"><ChevronRight className="w-6 h-6 text-gray-600" /></button>
@@ -84,21 +89,23 @@ const MoreBeautyToLove = () => {
      </div>
 
      {/* Single full-width banner */}
-     <div className="w-full mb-12 rounded-2xl overflow-hidden shadow-sm border border-gray-100">
+     <Link to="/shop" className="block w-full mb-12 rounded-2xl overflow-hidden shadow-sm border border-gray-100 cursor-pointer">
       <img
        src={bannerImg}
        alt="Explore Wellness"
        className="w-full h-auto block"
       />
-     </div>
+     </Link>
 
      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
       {wellness.grid.map((img, index) => (
-       <div key={index} className="cursor-pointer overflow-hidden rounded-2xl md:rounded-[1.5rem] shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1">
+       <Link to="/shop" key={index} className="block cursor-pointer overflow-hidden rounded-2xl md:rounded-[1.5rem] shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1">
         <img src={img} alt={`Wellness ${index + 1}`} className="w-full h-auto block" />
-       </div>
+       </Link>
       ))}
      </div>
+
+     
     </div>
 
     {/* 3. Beauty Advice Carousel */}
@@ -108,21 +115,21 @@ const MoreBeautyToLove = () => {
      </div>
 
      <div className="relative">
-      <button onClick={() => scroll(beautyGuidesRef, 'left')} className="absolute -left-4 md:-left-6 top-[40%] -translate-y-1/2 z-10 bg-white p-3 rounded-full shadow-xl border border-gray-100 hidden md:flex items-center justify-center hover:bg-gray-50 transition-all opacity-0 group-hover:opacity-100"><ChevronLeft className="w-6 h-6 text-gray-800" /></button>
+      <button onClick={() => scroll(beautyGuidesRef, 'left')} className="absolute -left-4 md:-left-6 top-[40%] -translate-y-1/2 z-10 bg-white p-3 rounded-full shadow-xl border border-gray-100 hidden md:flex items-center justify-center hover:bg-gray-50 transition-all opacity-0 group-hover:opacity-100"><ChevronLeft className="w-6 h-8 text-gray-800" /></button>
       <div 
        ref={beautyGuidesRef} 
        className="flex overflow-x-auto gap-4 md:gap-5 no-scrollbar pb-6 snap-x snap-mandatory md:justify-center"
       >
        {beautyGuides.map((guide, index) => (
-        <div key={index} className="flex-shrink-0 w-[165px] md:w-[230px] snap-start cursor-pointer">
+        <Link to="/shop" key={index} className="block flex-shrink-0 w-[165px] md:w-[230px] snap-start cursor-pointer text-left">
          <div className="overflow-hidden rounded-2xl shadow-sm mb-3">
           <img src={guide.img} alt={guide.title} className="w-full h-auto transform transition-transform duration-500 hover:scale-110" />
          </div>
          <p className="text-[12px] md:text-[14px] font-medium text-[#1e293b] line-clamp-1 hover:text-[#ff0050] transition-colors">{guide.title}</p>
-        </div>
+        </Link>
        ))}
       </div>
-      <button onClick={() => scroll(beautyGuidesRef, 'right')} className="absolute -right-4 md:-right-6 top-[40%] -translate-y-1/2 z-10 bg-white p-3 rounded-full shadow-xl border border-gray-100 hidden md:flex items-center justify-center hover:bg-gray-50 transition-all opacity-0 group-hover:opacity-100"><ChevronRight className="w-6 h-6 text-gray-800" /></button>
+      <button onClick={() => scroll(beautyGuidesRef, 'right')} className="absolute -right-4 md:-right-6 top-[40%] -translate-y-1/2 z-10 bg-white p-3 rounded-full shadow-xl border border-gray-100 hidden md:flex items-center justify-center hover:bg-gray-50 transition-all opacity-0 group-hover:opacity-100"><ChevronRight className="w-6 h-8 text-gray-800" /></button>
      </div>
     </div>
 

@@ -99,7 +99,7 @@ const OnboardInfluencerModal = ({ isOpen, onClose, onSuccess, initialData = null
               <h2 className={`text-lg md:text-2xl font-bold uppercase ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
                 {initialData ? 'Update Influencer' : 'Onboard New Influencer'}
               </h2>
-              <p className="text-[10px] font-bold text-gray-400 uppercase mt-1">
+              <p className="text-sm font-bold text-gray-400 uppercase mt-1">
                 {initialData ? 'Modify existing partner details' : 'Create a new partner profile'}
               </p>
             </div>
@@ -111,50 +111,50 @@ const OnboardInfluencerModal = ({ isOpen, onClose, onSuccess, initialData = null
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                <div className="space-y-2">
-                <label className={`text-[10px] font-bold uppercase ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>Full Name</label>
+                <label className={`text-sm font-bold uppercase ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>Full Name</label>
                 <input required name="name" value={formData.name} onChange={handleChange} placeholder="Enter Name" className={`w-full px-5 py-4 rounded-2xl text-sm font-medium outline-none border transition-all placeholder:text-gray-400 placeholder:font-normal placeholder:text-xs ${isDarkMode ? 'bg-gray-900 border-gray-700 text-white focus:border-primary/50' : 'bg-gray-50 border-gray-100 text-gray-800 focus:bg-white focus:border-primary/30'}`} />
               </div>
               <div className="space-y-2">
-                <label className={`text-[10px] font-bold uppercase ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>Email Address</label>
+                <label className={`text-sm font-bold uppercase ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>Email Address</label>
                 <input required type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Enter Email Address" className={`w-full px-5 py-4 rounded-2xl text-sm font-medium outline-none border transition-all placeholder:text-gray-400 placeholder:font-normal placeholder:text-xs ${isDarkMode ? 'bg-gray-900 border-gray-700 text-white focus:border-primary/50' : 'bg-gray-50 border-gray-100 text-gray-800 focus:bg-white focus:border-primary/30'}`} />
               </div>
               {!initialData && (
                 <div className="space-y-2">
-                  <label className={`text-[10px] font-bold uppercase ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>Password</label>
+                  <label className={`text-sm font-bold uppercase ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>Password</label>
                   <input required type="password" name="password" value={formData.password} onChange={handleChange} placeholder="Enter Password" className={`w-full px-5 py-4 rounded-2xl text-sm font-medium outline-none border transition-all placeholder:text-gray-400 placeholder:font-normal placeholder:text-xs ${isDarkMode ? 'bg-gray-900 border-gray-700 text-white focus:border-primary/50' : 'bg-gray-50 border-gray-100 text-gray-800 focus:bg-white focus:border-primary/30'}`} />
                 </div>
               )}
               {initialData && (
                 <div className="space-y-2">
-                  <label className={`text-[10px] font-bold uppercase ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>Password (Leave blank to keep same)</label>
+                  <label className={`text-sm font-bold uppercase ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>Password (Leave blank to keep same)</label>
                   <input type="password" name="password" value={formData.password} onChange={handleChange} placeholder="Enter Password" className={`w-full px-5 py-4 rounded-2xl text-sm font-medium outline-none border transition-all placeholder:text-gray-400 placeholder:font-normal placeholder:text-xs ${isDarkMode ? 'bg-gray-900 border-gray-700 text-white focus:border-primary/50' : 'bg-gray-50 border-gray-100 text-gray-800 focus:bg-white focus:border-primary/30'}`} />
                 </div>
               )}
               <div className="space-y-2">
-                <label className={`text-[10px] font-bold uppercase ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>Commission Rate (%)</label>
+                <label className={`text-sm font-bold uppercase ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>Commission Rate (%)</label>
                 <input required type="number" name="commissionRate" value={formData.commissionRate} onChange={handleChange} min="0" max="100" className={`w-full px-5 py-4 rounded-2xl text-sm font-medium outline-none border transition-all placeholder:text-gray-400 placeholder:font-normal placeholder:text-xs ${isDarkMode ? 'bg-gray-900 border-gray-700 text-white' : 'bg-gray-50 border-gray-100'}`} />
               </div>
             </div>
 
             <div className="space-y-2">
-              <label className={`text-[10px] font-bold uppercase ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>Influencer Bio</label>
+              <label className={`text-sm font-bold uppercase ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>Influencer Bio</label>
               <textarea name="bio" value={formData.bio} onChange={handleChange} rows="3" placeholder="Describe the influencer..." className={`w-full px-5 py-4 rounded-2xl text-sm font-medium outline-none border transition-all placeholder:text-gray-400 placeholder:font-normal placeholder:text-xs resize-none ${isDarkMode ? 'bg-gray-900 border-gray-700 text-white focus:border-primary/50' : 'bg-gray-50 border-gray-100 text-gray-800 focus:bg-white focus:border-primary/30'}`}></textarea>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className={`text-[10px] font-bold uppercase ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>Followers Count</label>
+                <label className={`text-sm font-bold uppercase ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>Followers Count</label>
                 <input type="number" name="followers" value={formData.followers} onChange={handleChange} min="0" placeholder="0" className={`w-full px-5 py-4 rounded-2xl text-sm font-medium outline-none border transition-all placeholder:text-gray-400 placeholder:font-normal placeholder:text-xs ${isDarkMode ? 'bg-gray-900 border-gray-700 text-white' : 'bg-gray-50 border-gray-100'}`} />
               </div>
               <div className="space-y-2">
-                <label className={`text-[10px] font-bold uppercase ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>Instagram Handle</label>
+                <label className={`text-sm font-bold uppercase ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>Instagram Handle</label>
                 <div className="relative">
                   <Camera size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400" />
                   <input name="instagram" value={formData.instagram} onChange={handleChange} placeholder="instagram.com/username" className={`w-full pl-12 pr-5 py-4 rounded-2xl text-sm font-medium outline-none border transition-all placeholder:text-gray-400 placeholder:font-normal placeholder:text-xs ${isDarkMode ? 'bg-gray-900 border-gray-700 text-white focus:border-primary/50' : 'bg-gray-50 border-gray-100 text-gray-800 focus:bg-white focus:border-primary/30'}`} />
                 </div>
               </div>
               <div className="space-y-2 col-span-full">
-                <label className={`text-[10px] font-bold uppercase ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>YouTube Channel</label>
+                <label className={`text-sm font-bold uppercase ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>YouTube Channel</label>
                 <div className="relative">
                   <Video size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400" />
                   <input name="youtube" value={formData.youtube} onChange={handleChange} placeholder="youtube.com/channel" className={`w-full pl-12 pr-5 py-4 rounded-2xl text-sm font-medium outline-none border transition-all placeholder:text-gray-400 placeholder:font-normal placeholder:text-xs ${isDarkMode ? 'bg-gray-900 border-gray-700 text-white focus:border-primary/50' : 'bg-gray-50 border-gray-100 text-gray-800 focus:bg-white focus:border-primary/30'}`} />

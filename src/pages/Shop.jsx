@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Filter, ChevronDown, Star, ShoppingBag, Heart, Search, SlidersHorizontal, X, Check, LayoutGrid, Loader2 } from 'lucide-react';
+import { Filter, ChevronDown, Star, ShoppingBag, Heart, Search, SlidersHorizontal, X, Check, LayoutGrid, Loader2, Plus, Minus } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useSearch } from '../context/SearchContext';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { toast } from '../utils/toast';
-import { getProducts } from '../api/productService';
+import { getProducts, getPublicCategories, getPublicBrands } from '../api/productService';
+import ProductCard from '../components/shared/ProductCard';
+
 
 const Shop = () => {
+  const navigate = useNavigate();
   const { searchQuery, setSearchQuery } = useSearch();
-  const { addToCart } = useCart();
+  const { cart, addToCart, updateQty, removeFromCart } = useCart();
   const { incrementWishlistCount, decrementWishlistCount } = useWishlist();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -26,6 +30,45 @@ const Shop = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [localSearch, setLocalSearch] = useState(searchQuery || '');
+  const [categories, setCategories] = useState(['All', 'Makeup', 'Skincare', 'Haircare', 'Fragrance', 'Tools', 'Natural']);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await getPublicCategories();
+        if (response.success) {
+          const payload = response.data ?? response;
+          if (Array.isArray(payload)) {
+            const names = payload.map(cat => cat.name);
+            setCategories(['All', ...names]);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch public categories for Shop:", error);
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  useEffect(() => {
+    const fetchBrands = async () => {
+      try {
+        const response = await getPublicBrands();
+        if (response.success) {
+          const payload = response.data ?? response;
+          if (Array.isArray(payload)) {
+            const names = payload.map(b => b.brand).filter(Boolean);
+            if (names.length > 0) {
+              setAvailableBrands(names);
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch public brands for Shop:", error);
+      }
+    };
+    fetchBrands();
+  }, []);
 
   // Synchronize local search text with global search context
   useEffect(() => {
@@ -47,7 +90,6 @@ const Shop = () => {
     return () => { document.body.style.overflow = 'unset'; };
   }, [isMobileFilterOpen]);
 
-  const categories = ['All', 'Makeup', 'Skincare', 'Haircare', 'Fragrance', 'Tools', 'Natural'];
   const brands = availableBrands;
 
   const priceRanges = [
@@ -125,11 +167,7 @@ const Shop = () => {
             const pagesCount = apiPagesCount || (totalItems ? Math.ceil(totalItems / 10) : 1);
             setTotalPages(pagesCount || 1);
 
-            // Extract dynamic brands if no brand filter is selected, so the sidebar list doesn't shrink
-            if (selectedBrands.length === 0) {
-              const fetchedBrands = rawProducts.map(p => p.brand || p.vendorId?.businessName).filter(Boolean);
-              setAvailableBrands(prev => Array.from(new Set([...prev, ...fetchedBrands])));
-            }
+            // Brands are loaded dynamically from /public-user/brands on mount
 
             // Map raw backend products to existing component layout schema
             const mapped = rawProducts.map(p => {
@@ -225,7 +263,7 @@ const Shop = () => {
         {(activeCategory !== 'All' || selectedBrands.length > 0 || selectedPrices.length > 0 || freeShippingOnly) && (
           <button 
             onClick={clearAllFilters}
-            className="text-[10px] font-semibold text-primary hover:text-white hover:bg-primary px-3 py-1.5 rounded-lg uppercase  transition-all"
+            className="text-sm font-semibold text-primary hover:text-white hover:bg-primary px-3 py-1.5 rounded-lg uppercase  transition-all"
           >
             Clear All
           </button>
@@ -234,20 +272,20 @@ const Shop = () => {
 
       {/* Categories */}
       <div className="space-y-4">
-        <h3 className="text-xs font-bold uppercase  text-gray-400">Categories</h3>
+        <h3 className="text-xs font-bold uppercase text-gray-400">Categories</h3>
         <div className="flex flex-col gap-2">
           {categories.map((cat) => (
             <button
               key={cat}
               onClick={() => setActiveCategory(cat)}
-              className={`text-left px-4 py-2.5 rounded-xl text-xs font-bold uppercase  transition-all duration-300 flex items-center justify-between ${
+              className={`w-full text-left px-4 py-2.5 rounded-xl text-xs font-bold uppercase transition-all duration-300 flex items-center justify-between ${
                 activeCategory === cat
                   ? 'bg-gray-900 text-white shadow-md'
                   : 'bg-transparent text-gray-600 hover:bg-gray-50'
               }`}
             >
-              {cat}
-              {activeCategory === cat && <Check size={14} className="text-white" />}
+              <span className="truncate text-left">{cat.trim()}</span>
+              {activeCategory === cat && <Check size={14} className="text-white flex-shrink-0 ml-2" />}
             </button>
           ))}
         </div>
@@ -362,7 +400,7 @@ const Shop = () => {
           
           {/* Desktop Filters Sidebar */}
           <aside className="hidden lg:block w-[280px] flex-shrink-0">
-            <div className="bg-white rounded-[2rem] border border-gray-100 p-8 shadow-sm sticky top-[100px]">
+            <div className="bg-white rounded-2xl border border-gray-100 p-8 shadow-sm sticky top-[100px]">
               <FilterContent />
             </div>
           </aside>
@@ -434,7 +472,7 @@ const Shop = () => {
               </div>
 
               <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
-                <span className="hidden sm:inline-block text-[10px] font-semibold text-gray-400 uppercase ">Sort By</span>
+                <span className="hidden sm:inline-block text-sm font-semibold text-gray-400 uppercase ">Sort By</span>
                 <div className="relative group">
                   <select
                     value={sortBy}
@@ -450,11 +488,10 @@ const Shop = () => {
                 </div>
               </div>
             </div>
-
             {/* Product Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6 lg:gap-8">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-6">
               {loading ? (
-                Array.from({ length: 8 }).map((_, i) => (
+                Array.from({ length: 10 }).map((_, i) => (
                   <div key={i} className="bg-white rounded-3xl p-4 border border-gray-100 flex flex-col h-[380px] animate-pulse">
                     <div className="aspect-square w-full bg-gray-100 rounded-2xl mb-4"></div>
                     <div className="h-3 w-1/3 bg-gray-100 rounded mb-2"></div>
@@ -475,88 +512,12 @@ const Shop = () => {
                 </div>
               ) : (
                 sortedProducts.map((product) => (
-                  <div
+                  <ProductCard
                     key={product.id}
-                    className="group flex flex-col h-full bg-white rounded-3xl overflow-hidden border border-gray-100 hover:border-primary/20 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500"
-                    onMouseEnter={() => setHoveredProduct(product.id)}
-                    onMouseLeave={() => setHoveredProduct(null)}
-                  >
-                    {/* Image Wrapper */}
-                    <div className="relative aspect-square overflow-hidden bg-gray-50 ">
-                      <div className="absolute inset-0 bg-gradient-to-t from-gray-900/10 to-transparent mix-blend-multiply opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"></div>
-                      
-                      <img 
-                        src={product.image} 
-                        alt={product.name} 
-                        className="w-full h-full object-cover rounded-2xl shadow-sm transition-all duration-700 ease-[cubic-bezier(0.33,1,0.68,1)] group-hover:scale-110"
-                      />
-                      
-                      {/* Top Badges */}
-                      <div className="absolute top-2 left-2 right-2 sm:top-4 sm:left-4 sm:right-4 flex justify-between items-start z-20">
-                        {product.badge ? (
-                          <span className="bg-gray-900 text-white text-[8px] sm:text-[9px] font-bold uppercase  px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg shadow-lg">
-                            {product.badge}
-                          </span>
-                        ) : (
-                          <div></div>
-                        )}
-                        
-                        {/* Wishlist Button */}
-                        <button
-                          onClick={(e) => { e.stopPropagation(); toggleWishlist(product.id); }}
-                          className={`w-7 h-7 sm:w-9 sm:h-9 rounded-full flex items-center justify-center transition-all shadow-md backdrop-blur-md border ${
-                            wishlist.includes(product.id)
-                              ? 'bg-primary border-primary text-white'
-                              : 'bg-white/80 border-white text-gray-400 hover:text-primary hover:bg-white'
-                          }`}
-                        >
-                          <Heart size={16} fill={wishlist.includes(product.id) ? "currentColor" : "none"} className="mt-[1px]" />
-                        </button>
-                      </div>
-
-
-                    </div>
-
-                    {/* Content */}
-                    <div className="p-3 sm:p-5 flex flex-col flex-grow text-left relative bg-white z-10">
-                      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-1 sm:mb-2 gap-1 sm:gap-0">
-                        <span className="text-[8px] sm:text-[9px] font-bold uppercase  text-primary/80 truncate w-full">
-                          {product.brand}
-                        </span>
-                        <div className="flex items-center gap-0.5 sm:gap-1 bg-gray-50 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md">
-                          <Star size={8} className="text-yellow-400 fill-yellow-400 sm:w-2.5 sm:h-2.5" />
-                          <span className="text-[9px] sm:text-[10px] font-bold text-gray-700">{product.rating}</span>
-                        </div>
-                      </div>
-                      
-                      <h3 className="text-gray-900 font-bold text-[11px] sm:text-sm uppercase leading-snug mb-0.5 sm:mb-1 group-hover:text-primary transition-colors line-clamp-2">
-                        {product.name}
-                      </h3>
-                      <p className="text-[8px] sm:text-[10px] font-bold uppercase  text-gray-400 mb-2 sm:mb-4">{product.category}</p>
-                      
-                      {/* Footer Info */}
-                      <div className="mt-auto pt-2 sm:pt-4 border-t border-gray-100/60">
-                        <div className="mb-2 sm:mb-3">
-                          <span className="text-sm sm:text-lg font-bold text-gray-900">₹{product.price}</span>
-                        </div>
-                        <button
-                          onClick={() => {
-                            const cartItemLocal = {
-                              id: product.firstVariant?._id || product.id,
-                              name: product.name,
-                              price: product.price,
-                              image: product.image,
-                            };
-                            addToCart(cartItemLocal, product.firstVariant?._id || product.id, product.originalProduct?._id || product.id);
-                            toast.success(`${product.name} added to cart`);
-                          }}
-                          className="w-full bg-gray-900 hover:bg-primary text-white py-2 sm:py-3 rounded-lg sm:rounded-xl font-bold uppercase text-[9px] sm:text-[10px]  shadow-md hover:shadow-primary/30 transition-all flex items-center justify-center gap-1.5"
-                        >
-                          <ShoppingBag size={12} className="sm:w-[14px] sm:h-[14px]" /> <span className="hidden sm:inline">Add to Cart</span><span className="sm:hidden">Add</span>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
+                    product={product.originalProduct}
+                    isWishlisted={wishlist.includes(product.id)}
+                    onWishlistToggle={() => toggleWishlist(product.id)}
+                  />
                 ))
               )}
             </div>

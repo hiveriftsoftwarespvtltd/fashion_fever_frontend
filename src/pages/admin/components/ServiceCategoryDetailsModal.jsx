@@ -68,9 +68,9 @@ const ServiceCategoryDetailsModal = ({ categoryId, onClose }) => {
                   <h2 className={`text-xl font-bold leading-tight ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                     {category.label || category.name}
                   </h2>
-                  <p className="text-[10px] font-bold text-primary uppercase mt-1">Service Category</p>
+                  <p className="text-sm font-bold text-primary uppercase mt-1">Service Category</p>
                   {category.name !== category.label && (
-                    <p className="text-[10px] font-bold text-gray-400 uppercase mt-0.5">/{category.name}</p>
+                    <p className="text-sm font-bold text-gray-400 uppercase mt-0.5">/{category.name}</p>
                   )}
                 </div>
               </div>
@@ -82,14 +82,14 @@ const ServiceCategoryDetailsModal = ({ categoryId, onClose }) => {
             {/* Category Statistics/Info Cards */}
             <div className="grid grid-cols-2 gap-4 mb-6">
               <div className={`p-4 rounded-2xl ${isDarkMode ? 'bg-gray-900/50 border border-white/5' : 'bg-gray-50 border border-gray-100/50'}`}>
-                <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Status</p>
+                <p className="text-sm font-bold text-gray-400 uppercase mb-1">Status</p>
                 <div className="flex items-center gap-1.5">
                   <div className={`w-1.5 h-1.5 rounded-full ${category.isActive ? 'bg-green-500' : 'bg-red-500'}`}></div>
                   <span className={`text-sm font-bold uppercase ${category.isActive ? 'text-green-500' : 'text-red-500'}`}>{category.isActive ? 'Active' : 'Inactive'}</span>
                 </div>
               </div>
               <div className={`p-4 rounded-2xl ${isDarkMode ? 'bg-gray-900/50 border border-white/5' : 'bg-gray-50 border-gray-100/50'}`}>
-                <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Delete State</p>
+                <p className="text-sm font-bold text-gray-400 uppercase mb-1">Delete State</p>
                 <p className={`text-sm font-bold uppercase ${category.isDeleted ? 'text-red-500' : 'text-gray-400'}`}>
                   {category.isDeleted ? 'Deleted' : 'Available'}
                 </p>
@@ -99,7 +99,7 @@ const ServiceCategoryDetailsModal = ({ categoryId, onClose }) => {
             {/* Description & Details Info */}
             <div className="space-y-5">
               <div>
-                <p className="text-[10px] font-bold text-gray-400 uppercase mb-2">Category Description</p>
+                <p className="text-sm font-bold text-gray-400 uppercase mb-2">Category Description</p>
                 <p className={`p-4 rounded-2xl text-xs leading-relaxed border ${isDarkMode ? 'bg-gray-900/20 border-white/5 text-gray-400' : 'bg-gray-50 border-gray-100 text-gray-600'}`}>
                   {category.description || 'No description provided.'}
                 </p>
@@ -108,7 +108,7 @@ const ServiceCategoryDetailsModal = ({ categoryId, onClose }) => {
               {/* Image Metadata section */}
               {category.image && (
                 <div>
-                  <p className="text-[10px] font-bold text-gray-400 uppercase mb-2">Cover Image File Info</p>
+                  <p className="text-sm font-bold text-gray-400 uppercase mb-2">Cover Image File Info</p>
                   <div className={`p-4 rounded-2xl border space-y-2 text-xs ${isDarkMode ? 'bg-gray-900/20 border-white/5 text-gray-400' : 'bg-gray-50 border-gray-100 text-gray-600'}`}>
                     <div className="flex justify-between items-center">
                       <span className="flex items-center gap-1.5 font-bold uppercase text-[9px] text-gray-400">
@@ -130,7 +130,7 @@ const ServiceCategoryDetailsModal = ({ categoryId, onClose }) => {
                       <span className="flex items-center gap-1.5 font-bold uppercase text-[9px] text-gray-400">
                         <User size={12} /> Uploaded By (User ID)
                       </span>
-                      <span className="font-bold font-mono text-[10px]">
+                      <span className="font-bold font-mono text-sm">
                         {category.image.uploadedBy || '—'}
                       </span>
                     </div>
@@ -149,7 +149,7 @@ const ServiceCategoryDetailsModal = ({ categoryId, onClose }) => {
               {/* Created / Updated timestamps */}
               <div className={`p-4 rounded-2xl border ${isDarkMode ? 'bg-gray-900/20 border-white/5 text-gray-400' : 'bg-gray-50 border-gray-100 text-gray-500'}`}>
                 <div className="flex justify-between items-center mb-2.5">
-                  <span className="text-[10px] font-bold uppercase flex items-center gap-1 text-gray-400">
+                  <span className="text-sm font-bold uppercase flex items-center gap-1 text-gray-400">
                     <Clock size={12} /> Created At
                   </span>
                   <span className="text-xs font-bold text-gray-700 dark:text-gray-500">
@@ -157,7 +157,7 @@ const ServiceCategoryDetailsModal = ({ categoryId, onClose }) => {
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-[10px] font-bold uppercase flex items-center gap-1 text-gray-400">
+                  <span className="text-sm font-bold uppercase flex items-center gap-1 text-gray-400">
                     <Clock size={12} /> Last Updated
                   </span>
                   <span className="text-xs font-bold text-gray-700 dark:text-gray-500">

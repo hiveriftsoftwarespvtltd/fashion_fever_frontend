@@ -59,8 +59,8 @@ const CategoryDetailsModal = ({ categoryId, onClose }) => {
                 </div>
                 <div>
                   <h2 className={`text-xl font-bold leading-tight ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{category.label || category.name}</h2>
-                  <p className="text-[10px] font-bold text-primary uppercase mt-1">Product Category</p>
-                  <p className="text-[10px] font-bold text-gray-400 uppercase mt-0.5">/{category.slug}</p>
+                  <p className="text-sm font-bold text-primary uppercase mt-1">Product Category</p>
+                  <p className="text-sm font-bold text-gray-400 uppercase mt-0.5">/{category.slug}</p>
                 </div>
               </div>
               <button onClick={onClose} className={`p-2 rounded-xl transition-all cursor-pointer ${isDarkMode ? 'hover:bg-white/5 text-gray-500' : 'hover:bg-gray-50 text-gray-400'}`}>
@@ -71,14 +71,14 @@ const CategoryDetailsModal = ({ categoryId, onClose }) => {
             {/* Category Statistics/Info Cards */}
             <div className="grid grid-cols-2 gap-4 mb-6">
               <div className={`p-4 rounded-2xl ${isDarkMode ? 'bg-gray-900/50 border border-white/5' : 'bg-gray-50 border border-gray-100/50'}`}>
-                <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Status</p>
+                <p className="text-sm font-bold text-gray-400 uppercase mb-1">Status</p>
                 <div className="flex items-center gap-1.5">
                   <div className={`w-1.5 h-1.5 rounded-full ${category.isActive ? 'bg-green-500' : 'bg-red-500'}`}></div>
                   <span className={`text-sm font-bold uppercase ${category.isActive ? 'text-green-500' : 'text-red-500'}`}>{category.isActive ? 'Active' : 'Inactive'}</span>
                 </div>
               </div>
               <div className={`p-4 rounded-2xl ${isDarkMode ? 'bg-gray-900/50 border border-white/5' : 'bg-gray-50 border border-gray-100/50'}`}>
-                <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Delete State</p>
+                <p className="text-sm font-bold text-gray-400 uppercase mb-1">Delete State</p>
                 <p className={`text-sm font-bold uppercase ${category.isDeleted ? 'text-red-500' : 'text-gray-400'}`}>
                   {category.isDeleted ? 'Deleted' : 'Available'}
                 </p>
@@ -88,7 +88,7 @@ const CategoryDetailsModal = ({ categoryId, onClose }) => {
             {/* Description & Details Info */}
             <div className="space-y-4">
               <div>
-                <p className="text-[10px] font-bold text-gray-400 uppercase mb-2">Category Description</p>
+                <p className="text-sm font-bold text-gray-400 uppercase mb-2">Category Description</p>
                 <p className={`p-4 rounded-2xl text-xs leading-relaxed border ${isDarkMode ? 'bg-gray-900/20 border-white/5 text-gray-400' : 'bg-gray-50 border-gray-100 text-gray-600'}`}>
                   {category.description || 'No description provided.'}
                 </p>
@@ -96,11 +96,11 @@ const CategoryDetailsModal = ({ categoryId, onClose }) => {
 
               {/* Tags list */}
               <div>
-                <p className="text-[10px] font-bold text-gray-400 uppercase mb-2">Assigned Search Tags</p>
+                <p className="text-sm font-bold text-gray-400 uppercase mb-2">Assigned Search Tags</p>
                 <div className="flex flex-wrap gap-1.5">
                   {category.tags && category.tags.length > 0 ? (
                     category.tags.map((tag, i) => (
-                      <span key={i} className="px-2.5 py-1 rounded bg-primary/10 text-primary text-[10px] font-bold uppercase flex items-center gap-1">
+                      <span key={i} className="px-2.5 py-1 rounded bg-primary/10 text-primary text-sm font-bold uppercase flex items-center gap-1">
                         <Sparkles size={8} /> {tag}
                       </span>
                     ))
@@ -113,7 +113,7 @@ const CategoryDetailsModal = ({ categoryId, onClose }) => {
               {/* Created / Updated timestamps */}
               <div className={`p-4 rounded-2xl border ${isDarkMode ? 'bg-gray-900/20 border-white/5 text-gray-400' : 'bg-gray-50 border-gray-100 text-gray-500'}`}>
                 <div className="flex justify-between items-center mb-2.5">
-                  <span className="text-[10px] font-bold uppercase flex items-center gap-1">
+                  <span className="text-sm font-bold uppercase flex items-center gap-1">
                     <Clock size={12} className="text-gray-400" /> Created At
                   </span>
                   <span className="text-xs font-bold text-gray-700 dark:text-gray-300">
@@ -121,7 +121,7 @@ const CategoryDetailsModal = ({ categoryId, onClose }) => {
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-[10px] font-bold uppercase flex items-center gap-1">
+                  <span className="text-sm font-bold uppercase flex items-center gap-1">
                     <Clock size={12} className="text-gray-400" /> Last Updated
                   </span>
                   <span className="text-xs font-bold text-gray-700 dark:text-gray-300">

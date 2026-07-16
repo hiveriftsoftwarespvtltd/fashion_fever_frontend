@@ -48,7 +48,7 @@ const SubscriptionPlanDetailsModal = ({ planId, onClose }) => {
 
   const FeatureRow = ({ label, value }) => (
     <div className="flex justify-between items-center py-2.5 border-b border-gray-100/50 dark:border-white/5">
-      <span className="text-[10px] font-bold uppercase text-gray-400">{label}</span>
+      <span className="text-sm font-bold uppercase text-gray-400">{label}</span>
       {value ? (
         <span className="inline-flex items-center gap-1 text-emerald-500 font-bold text-xs">
           <CheckCircle2 size={14} /> Enabled
@@ -81,9 +81,9 @@ const SubscriptionPlanDetailsModal = ({ planId, onClose }) => {
                   <h2 className={`text-xl font-bold leading-tight ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                     {plan.label || plan.name}
                   </h2>
-                  <p className="text-[10px] font-bold text-primary uppercase mt-1">Service Subscription Plan</p>
+                  <p className="text-sm font-bold text-primary uppercase mt-1">Service Subscription Plan</p>
                   {plan.name !== plan.label && (
-                    <p className="text-[10px] font-bold text-gray-400 uppercase mt-0.5">Key: {plan.name}</p>
+                    <p className="text-sm font-bold text-gray-400 uppercase mt-0.5">Key: {plan.name}</p>
                   )}
                 </div>
               </div>
@@ -95,14 +95,14 @@ const SubscriptionPlanDetailsModal = ({ planId, onClose }) => {
             {/* Core Pricing Card */}
             <div className={`p-5 rounded-2xl mb-6 grid grid-cols-2 gap-4 border ${isDarkMode ? 'bg-gray-900/50 border-white/5' : 'bg-gray-50 border-gray-100/50'}`}>
               <div>
-                <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Pricing Cost</p>
+                <p className="text-sm font-bold text-gray-400 uppercase mb-1">Pricing Cost</p>
                 <p className="text-xl font-extrabold text-primary flex items-center">
                   <DollarSign size={18} />
                   {plan.price === 0 ? 'FREE' : plan.price}
                 </p>
               </div>
               <div>
-                <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Plan Duration</p>
+                <p className="text-sm font-bold text-gray-400 uppercase mb-1">Plan Duration</p>
                 <p className={`text-sm font-extrabold flex items-center gap-1.5 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
                   <Calendar size={16} className="text-gray-400" />
                   {formatDuration(plan.durationDays)}
@@ -112,7 +112,7 @@ const SubscriptionPlanDetailsModal = ({ planId, onClose }) => {
 
             {/* Limits & Commission */}
             <div className="space-y-4 mb-6">
-              <h3 className={`text-[10px] font-black uppercase tracking-wider ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Tiers & Limitations</h3>
+              <h3 className={`text-sm font-black uppercase tracking-wider ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Tiers & Limitations</h3>
               
               <div className="grid grid-cols-2 gap-4">
                 <div className={`p-4 rounded-xl border ${isDarkMode ? 'bg-gray-900/20 border-white/5 text-gray-300' : 'bg-white border-gray-100 text-gray-600'}`}>
@@ -139,7 +139,7 @@ const SubscriptionPlanDetailsModal = ({ planId, onClose }) => {
 
             {/* Feature Flags */}
             <div className="mb-6">
-              <h3 className={`text-[10px] font-black uppercase tracking-wider mb-2.5 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Feature Inclusions</h3>
+              <h3 className={`text-sm font-black uppercase tracking-wider mb-2.5 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Feature Inclusions</h3>
               <div className={`px-4 rounded-2xl border ${isDarkMode ? 'bg-gray-900/10 border-white/5' : 'bg-gray-50/50 border-gray-100'}`}>
                 <FeatureRow label="Featured Listing" value={plan.featuredListing} />
                 <FeatureRow label="Priority Support" value={plan.prioritySupport} />
@@ -153,7 +153,7 @@ const SubscriptionPlanDetailsModal = ({ planId, onClose }) => {
                 <span className="flex items-center gap-1.5 font-bold uppercase text-[9px] text-gray-400">
                   <Layers size={12} /> Plan ID
                 </span>
-                <span className="font-bold font-mono text-[10px]">
+                <span className="font-bold font-mono text-sm">
                   {plan._id}
                 </span>
               </div>

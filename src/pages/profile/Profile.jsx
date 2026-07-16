@@ -290,18 +290,18 @@ const Profile = () => {
                 {!isEditing ? (
                   <button
                     onClick={() => { setEditForm({ name: profileData?.name || '', phone: profileData?.phone || '' }); setIsEditing(true); }}
-                    className="flex items-center gap-2 text-[10px] font-bold uppercase  text-primary border border-primary/20 bg-primary/5 hover:bg-primary/10 px-3 py-2 rounded-lg transition-all cursor-pointer"
+                    className="flex items-center gap-2 text-sm font-bold uppercase  text-primary border border-primary/20 bg-primary/5 hover:bg-primary/10 px-3 py-2 rounded-lg transition-all cursor-pointer"
                   >
                     <Pencil size={12} /> Edit
                   </button>
                 ) : (
                   <div className="flex items-center gap-2">
                     <button onClick={handleSaveDetails} disabled={isSaving}
-                      className="flex items-center gap-1.5 text-[10px] font-bold uppercase text-white bg-primary hover:bg-primary-hover px-3 py-2 rounded-lg transition-all cursor-pointer disabled:opacity-60">
+                      className="flex items-center gap-1.5 text-sm font-bold uppercase text-white bg-primary hover:bg-primary-hover px-3 py-2 rounded-lg transition-all cursor-pointer disabled:opacity-60">
                       {isSaving ? <Loader2 size={11} className="animate-spin" /> : <Check size={11} />} Save
                     </button>
                     <button onClick={() => setIsEditing(false)} disabled={isSaving}
-                      className="flex items-center gap-1.5 text-[10px] font-bold uppercase text-gray-500 border border-gray-200 hover:bg-gray-50 px-3 py-2 rounded-lg transition-all cursor-pointer disabled:opacity-60">
+                      className="flex items-center gap-1.5 text-sm font-bold uppercase text-gray-500 border border-gray-200 hover:bg-gray-50 px-3 py-2 rounded-lg transition-all cursor-pointer disabled:opacity-60">
                       <X size={11} /> Cancel
                     </button>
                   </div>
@@ -315,7 +315,7 @@ const Profile = () => {
                     <User size={16} />
                   </div>
                   <div className="flex-grow">
-                    <label className="text-[10px] font-bold text-gray-400 uppercase ">Full Name</label>
+                    <label className="text-sm font-bold text-gray-400 uppercase ">Full Name</label>
                     {isEditing ? (
                       <input type="text" value={editForm.name} onChange={e => setEditForm(f => ({ ...f, name: e.target.value }))}
                         placeholder="Enter full name"
@@ -332,7 +332,7 @@ const Profile = () => {
                     <Phone size={16} />
                   </div>
                   <div className="flex-grow">
-                    <label className="text-[10px] font-bold text-gray-400 uppercase ">Phone Number</label>
+                    <label className="text-sm font-bold text-gray-400 uppercase ">Phone Number</label>
                     {isEditing ? (
                       <input type="tel" value={editForm.phone} onChange={e => setEditForm(f => ({ ...f, phone: e.target.value }))}
                         placeholder="Enter phone number"
@@ -349,7 +349,7 @@ const Profile = () => {
                     <Mail size={16} />
                   </div>
                   <div className="flex-grow">
-                    <label className="text-[10px] font-bold text-gray-400 uppercase ">Email Address</label>
+                    <label className="text-sm font-bold text-gray-400 uppercase ">Email Address</label>
                     <p className="text-sm font-bold text-gray-800 mt-0.5">{profileData?.email}</p>
                   </div>
                   {profileData?.isEmailVerified ? (
@@ -369,7 +369,7 @@ const Profile = () => {
                     <Calendar size={16} />
                   </div>
                   <div>
-                    <label className="text-[10px] font-bold text-gray-400 uppercase ">Member Since</label>
+                    <label className="text-sm font-bold text-gray-400 uppercase ">Member Since</label>
                     <p className="text-sm font-bold text-gray-800 mt-0.5">
                       {profileData?.createdAt ? new Date(profileData.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A'}
                     </p>
@@ -390,7 +390,7 @@ const Profile = () => {
                   <div className="flex items-center justify-between p-4 bg-gray-50/50 rounded-xl border border-gray-100">
                     <div className="text-left">
                       <p className="text-xs font-bold text-gray-800 uppercase">Password</p>
-                      <p className="text-[10px] text-gray-400 mt-0.5">Last updated: 3 months ago</p>
+                      <p className="text-sm text-gray-400 mt-0.5">Last updated: 3 months ago</p>
                     </div>
                     <button 
                       onClick={() => setShowPassModal(true)}
@@ -403,7 +403,7 @@ const Profile = () => {
                   <div className="flex items-center justify-between p-4 bg-gray-50/50 rounded-xl border border-gray-100">
                     <div className="text-left">
                       <p className="text-xs font-bold text-gray-800 uppercase">Two-Factor Auth (2FA)</p>
-                      <p className="text-[10px] text-gray-400 mt-0.5">Add an extra layer of protection</p>
+                      <p className="text-sm text-gray-400 mt-0.5">Add an extra layer of protection</p>
                     </div>
                     <button 
                       onClick={() => {
@@ -427,7 +427,7 @@ const Profile = () => {
                   <div className="flex items-center justify-between p-4 bg-gray-50/50 rounded-xl border border-gray-100">
                     <div className="text-left">
                       <p className="text-xs font-bold text-gray-800 uppercase">Sessions & Devices</p>
-                      <p className="text-[10px] text-gray-400 mt-0.5">Currently logged in: 1 active device</p>
+                      <p className="text-sm text-gray-400 mt-0.5">Currently logged in: 1 active device</p>
                     </div>
                     <button 
                       onClick={() => toast.success('Logged out of all other devices.')}
@@ -440,7 +440,7 @@ const Profile = () => {
                   <div className="flex items-center justify-between p-4 bg-red-50/20 rounded-xl border border-red-100/50">
                     <div className="text-left">
                       <p className="text-xs font-bold text-red-700 uppercase">Deactivate Account</p>
-                      <p className="text-[10px] text-red-400 mt-0.5">Temporarily disable your profile</p>
+                      <p className="text-sm text-red-400 mt-0.5">Temporarily disable your profile</p>
                     </div>
                     <button 
                       onClick={() => {
@@ -545,7 +545,7 @@ const Profile = () => {
               <div className="bg-gradient-to-r from-primary to-primary-hover text-white rounded-xl shadow-lg shadow-primary/20 p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div className="text-left">
                   <h3 className="text-sm font-bold uppercase  mb-1">Want to sell on WAKEUP?</h3>
-                  <p className="text-[10px] font-medium uppercase opacity-80">Become a registered merchant and list your products or beauty services!</p>
+                  <p className="text-sm font-medium uppercase opacity-80">Become a registered merchant and list your products or beauty services!</p>
                 </div>
                 <button
                   onClick={() => toast.success('Opening Merchant Application...')}
@@ -578,7 +578,7 @@ const Profile = () => {
             
             <form onSubmit={handleChangePassword} className="p-6 space-y-4">
               <div>
-                <label className="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Current Password</label>
+                <label className="text-sm font-bold text-gray-400 uppercase mb-1 block">Current Password</label>
                 <input 
                   type="password"
                   value={passForm.current}
@@ -589,7 +589,7 @@ const Profile = () => {
               </div>
 
               <div>
-                <label className="text-[10px] font-bold text-gray-400 uppercase mb-1 block">New Password</label>
+                <label className="text-sm font-bold text-gray-400 uppercase mb-1 block">New Password</label>
                 <input 
                   type="password"
                   value={passForm.newPassword}
@@ -600,7 +600,7 @@ const Profile = () => {
               </div>
 
               <div>
-                <label className="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Confirm New Password</label>
+                <label className="text-sm font-bold text-gray-400 uppercase mb-1 block">Confirm New Password</label>
                 <input 
                   type="password"
                   value={passForm.confirmPassword}

@@ -108,7 +108,7 @@ const HomeContentList = ({
           <div className="flex flex-col min-w-0">
             <span className={`text-xs font-bold truncate ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>{item.title}</span>
             {item.subTitle && (
-              <span className="text-[10px] font-bold text-gray-400 truncate">{item.subTitle}</span>
+              <span className="text-sm font-bold text-gray-400 truncate">{item.subTitle}</span>
             )}
           </div>
         </div>
@@ -117,7 +117,7 @@ const HomeContentList = ({
     {
       header: 'Content Type',
       render: (item) => (
-        <span className="px-2 py-0.5 rounded-lg bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wider">
+        <span className="px-2 py-0.5 rounded-lg bg-primary/10 text-primary text-sm font-bold uppercase tracking-wider">
           {item.contentType || 'BANNER'}
         </span>
       )
@@ -151,7 +151,7 @@ const HomeContentList = ({
       render: (item) => (
         <div className="flex items-center gap-2">
           <div className={`w-1.5 h-1.5 rounded-full ${item.isActive ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]' : 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]'}`}></div>
-          <span className="text-[10px] font-semibold uppercase text-gray-400">{item.isActive ? 'Active' : 'Draft'}</span>
+          <span className="text-sm font-semibold uppercase text-gray-400">{item.isActive ? 'Active' : 'Draft'}</span>
         </div>
       )
     },
@@ -184,7 +184,7 @@ const HomeContentList = ({
         }
         return (
           <div className="flex flex-col">
-            <span className={`text-[10px] uppercase font-bold text-gray-700 dark:text-gray-300`}>{label}</span>
+            <span className={`text-sm uppercase font-bold text-gray-700 dark:text-gray-300`}>{label}</span>
             {detail && <span className="text-[8px] text-gray-400 truncate max-w-[120px]">{detail}</span>}
           </div>
         );
@@ -263,12 +263,12 @@ const HomeContentList = ({
           <h2 className={`text-lg lg:text-3xl font-bold uppercase transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
             Home Content Manager
           </h2>
-          <p className="text-[10px] font-semibold uppercase text-gray-400 mt-1">
+          <p className="text-sm font-semibold uppercase text-gray-400 mt-1">
             Publish landing banners and customize slider redirects
           </p>
         </div>
         <div className={`px-4 lg:px-6 py-3 lg:py-4 rounded-2xl lg:rounded-[24px] border shadow-sm transition-colors duration-300 ${isDarkMode ? 'bg-gray-800 border-white/5' : 'bg-white border-gray-100'}`}>
-          <p className="text-[10px] font-bold uppercase text-gray-400 mb-0.5">Active Items</p>
+          <p className="text-sm font-bold uppercase text-gray-400 mb-0.5">Active Items</p>
           <p className="text-xl lg:text-2xl font-bold">{homeContents.length}</p>
         </div>
       </div>

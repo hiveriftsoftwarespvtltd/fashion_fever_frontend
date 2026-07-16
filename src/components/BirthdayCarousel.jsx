@@ -1,21 +1,23 @@
 import React, { useRef } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import needhelp1 from '../assets/needhelp1.png';
+import needhelp2 from '../assets/needhelp2.png';
+import needhelp3 from '../assets/needhelp3.png';
+import needhelp4 from '../assets/needhelp4.png';
+import needhelp5 from '../assets/needhelp5.png';
+import needhelp6 from '../assets/needhelp6.png';
 
 const BirthdayCarousel = () => {
  const scrollRef = useRef(null);
 
  const images = [
- "https://images-static.nykaa.com/uploads/5c098b63-6844-4ce8-a3cf-3e1015c2277a.jpg?tr=cm-pad_resize,w-300",
- "https://images-static.nykaa.com/uploads/fbbeab50-12f4-449d-917b-4efa0fa79941.jpg?tr=cm-pad_resize,w-300",
- "https://images-static.nykaa.com/uploads/b12e526b-c6c7-45f8-9cd4-491e3767d78b.jpg?tr=cm-pad_resize,w-300",
- "https://images-static.nykaa.com/uploads/2c3c7fa3-2da8-49a1-8643-d1aaba2479b5.jpg?tr=cm-pad_resize,w-300",
- "https://images-static.nykaa.com/uploads/1db00d7e-5594-47ab-96e2-f7310500a7b1.jpg?tr=cm-pad_resize,w-300",
- "https://images-static.nykaa.com/uploads/b5555e6a-916e-4760-a0bd-de61e1f3a413.jpg?tr=cm-pad_resize,w-300",
- "https://images-static.nykaa.com/uploads/7c2dca89-2b54-4a3e-9bd5-9e930455944f.jpg?tr=cm-pad_resize,w-300",
- "https://images-static.nykaa.com/uploads/f678d929-1ee7-4478-8299-4254514a7585.jpg?tr=cm-pad_resize,w-300",
- "https://images-static.nykaa.com/uploads/d4e39488-7ba7-4983-bdb6-07a89706dc11.jpg?tr=cm-pad_resize,w-300",
- "https://images-static.nykaa.com/uploads/d4e39488-7ba7-4983-bdb6-07a89706dc11.jpg?tr=cm-pad_resize,w-300",
- "https://images-static.nykaa.com/uploads/4a1da26b-fed1-4107-a94a-58126abe5668.jpg?tr=cm-pad_resize,w-300"
+  needhelp1,
+  needhelp2,
+  needhelp3,
+  needhelp4,
+  needhelp5,
+  needhelp6,
  ];
 
  const scroll = (direction) => {
@@ -51,16 +53,17 @@ const BirthdayCarousel = () => {
    className="flex overflow-x-auto gap-5 no-scrollbar pb-8 snap-x snap-mandatory"
   >
    {images.map((img, index) => (
-   <div 
+   <Link 
     key={index} 
-    className="flex-shrink-0 w-[260px] md:w-[320px] snap-start cursor-pointer transition-all duration-300 hover:scale-[1.03]"
+    to="/shop"
+    className="flex-shrink-0 w-[260px] md:w-[320px] snap-start cursor-pointer transition-all duration-300 hover:scale-[1.03] block"
    >
     <img 
     src={img} 
     alt={`Slide ${index + 1}`} 
     className="w-full h-auto rounded-[40px] shadow-sm border-2 border-white/40"
     />
-   </div>
+   </Link>
    ))}
   </div>
   </div>

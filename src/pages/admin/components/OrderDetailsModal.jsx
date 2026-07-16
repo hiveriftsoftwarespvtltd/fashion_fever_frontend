@@ -80,7 +80,7 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
                 </div>
                 <div>
                   <h2 className={`text-lg font-bold leading-tight ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{details.orderNumber}</h2>
-                  <p className="text-[10px] font-bold text-gray-400 uppercase mt-0.5 flex items-center gap-1">
+                  <p className="text-sm font-bold text-gray-400 uppercase mt-0.5 flex items-center gap-1">
                     <Calendar size={10} /> {(() => {
                       const dateVal = details.createdAt || details.dateOfPurchase;
                       const dateObj = dateVal ? new Date(dateVal) : null;
@@ -99,19 +99,19 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
             {/* Quick Status Cards */}
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
               <div className={`p-4 rounded-2xl border ${isDarkMode ? 'bg-gray-900/50 border-white/5' : 'bg-gray-50 border-gray-100/50'}`}>
-                <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Order Status</p>
+                <p className="text-sm font-bold text-gray-400 uppercase mb-1">Order Status</p>
                 <span className={`px-2.5 py-1 rounded-full text-xs font-bold uppercase border ${getOrderStatusColor(details.orderStatus)}`}>
                   {details.orderStatus || 'Pending'}
                 </span>
               </div>
               <div className={`p-4 rounded-2xl border ${isDarkMode ? 'bg-gray-900/50 border-white/5' : 'bg-gray-50 border-gray-100/50'}`}>
-                <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Payment Method</p>
+                <p className="text-sm font-bold text-gray-400 uppercase mb-1">Payment Method</p>
                 <span className="text-xs font-bold text-gray-700 dark:text-gray-300 uppercase flex items-center gap-1">
                   <CreditCard size={12} className="text-primary" /> {details.paymentMethod || 'COD'}
                 </span>
               </div>
               <div className={`p-4 rounded-2xl border col-span-2 sm:col-span-1 ${isDarkMode ? 'bg-gray-900/50 border-white/5' : 'bg-gray-50 border-gray-100/50'}`}>
-                <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Payment Status</p>
+                <p className="text-sm font-bold text-gray-400 uppercase mb-1">Payment Status</p>
                 <span className={`px-2.5 py-1 rounded-full text-xs font-bold uppercase border ${details.paymentStatus === 'paid' ? 'text-green-500 bg-green-500/10 border-green-500/20' : 'text-amber-500 bg-amber-500/10 border-amber-500/20'}`}>
                   {details.paymentStatus || 'Pending'}
                 </span>
@@ -122,7 +122,7 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Shipping Address */}
               <div className={`p-5 rounded-3xl border ${isDarkMode ? 'bg-gray-900/20 border-white/5' : 'bg-gray-50/50 border-gray-100'}`}>
-                <p className="text-[10px] font-bold text-gray-400 uppercase mb-3 flex items-center gap-1">
+                <p className="text-sm font-bold text-gray-400 uppercase mb-3 flex items-center gap-1">
                   <MapPin size={12} /> Shipping Address
                 </p>
                 {details.shippingAddress ? (
@@ -131,7 +131,7 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
                     <p>{details.shippingAddress.line1}</p>
                     {details.shippingAddress.line2 && <p>{details.shippingAddress.line2}</p>}
                     <p>{details.shippingAddress.city}, {details.shippingAddress.state} - {details.shippingAddress.pincode}</p>
-                    <p className="uppercase font-bold text-[10px] text-primary tracking-wider mt-1">{details.shippingAddress.country || 'India'}</p>
+                    <p className="uppercase font-bold text-sm text-primary tracking-wider mt-1">{details.shippingAddress.country || 'India'}</p>
                   </div>
                 ) : (
                   <p className="text-xs text-gray-400">No shipping address recorded.</p>
@@ -141,7 +141,7 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
               {/* Vendor & General Info */}
               <div className={`p-5 rounded-3xl border ${isDarkMode ? 'bg-gray-900/20 border-white/5' : 'bg-gray-50/50 border-gray-100'} flex flex-col justify-between`}>
                 <div>
-                  <p className="text-[10px] font-bold text-gray-400 uppercase mb-3 flex items-center gap-1">
+                  <p className="text-sm font-bold text-gray-400 uppercase mb-3 flex items-center gap-1">
                     <FileText size={12} /> Order Notes
                   </p>
                   <p className={`p-3 rounded-xl text-xs border leading-relaxed italic ${isDarkMode ? 'bg-gray-900/50 border-white/5 text-gray-400' : 'bg-white border-gray-100 text-gray-500'}`}>
@@ -157,7 +157,7 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
 
             {/* Order Items Table */}
             <div>
-              <p className="text-[10px] font-bold text-gray-400 uppercase mb-3">Order Items</p>
+              <p className="text-sm font-bold text-gray-400 uppercase mb-3">Order Items</p>
               <div className={`border rounded-2xl overflow-hidden ${isDarkMode ? 'border-white/5' : 'border-gray-100 shadow-sm bg-white dark:bg-transparent'}`}>
                 <table className="w-full text-xs text-left border-collapse">
                   <thead>

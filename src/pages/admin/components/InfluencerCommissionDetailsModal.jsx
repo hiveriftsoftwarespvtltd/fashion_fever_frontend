@@ -106,7 +106,7 @@ export const InfluencerCommissionDetailsModal = ({ influencerId, onClose, initia
               <h3 className="text-lg font-black uppercase tracking-wide">
                 {details?.influencer?.name || 'Influencer'} Payout Breakdown
               </h3>
-              <p className="text-[10px] font-bold text-gray-400 uppercase">
+              <p className="text-sm font-bold text-gray-400 uppercase">
                 Influencer Commission Account ID: {influencerId}
               </p>
             </div>
@@ -142,7 +142,7 @@ export const InfluencerCommissionDetailsModal = ({ influencerId, onClose, initia
           <div className={`p-4 rounded-2xl border text-left space-y-3 ${
             isDarkMode ? 'bg-gray-900/30 border-white/5' : 'bg-gray-50/50 border-gray-100'
           }`}>
-            <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
+            <span className="text-sm font-black text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
               <SlidersHorizontal size={12} className="text-primary" /> Filter details by Month/Year
             </span>
             <div className="flex flex-col sm:flex-row gap-3">
@@ -215,7 +215,7 @@ export const InfluencerCommissionDetailsModal = ({ influencerId, onClose, initia
               <div className={`p-5 rounded-2xl border text-left ${
                 isDarkMode ? 'bg-gray-900/30 border-white/5' : 'bg-pink-500/[0.01] border-pink-500/10 shadow-sm'
               }`}>
-                <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider flex items-center gap-1.5 mb-3">
+                <span className="text-sm font-black text-gray-400 uppercase tracking-wider flex items-center gap-1.5 mb-3">
                   <Award size={13} className="text-pink-500" /> Achieved Target Slab details
                 </span>
                 {details.slab ? (
@@ -224,7 +224,7 @@ export const InfluencerCommissionDetailsModal = ({ influencerId, onClose, initia
                       <p className={`text-base font-black ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>
                         {details.summary?.commissionRate}% Commission Slab Reached!
                       </p>
-                      <p className="text-[10px] text-gray-400 font-bold uppercase mt-1">
+                      <p className="text-sm text-gray-400 font-bold uppercase mt-1">
                         Applied slab sales target range: ₹{details.slab.minSales?.toLocaleString('en-IN')} - ₹{details.slab.maxSales?.toLocaleString('en-IN')}
                       </p>
                     </div>
@@ -242,7 +242,7 @@ export const InfluencerCommissionDetailsModal = ({ influencerId, onClose, initia
 
               {/* Commissions details List */}
               <div className="space-y-3">
-                <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider flex items-center gap-1.5 text-left">
+                <span className="text-sm font-black text-gray-400 uppercase tracking-wider flex items-center gap-1.5 text-left">
                   <ShoppingBag size={12} className="text-primary" /> Active Commission Orders List (Commissions)
                 </span>
                 {details.commissions && details.commissions.length > 0 ? (
@@ -261,7 +261,7 @@ export const InfluencerCommissionDetailsModal = ({ influencerId, onClose, initia
                       <tbody className="divide-y divide-gray-100 dark:divide-white/5 text-xs font-medium">
                         {details.commissions.map((comm, idx) => (
                           <tr key={idx} className={isDarkMode ? 'hover:bg-white/[0.01]' : 'hover:bg-gray-50/50'}>
-                            <td className="py-3 px-4 font-mono text-[10px] text-gray-400">{comm.orderId || 'N/A'}</td>
+                            <td className="py-3 px-4 font-mono text-sm text-gray-400">{comm.orderId || 'N/A'}</td>
                             <td className="py-3 px-4 text-right">₹{(comm.salesAmount || 0).toLocaleString()}</td>
                             <td className="py-3 px-4 text-right text-primary font-bold">₹{(comm.earnedAmount || 0).toLocaleString()}</td>
                             <td className="py-3 px-4 text-center uppercase text-[9px] font-black">
@@ -278,7 +278,7 @@ export const InfluencerCommissionDetailsModal = ({ influencerId, onClose, initia
                   <div className={`py-6 rounded-2xl border text-center ${
                     isDarkMode ? 'border-white/5' : 'border-gray-100 bg-gray-50/20'
                   }`}>
-                    <p className="text-[10px] font-bold text-gray-400 uppercase">No active commission orders for this month</p>
+                    <p className="text-sm font-bold text-gray-400 uppercase">No active commission orders for this month</p>
                   </div>
                 )}
               </div>

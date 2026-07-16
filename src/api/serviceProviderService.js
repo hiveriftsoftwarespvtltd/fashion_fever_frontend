@@ -39,6 +39,25 @@ export const getServicesList = async () => {
 };
 
 /**
+ * Fetch all Services for a specific Provider
+ * Method: GET
+ * URL: /service/get-all-services/:providerId
+ */
+export const getProviderServices = async (providerId) => {
+  try {
+    const response = await apiClient.get(`/service/get-all-services/${providerId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Get provider services list error:', error.response || error);
+    return error.response?.data || {
+      success: false,
+      message: error.response?.data?.message || error.message || 'Failed to fetch provider services.',
+      statusCode: error.response?.status || 500
+    };
+  }
+};
+
+/**
  * Create a new Service
  * Method: POST
  * URL: /service/create-service
@@ -330,16 +349,19 @@ export const updateServiceProvider = async (providerData) => {
 };
 
 /**
- * Fetch available time slots for a specific provider, service, and date
- * Method: GET
- * URL: /service/slots/:providerId/:serviceId
+ * Fetch available time slots for a specific provider, services list, and date
+ * Method: POST
+ * URL: /service/slots/:providerId
  * @param {string} providerId
- * @param {string} serviceId
+ * @param {Array<string>} serviceIds
  * @param {string} date - Format: YYYY-MM-DD
  */
-export const getAvailableSlots = async (providerId, serviceId, date) => {
+export const getAvailableSlots = async (providerId, serviceIds, date) => {
   try {
-    const response = await apiClient.get(`/service/slots/${providerId}/${serviceId}`, {
+    const response = await apiClient.post(`/service/slots/${providerId}`, {
+      serviceIds,
+      date
+    }, {
       params: { date }
     });
     return response.data;
@@ -357,7 +379,7 @@ export const getAvailableSlots = async (providerId, serviceId, date) => {
  * Create a new service booking
  * Method: POST
  * URL: /service-booking/create-booking
- * @param {object} bookingData - Payload: { serviceId, staffId, bookingDate, slotStartTime, serviceAddress }
+ * @param {object} bookingData - Payload: { items: [{ serviceId }], staffId, serviceProviderId, bookingDate, slotStartTime, serviceAddress }
  */
 export const createBooking = async (bookingData) => {
   try {
@@ -373,5 +395,122 @@ export const createBooking = async (bookingData) => {
   }
 };
 
+/**
+ * Get user service booking history
+ * Method: GET
+ * URL: /service-booking/user-service-booking-history
+ * @param {string} startDate - format: YYYY-MM-DD
+ * @param {string} endDate - format: YYYY-MM-DD
+ */
+export const getUserBookingHistory = async (startDate, endDate) => {
+  try {
+    const params = {};
+    if (startDate) params.startDate = startDate;
+    if (endDate) params.endDate = endDate;
+    const response = await apiClient.get('/service-booking/user-service-booking-history', { params });
+    return response.data;
+  } catch (error) {
+    console.error('Get booking history error:', error.response || error);
+    return error.response?.data || {
+      success: false,
+      message: error.response?.data?.message || error.message || 'Failed to fetch booking history.',
+      statusCode: error.response?.status || 500
+    };
+  }
+};
 
+/**
+ * Create a new service lead
+ * Method: POST
+ * URL: /service/create-lead
+ * @param {object} leadData - Contains categoryIds, requirement, budget, preferredDate, address, pincode, city, state, location, quantity, phoneNumber, gender
+ */
+export const createServiceLead = async (leadData) => {
+  try {
+    const response = await apiClient.post('/service/create-lead', leadData);
+    return response.data;
+  } catch (error) {
+    console.error('Create service lead error:', error.response || error);
+    return error.response?.data || {
+      success: false,
+      message: error.response?.data?.message || error.message || 'Failed to create service lead.',
+      statusCode: error.response?.status || 500
+    };
+  }
+};
 
+/**
+ * Get user service leads list
+ * Method: GET
+ * URL: /service/user-service-leads
+ */
+export const getUserServiceLeads = async () => {
+  try {
+    const response = await apiClient.get('/service/user-service-leads');
+    return response.data;
+  } catch (error) {
+    console.error('Get user service leads error:', error.response || error);
+    return error.response?.data || {
+      success: false,
+      message: error.response?.data?.message || error.message || 'Failed to fetch service leads.',
+      statusCode: error.response?.status || 500
+    };
+  }
+};
+
+/**
+ * Fetch service provider wallet balance
+ * Method: GET
+ * URL: /wallet/service-provider/balance
+ */
+export const getServiceProviderWalletBalance = async () => {
+  try {
+    const response = await apiClient.get('/wallet/service-provider/balance');
+    return response.data;
+  } catch (error) {
+    console.error('Get service provider wallet balance error:', error.response || error);
+    return error.response?.data || {
+      success: false,
+      message: error.response?.data?.message || error.message || 'Failed to fetch wallet balance.',
+      statusCode: error.response?.status || 500
+    };
+  }
+};
+
+/**
+ * Fetch service provider wallet transactions list
+ * Method: GET
+ * URL: /wallet/service-provider/transactions
+ */
+export const getServiceProviderWalletTransactions = async () => {
+  try {
+    const response = await apiClient.get('/wallet/service-provider/transactions');
+    return response.data;
+  } catch (error) {
+    console.error('Get service provider wallet transactions error:', error.response || error);
+    return error.response?.data || {
+      success: false,
+      message: error.response?.data?.message || error.message || 'Failed to fetch transactions.',
+      statusCode: error.response?.status || 500
+    };
+  }
+};
+
+/**
+ * Fetch service provider specific leads (assigned / relevant)
+ * Method: GET
+ * URL: /service-leads/provider/my-leads
+ */
+export const getServiceProviderMyLeads = async () => {
+  try {
+    const response = await apiClient.get('/service-leads/provider/my-leads');
+    return response.data;
+  } catch (error) {
+    console.error('Get service provider my leads error:', error.response || error);
+    return error.response?.data || {
+      success: false,
+      message: error.response?.data?.message || error.message || 'Failed to fetch service provider leads.',
+      statusCode: error.response?.status || 500
+    };
+  }
+};

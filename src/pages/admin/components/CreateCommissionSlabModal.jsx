@@ -98,23 +98,23 @@ const CreateCommissionSlabModal = ({ isOpen, onClose, onSuccess, isDarkMode, ini
       />
 
       {/* Modal Box */}
-      <div className={`relative w-full max-w-md rounded-3xl shadow-2xl border transform transition-all overflow-hidden ${
+      <div className={`relative w-full max-w-md rounded-3xl shadow-2xl border transform transition-all flex flex-col max-h-[90vh] overflow-hidden ${
         isDarkMode ? 'bg-gray-900 border-white/5 text-white' : 'bg-white border-gray-100 text-gray-800'
       }`}>
         {/* Accent Bar */}
-        <div className="h-1.5 bg-gradient-to-r from-primary via-pink-400 to-purple-500" />
+        <div className="h-1.5 bg-gradient-to-r from-primary via-pink-400 to-purple-500 flex-shrink-0" />
 
         {/* Close Button */}
         <button 
           onClick={onClose}
-          className={`absolute top-5 right-5 p-2 rounded-xl transition-colors ${
+          className={`absolute top-5 right-5 p-2 rounded-xl transition-colors z-10 ${
             isDarkMode ? 'hover:bg-white/5 text-gray-400 hover:text-white' : 'hover:bg-gray-50 text-gray-500 hover:text-gray-800'
           }`}
         >
           <X size={18} />
         </button>
 
-        <div className="p-6 md:p-8">
+        <div className="p-6 md:p-8 overflow-y-auto">
           {/* Header */}
           <div className="flex items-center gap-3 mb-6">
             <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center">
@@ -124,7 +124,7 @@ const CreateCommissionSlabModal = ({ isOpen, onClose, onSuccess, isDarkMode, ini
               <h3 className="text-lg font-black uppercase tracking-wide">
                 {initialData ? 'Update Slab' : 'Create Slab'}
               </h3>
-              <p className="text-[10px] font-bold text-gray-400 uppercase">
+              <p className="text-sm font-bold text-gray-400 uppercase">
                 {initialData ? 'Modify commission details' : 'Add a new commission range'}
               </p>
             </div>
@@ -134,7 +134,7 @@ const CreateCommissionSlabModal = ({ isOpen, onClose, onSuccess, isDarkMode, ini
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Min Sales */}
             <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-wider text-gray-400 flex items-center gap-1.5">
+              <label className="text-sm font-black uppercase tracking-wider text-gray-400 flex items-center gap-1.5">
                 <IndianRupee size={11} className="text-primary" /> Minimum Sales (INR)
               </label>
               <input
@@ -155,7 +155,7 @@ const CreateCommissionSlabModal = ({ isOpen, onClose, onSuccess, isDarkMode, ini
 
             {/* Max Sales */}
             <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-wider text-gray-400 flex items-center gap-1.5">
+              <label className="text-sm font-black uppercase tracking-wider text-gray-400 flex items-center gap-1.5">
                 <IndianRupee size={11} className="text-primary" /> Maximum Sales (INR)
               </label>
               <input
@@ -176,7 +176,7 @@ const CreateCommissionSlabModal = ({ isOpen, onClose, onSuccess, isDarkMode, ini
 
             {/* Commission Rate */}
             <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-wider text-gray-400 flex items-center gap-1.5">
+              <label className="text-sm font-black uppercase tracking-wider text-gray-400 flex items-center gap-1.5">
                 <Percent size={11} className="text-primary" /> Commission Rate (%)
               </label>
               <input
@@ -201,7 +201,7 @@ const CreateCommissionSlabModal = ({ isOpen, onClose, onSuccess, isDarkMode, ini
               <div className="flex items-center justify-between p-4 rounded-2xl border border-gray-100/50 bg-gray-50/50 dark:bg-gray-800/30 dark:border-white/5">
                 <div className="flex flex-col text-left">
                   <span className="text-xs font-bold uppercase tracking-wider">Slab Active Status</span>
-                  <span className="text-[10px] text-gray-400 uppercase">Toggle to activate/deactivate this range</span>
+                  <span className="text-sm text-gray-400 uppercase">Toggle to activate/deactivate this range</span>
                 </div>
                 <button
                   type="button"

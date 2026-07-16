@@ -46,7 +46,7 @@ export const CouponDetailsModal = ({ couponId, onClose }) => {
                 </div>
                 <div>
                   <h2 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>{coupon.code}</h2>
-                  <p className="text-[10px] font-bold text-gray-400 uppercase">{coupon.type} Discount</p>
+                  <p className="text-sm font-bold text-gray-400 uppercase">{coupon.type} Discount</p>
                 </div>
               </div>
               <button onClick={onClose} className={`p-2 rounded-xl transition-all ${isDarkMode ? 'hover:bg-white/5 text-gray-500' : 'hover:bg-gray-50 text-gray-400'}`}>
@@ -56,35 +56,35 @@ export const CouponDetailsModal = ({ couponId, onClose }) => {
 
             <div className="grid grid-cols-2 gap-4 mb-8">
               <div className={`p-4 rounded-2xl ${isDarkMode ? 'bg-gray-900/50' : 'bg-gray-50'}`}>
-                <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Value</p>
+                <p className="text-sm font-bold text-gray-400 uppercase mb-1">Value</p>
                 <p className="text-lg font-bold text-primary">{coupon.type === 'percentage' ? `${coupon.value}%` : `₹${coupon.value}`}</p>
               </div>
               <div className={`p-4 rounded-2xl ${isDarkMode ? 'bg-gray-900/50' : 'bg-gray-50'}`}>
-                <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Total Used</p>
+                <p className="text-sm font-bold text-gray-400 uppercase mb-1">Total Used</p>
                 <p className="text-lg font-bold text-gray-400">{coupon.totalUsed} <span className="text-xs">/ {coupon.totalUsageLimit}</span></p>
               </div>
               <div className={`p-4 rounded-2xl ${isDarkMode ? 'bg-gray-900/50' : 'bg-gray-50'}`}>
-                <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Min Order</p>
+                <p className="text-sm font-bold text-gray-400 uppercase mb-1">Min Order</p>
                 <p className="text-sm font-bold">₹{coupon.minimumOrderAmount}</p>
               </div>
               <div className={`p-4 rounded-2xl ${isDarkMode ? 'bg-gray-900/50' : 'bg-gray-50'}`}>
-                <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Max Discount</p>
+                <p className="text-sm font-bold text-gray-400 uppercase mb-1">Max Discount</p>
                 <p className="text-sm font-bold">₹{coupon.maximumDiscount}</p>
               </div>
             </div>
 
             <div className="space-y-4">
-              <div className="flex justify-between items-center text-[10px] font-bold uppercase text-gray-400 px-1">
+              <div className="flex justify-between items-center text-sm font-bold uppercase text-gray-400 px-1">
                 <span>Validity Period</span>
                 <span className={coupon.isActive ? 'text-green-500' : 'text-red-500'}>{coupon.isActive ? 'Currently Active' : 'Inactive'}</span>
               </div>
               <div className={`p-4 rounded-2xl border ${isDarkMode ? 'bg-gray-900/20 border-white/5' : 'bg-gray-50 border-gray-100'}`}>
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-[10px] font-bold text-gray-400 uppercase">Starts</span>
+                  <span className="text-sm font-bold text-gray-400 uppercase">Starts</span>
                   <span className="text-xs font-bold">{new Date(coupon.startsAt).toLocaleDateString()}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-[10px] font-bold text-gray-400 uppercase">Expires</span>
+                  <span className="text-sm font-bold text-gray-400 uppercase">Expires</span>
                   <span className="text-xs font-bold text-red-500">{new Date(coupon.expiresAt).toLocaleDateString()}</span>
                 </div>
               </div>
@@ -92,7 +92,7 @@ export const CouponDetailsModal = ({ couponId, onClose }) => {
 
             {coupon.description && (
               <div className="mt-6">
-                <p className="text-[10px] font-bold text-gray-400 uppercase mb-2">Description</p>
+                <p className="text-sm font-bold text-gray-400 uppercase mb-2">Description</p>
                 <p className={`p-4 rounded-2xl text-xs leading-relaxed ${isDarkMode ? 'bg-gray-900/50 text-gray-400' : 'bg-gray-50 text-gray-600'}`}>
                   {coupon.description}
                 </p>
@@ -226,7 +226,7 @@ export const CreateCouponModal = ({ isOpen, onClose, influencerId, influencerNam
                 <h2 className={`text-xl font-bold uppercase ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
                   {initialData ? 'Update Coupon' : 'Create Coupon'}
                 </h2>
-                <p className="text-[10px] font-bold text-gray-400 uppercase mt-1">
+                <p className="text-sm font-bold text-gray-400 uppercase mt-1">
                   {initialData ? `Editing: ${initialData.code}` : influencerName ? `Assigning to: ${influencerName}` : 'Creating Platform Coupon'}
                 </p>
               </div>
@@ -239,44 +239,44 @@ export const CreateCouponModal = ({ isOpen, onClose, influencerId, influencerNam
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase text-gray-400">Coupon Code</label>
+                <label className="text-sm font-bold uppercase text-gray-400">Coupon Code</label>
                 <input required name="code" value={formData.code} onChange={handleChange} placeholder="e.g. SAVE50" className={`w-full px-5 py-4 rounded-2xl text-sm font-medium outline-none border transition-all ${isDarkMode ? 'bg-gray-900 border-gray-700 text-white focus:border-primary/50' : 'bg-gray-50 border-gray-100 text-gray-800 focus:bg-white focus:border-primary/30'}`} />
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase text-gray-400">Discount Type</label>
+                <label className="text-sm font-bold uppercase text-gray-400">Discount Type</label>
                 <select name="type" value={formData.type} onChange={handleChange} className={`w-full px-5 py-4 rounded-2xl text-sm font-medium outline-none border transition-all ${isDarkMode ? 'bg-gray-900 border-gray-700 text-white' : 'bg-gray-50 border-gray-100'}`}>
                   <option value="fixed">Fixed Amount</option>
                   <option value="percentage">Percentage</option>
                 </select>
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase text-gray-400">Value ({formData.type === 'fixed' ? '₹' : '%'})</label>
+                <label className="text-sm font-bold uppercase text-gray-400">Value ({formData.type === 'fixed' ? '₹' : '%'})</label>
                 <input required type="number" name="value" value={formData.value} onChange={handleChange} min="0" className={`w-full px-5 py-4 rounded-2xl text-sm font-medium outline-none border transition-all ${isDarkMode ? 'bg-gray-900 border-gray-700 text-white' : 'bg-gray-50 border-gray-100'}`} />
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase text-gray-400">Min Order Amount</label>
+                <label className="text-sm font-bold uppercase text-gray-400">Min Order Amount</label>
                 <input required type="number" name="minimumOrderAmount" value={formData.minimumOrderAmount} onChange={handleChange} min="0" className={`w-full px-5 py-4 rounded-2xl text-sm font-medium outline-none border transition-all ${isDarkMode ? 'bg-gray-900 border-gray-700 text-white' : 'bg-gray-50 border-gray-100'}`} />
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase text-gray-400">Usage Limit (Per User)</label>
+                <label className="text-sm font-bold uppercase text-gray-400">Usage Limit (Per User)</label>
                 <input required type="number" name="usageLimitPerUser" value={formData.usageLimitPerUser} onChange={handleChange} min="1" className={`w-full px-5 py-4 rounded-2xl text-sm font-medium outline-none border transition-all ${isDarkMode ? 'bg-gray-900 border-gray-700 text-white' : 'bg-gray-50 border-gray-100'}`} />
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase text-gray-400">Total Usage Limit</label>
+                <label className="text-sm font-bold uppercase text-gray-400">Total Usage Limit</label>
                 <input required type="number" name="totalUsageLimit" value={formData.totalUsageLimit} onChange={handleChange} min="1" className={`w-full px-5 py-4 rounded-2xl text-sm font-medium outline-none border transition-all ${isDarkMode ? 'bg-gray-900 border-gray-700 text-white' : 'bg-gray-50 border-gray-100'}`} />
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase text-gray-400">Starts At</label>
+                <label className="text-sm font-bold uppercase text-gray-400">Starts At</label>
                 <input required type="date" name="startsAt" value={formData.startsAt} onChange={handleChange} className={`w-full px-5 py-4 rounded-2xl text-sm font-medium outline-none border transition-all ${isDarkMode ? 'bg-gray-900 border-gray-700 text-white' : 'bg-gray-50 border-gray-100'}`} />
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase text-gray-400">Expires At</label>
+                <label className="text-sm font-bold uppercase text-gray-400">Expires At</label>
                 <input required type="date" name="expiresAt" value={formData.expiresAt} onChange={handleChange} className={`w-full px-5 py-4 rounded-2xl text-sm font-medium outline-none border transition-all ${isDarkMode ? 'bg-gray-900 border-gray-700 text-white' : 'bg-gray-50 border-gray-100'}`} />
               </div>
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-bold uppercase text-gray-400">Description</label>
+              <label className="text-sm font-bold uppercase text-gray-400">Description</label>
               <textarea name="description" value={formData.description} onChange={handleChange} rows="2" placeholder="Describe the coupon purpose..." className={`w-full px-5 py-4 rounded-2xl text-sm font-medium outline-none border transition-all resize-none ${isDarkMode ? 'bg-gray-900 border-gray-700 text-white focus:border-primary/50' : 'bg-gray-50 border-gray-100 text-gray-800 focus:bg-white focus:border-primary/30'}`}></textarea>
             </div>
 

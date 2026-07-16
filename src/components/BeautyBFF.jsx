@@ -1,4 +1,6 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
+import beautyBffVideo from '../assets/UNLOCKTHESECRETTO.mp4';
 
 const BeautyBFF = () => {
  return (
@@ -8,13 +10,16 @@ const BeautyBFF = () => {
      <h2 className="text-[20px] md:text-[24px] font-bold text-[#001325]">Your Beauty BFF Is Here!</h2>
     </div>
     
-    <div className="w-full overflow-hidden rounded-2xl md:rounded-[2rem] shadow-sm hover:shadow-md transition-shadow cursor-pointer">
-     <img 
-      src="https://images-static.nykaa.com/uploads/534900d4-50d4-4d22-8586-1c7496e7235b.png?tr=cm-pad_resize,w-1200" 
-      alt="Your Beauty BFF - Korean Glass Skin" 
+    <Link to="/shop" className="w-full block overflow-hidden rounded-2xl md:rounded-[2rem] shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+     <video 
+      src={beautyBffVideo} 
+      autoPlay 
+      loop 
+      muted 
+      playsInline
       className="w-full h-auto object-contain"
      />
-    </div>
+    </Link>
    </div>
   </div>
  );

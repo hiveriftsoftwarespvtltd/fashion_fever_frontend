@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import Swal from 'sweetalert2';
 import { toast } from '../../../utils/toast';
-import { addServiceStaff, getServiceStaffDetails, deleteServiceStaff, updateServiceStaff, getServiceStaff } from '../../../api/serviceProviderService';
+import { addServiceStaff, getServiceStaffDetails, deleteServiceStaff, updateServiceStaff, getServiceStaff, getProviderServices } from '../../../api/serviceProviderService';
 import { useUser } from '../../../context/UserContext';
 
 const ServiceProviderStaff = ({ isDarkMode, profileData }) => {
@@ -38,10 +38,13 @@ const ServiceProviderStaff = ({ isDarkMode, profileData }) => {
     name: '',
     phone: '',
     email: '',
-    experienceYears: ''
+    experienceYears: '',
+    gender: 'FEMALE'
   });
   
   const [skills, setSkills] = useState(['']); // Start with one empty skill input
+  const [selectedServices, setSelectedServices] = useState([]);
+  const [servicesList, setServicesList] = useState([]);
   const [file, setFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
 
@@ -98,9 +101,26 @@ const ServiceProviderStaff = ({ isDarkMode, profileData }) => {
     }
   }, [profileData?._id]);
 
+  // Fetch all services for provider
+  const fetchServices = useCallback(async () => {
+    const activeProviderId = profileData?._id;
+    if (!activeProviderId) return;
+
+    try {
+      const res = await getProviderServices(activeProviderId);
+      const unpacked = res?.data?.data ?? res?.data ?? res;
+      if (Array.isArray(unpacked)) {
+        setServicesList(unpacked);
+      }
+    } catch (err) {
+      console.error("Failed to fetch services:", err);
+    }
+  }, [profileData?._id]);
+
   useEffect(() => {
     fetchStaffList();
-  }, [fetchStaffList]);
+    fetchServices();
+  }, [fetchStaffList, fetchServices]);
 
   // Handle standard input change
   const handleInputChange = (e) => {
@@ -216,9 +236,11 @@ const ServiceProviderStaff = ({ isDarkMode, profileData }) => {
       name: member.name || '',
       phone: member.phone || '',
       email: member.email || '',
-      experienceYears: member.experienceYears || ''
+      experienceYears: member.experienceYears || '',
+      gender: member.gender || 'FEMALE'
     });
     setSkills(member.skills && member.skills.length > 0 ? member.skills : ['']);
+    setSelectedServices(member.services ? member.services.map(s => typeof s === 'object' ? s._id : s) : []);
     setFile(null);
     setImagePreview(member.image?.url || member.image || null);
     setIsModalOpen(true);
@@ -259,10 +281,16 @@ const ServiceProviderStaff = ({ isDarkMode, profileData }) => {
       dataToSend.append('phone', formData.phone.trim());
       dataToSend.append('email', formData.email.trim());
       dataToSend.append('experienceYears', Number(formData.experienceYears));
+      dataToSend.append('gender', formData.gender);
 
       // Append skills using indexed keys skills[0], skills[1] etc
       filteredSkills.forEach((skill, index) => {
         dataToSend.append(`skills[${index}]`, skill.trim());
+      });
+
+      // Append services using indexed keys services[0], services[1] etc
+      selectedServices.forEach((serviceId, index) => {
+        dataToSend.append(`services[${index}]`, serviceId);
       });
 
       // Append profile file
@@ -291,8 +319,9 @@ const ServiceProviderStaff = ({ isDarkMode, profileData }) => {
         await fetchStaffList();
 
         // Reset state
-        setFormData({ name: '', phone: '', email: '', experienceYears: '' });
+        setFormData({ name: '', phone: '', email: '', experienceYears: '', gender: 'FEMALE' });
         setSkills(['']);
+        setSelectedServices([]);
         setFile(null);
         setImagePreview(null);
         setEditingStaff(null);
@@ -326,15 +355,16 @@ const ServiceProviderStaff = ({ isDarkMode, profileData }) => {
           <h2 className={`text-lg lg:text-3xl font-bold uppercase transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
             Manage Staff
           </h2>
-          <p className="text-[10px] font-semibold uppercase text-gray-400 mt-1">
+          <p className="text-sm font-semibold uppercase text-gray-400 mt-1">
             Oversee your salon team, experience levels, contacts, and specialized skill categories
           </p>
         </div>
         <button
           onClick={() => {
             setEditingStaff(null);
-            setFormData({ name: '', phone: '', email: '', experienceYears: '' });
+            setFormData({ name: '', phone: '', email: '', experienceYears: '', gender: 'FEMALE' });
             setSkills(['']);
+            setSelectedServices([]);
             setFile(null);
             setImagePreview(null);
             setIsModalOpen(true);
@@ -383,10 +413,10 @@ const ServiceProviderStaff = ({ isDarkMode, profileData }) => {
           <div className="py-24 flex flex-col items-center justify-center text-center">
             <User size={48} className="text-gray-300 dark:text-gray-600 mb-4" />
             <p className={`text-sm font-black uppercase ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>No Staff Members Found</p>
-            <p className="text-[10px] text-gray-400 font-bold uppercase mt-1">Register your team members to allocate salon bookings</p>
+            <p className="text-sm text-gray-400 font-bold uppercase mt-1">Register your team members to allocate salon bookings</p>
             <button
               onClick={() => setIsModalOpen(true)}
-              className="mt-6 px-4 py-2.5 bg-primary/10 text-primary border border-primary/20 rounded-xl text-[10px] font-black uppercase tracking-wider hover:bg-primary hover:text-white transition-all cursor-pointer"
+              className="mt-6 px-4 py-2.5 bg-primary/10 text-primary border border-primary/20 rounded-xl text-sm font-black uppercase tracking-wider hover:bg-primary hover:text-white transition-all cursor-pointer"
             >
               Add Staff Member Now
             </button>
@@ -395,7 +425,7 @@ const ServiceProviderStaff = ({ isDarkMode, profileData }) => {
           <div className="overflow-x-auto w-full">
             <table className="w-full border-collapse">
               <thead>
-                <tr className={`border-b text-left text-[10px] font-black uppercase tracking-wider ${
+                <tr className={`border-b text-left text-sm font-black uppercase tracking-wider ${
                   isDarkMode ? 'bg-gray-900/30 border-white/5 text-gray-400' : 'bg-gray-50/50 border-gray-100 text-gray-500'
                 }`}>
                   <th className="py-5 px-6">Staff Member</th>
@@ -437,10 +467,13 @@ const ServiceProviderStaff = ({ isDarkMode, profileData }) => {
                           </span>
                         </div>
                         <div className="flex flex-col">
-                          <span className={`text-sm font-bold ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>
+                          <span className={`text-sm font-bold flex items-center gap-2 ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>
                             {item.name}
+                            <span className="px-1.5 py-0.5 bg-gray-150 dark:bg-gray-700 text-gray-500 dark:text-gray-400 rounded text-[9px] font-bold">
+                              {item.gender || 'FEMALE'}
+                            </span>
                           </span>
-                          <span className="text-[10px] text-gray-400 font-medium">
+                          <span className="text-sm text-gray-405 font-medium">
                             Staff ID: {item._id?.substring(18)}
                           </span>
                         </div>
@@ -454,7 +487,7 @@ const ServiceProviderStaff = ({ isDarkMode, profileData }) => {
                           <Phone size={11} className="text-primary/70" />
                           {item.phone}
                         </span>
-                        <span className="text-[10px] text-gray-405 flex items-center gap-1.5">
+                        <span className="text-sm text-gray-405 flex items-center gap-1.5">
                           <Mail size={11} />
                           {item.email}
                         </span>
@@ -482,6 +515,18 @@ const ServiceProviderStaff = ({ isDarkMode, profileData }) => {
                             {skill}
                           </span>
                         ))}
+                        {item.services && item.services.map((srv, idx) => {
+                          const serviceName = typeof srv === 'object' ? (srv.title || srv.name) : (servicesList.find(s => s._id === srv)?.title || servicesList.find(s => s._id === srv)?.name || 'Service');
+                          return (
+                            <span 
+                              key={`srv-${idx}`} 
+                              className="px-2 py-0.5 bg-green-500/5 text-green-500 border border-green-500/10 rounded-full text-[9px] font-black uppercase tracking-wider"
+                              title="Assigned Service"
+                            >
+                              {serviceName}
+                            </span>
+                          );
+                        })}
                       </div>
                     </td>
 
@@ -557,7 +602,7 @@ const ServiceProviderStaff = ({ isDarkMode, profileData }) => {
                     <h2 className={`text-lg font-bold uppercase ${isDarkMode ? 'text-white' : 'text-gray-850'}`}>
                       {editingStaff ? 'Edit Staff Member' : 'Add Staff Member'}
                     </h2>
-                    <p className="text-[10px] font-bold text-gray-400 uppercase mt-0.5">
+                    <p className="text-sm font-bold text-gray-400 uppercase mt-0.5">
                       {editingStaff ? 'Modify details for the selected stylist or consultant' : 'Register a stylist or beauty consultant under your provider profile'}
                     </p>
                   </div>
@@ -581,7 +626,7 @@ const ServiceProviderStaff = ({ isDarkMode, profileData }) => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Staff Name */}
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black uppercase tracking-wider text-gray-400">
+                    <label className="text-sm font-black uppercase tracking-wider text-gray-400">
                       Staff Name *
                     </label>
                     <input
@@ -601,7 +646,7 @@ const ServiceProviderStaff = ({ isDarkMode, profileData }) => {
 
                   {/* Staff Phone */}
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black uppercase tracking-wider text-gray-400">
+                    <label className="text-sm font-black uppercase tracking-wider text-gray-400">
                       Phone Number *
                     </label>
                     <input
@@ -623,7 +668,7 @@ const ServiceProviderStaff = ({ isDarkMode, profileData }) => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Staff Email */}
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black uppercase tracking-wider text-gray-400">
+                    <label className="text-sm font-black uppercase tracking-wider text-gray-400">
                       Email Address *
                     </label>
                     <input
@@ -643,7 +688,7 @@ const ServiceProviderStaff = ({ isDarkMode, profileData }) => {
 
                   {/* Experience Years */}
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black uppercase tracking-wider text-gray-400 flex items-center gap-1">
+                    <label className="text-sm font-black uppercase tracking-wider text-gray-400 flex items-center gap-1">
                       <Award size={11} /> Experience (Years) *
                     </label>
                     <input
@@ -666,7 +711,7 @@ const ServiceProviderStaff = ({ isDarkMode, profileData }) => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Single Image Upload */}
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black uppercase tracking-wider text-gray-400 flex items-center gap-1">
+                    <label className="text-sm font-black uppercase tracking-wider text-gray-400 flex items-center gap-1">
                       <Upload size={11} /> Profile Picture
                     </label>
                     <div className="flex items-center gap-4">
@@ -704,7 +749,7 @@ const ServiceProviderStaff = ({ isDarkMode, profileData }) => {
 
                   {/* Skills / Specializations list */}
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black uppercase tracking-wider text-gray-400 flex items-center justify-between">
+                    <label className="text-sm font-black uppercase tracking-wider text-gray-400 flex items-center justify-between">
                       <span>Skills & Specializations *</span>
                       <button 
                         type="button" 
@@ -742,6 +787,64 @@ const ServiceProviderStaff = ({ isDarkMode, profileData }) => {
                           )}
                         </div>
                       ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Gender Select */}
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-black uppercase tracking-wider text-gray-400">
+                      Gender *
+                    </label>
+                    <select
+                      name="gender"
+                      value={formData.gender}
+                      onChange={handleInputChange}
+                      required
+                      className={`w-full px-4 py-3 rounded-xl text-xs font-bold outline-none border transition-all ${
+                        isDarkMode 
+                          ? 'bg-gray-900 border-gray-700 focus:border-primary/50 text-white' 
+                          : 'bg-gray-50 border-gray-100 focus:bg-white focus:border-primary/30 text-gray-800'
+                      }`}
+                    >
+                      <option value="FEMALE">Female</option>
+                      <option value="MALE">Male</option>
+                      <option value="OTHER">Other</option>
+                    </select>
+                  </div>
+
+                  {/* Services Multiselect Checkboxes */}
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-black uppercase tracking-wider text-gray-400">
+                      Assign Services *
+                    </label>
+                    <div className={`p-3 rounded-xl border max-h-36 overflow-y-auto space-y-2 ${
+                      isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-100'
+                    }`}>
+                      {servicesList.length === 0 ? (
+                        <p className="text-sm font-bold text-gray-400 uppercase">No services available</p>
+                      ) : (
+                        servicesList.map((srv) => (
+                          <label key={srv._id} className="flex items-center gap-2 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={selectedServices.includes(srv._id)}
+                              onChange={(e) => {
+                                if (e.target.checked) {
+                                  setSelectedServices([...selectedServices, srv._id]);
+                                } else {
+                                  setSelectedServices(selectedServices.filter(id => id !== srv._id));
+                                }
+                              }}
+                              className="accent-primary"
+                            />
+                            <span className={`text-[11px] font-bold ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                              {srv.title || srv.name}
+                            </span>
+                          </label>
+                        ))
+                      )}
                     </div>
                   </div>
                 </div>
@@ -806,7 +909,7 @@ const ServiceProviderStaff = ({ isDarkMode, profileData }) => {
                     <h3 className={`text-lg font-black uppercase ${isDarkMode ? 'text-white' : 'text-gray-850'}`}>
                       {viewingStaff.name}
                     </h3>
-                    <p className="text-[10px] font-bold text-primary uppercase mt-0.5">Stylist & Consultant</p>
+                    <p className="text-sm font-bold text-primary uppercase mt-0.5">Stylist & Consultant</p>
                   </div>
                 </div>
                 <button 
@@ -819,23 +922,29 @@ const ServiceProviderStaff = ({ isDarkMode, profileData }) => {
                 </button>
               </div>
 
-              {/* Status & Experience */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className={`p-4 rounded-2xl border ${isDarkMode ? 'bg-gray-900/50 border-white/5' : 'bg-gray-50 border-gray-100/50'}`}>
+              {/* Status, Experience & Gender */}
+              <div className="grid grid-cols-3 gap-3">
+                <div className={`p-3 rounded-2xl border ${isDarkMode ? 'bg-gray-900/50 border-white/5' : 'bg-gray-50 border-gray-100/50'}`}>
                   <p className="text-[9px] font-black text-gray-400 uppercase mb-1">Status</p>
                   <div className="flex items-center gap-1.5">
-                    <div className={`w-1.5 h-1.5 rounded-full ${viewingStaff.isActive ? 'bg-green-500' : 'bg-amber-505'}`} />
-                    <span className={`text-xs font-black uppercase ${viewingStaff.isActive ? 'text-green-550' : 'text-amber-500'}`}>
+                    <div className={`w-1.5 h-1.5 rounded-full ${viewingStaff.isActive ? 'bg-green-500' : 'bg-amber-500'}`} />
+                    <span className={`text-sm font-black uppercase ${viewingStaff.isActive ? 'text-green-500' : 'text-amber-500'}`}>
                       {viewingStaff.isActive ? 'Active' : 'Inactive'}
                     </span>
                   </div>
                 </div>
-                <div className={`p-4 rounded-2xl border ${isDarkMode ? 'bg-gray-900/50 border-white/5' : 'bg-gray-50 border-gray-100/50'}`}>
+                <div className={`p-3 rounded-2xl border ${isDarkMode ? 'bg-gray-900/50 border-white/5' : 'bg-gray-50 border-gray-100/50'}`}>
                   <p className="text-[9px] font-black text-gray-400 uppercase mb-1 flex items-center gap-1">
-                    <Award size={10} className="text-amber-500" /> Experience
+                    <Award size={10} className="text-amber-500" /> Exp
                   </p>
-                  <p className={`text-xs font-black ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
+                  <p className={`text-sm font-black ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
                     {viewingStaff.experienceYears} Years
+                  </p>
+                </div>
+                <div className={`p-3 rounded-2xl border ${isDarkMode ? 'bg-gray-900/50 border-white/5' : 'bg-gray-50 border-gray-100/50'}`}>
+                  <p className="text-[9px] font-black text-gray-400 uppercase mb-1">Gender</p>
+                  <p className={`text-sm font-black uppercase ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
+                    {viewingStaff.gender || 'FEMALE'}
                   </p>
                 </div>
               </div>
@@ -859,12 +968,12 @@ const ServiceProviderStaff = ({ isDarkMode, profileData }) => {
 
               {/* Skills Tags */}
               <div className="space-y-2">
-                <p className="text-[10px] font-black text-gray-400 uppercase">Specialized Skill Tags</p>
+                <p className="text-sm font-black text-gray-400 uppercase">Specialized Skill Tags</p>
                 <div className="flex flex-wrap gap-2">
                   {viewingStaff.skills && viewingStaff.skills.map((skill, index) => (
                     <span 
                       key={index} 
-                      className="px-3 py-1 bg-primary/10 text-primary border border-primary/20 rounded-full text-[10px] font-black uppercase tracking-wider"
+                      className="px-3 py-1 bg-primary/10 text-primary border border-primary/20 rounded-full text-sm font-black uppercase tracking-wider"
                     >
                       {skill}
                     </span>
@@ -872,9 +981,31 @@ const ServiceProviderStaff = ({ isDarkMode, profileData }) => {
                 </div>
               </div>
 
+              {/* Assigned Services */}
+              <div className="space-y-2">
+                <p className="text-sm font-black text-gray-400 uppercase">Assigned Services</p>
+                <div className="flex flex-wrap gap-2">
+                  {viewingStaff.services && viewingStaff.services.length > 0 ? (
+                    viewingStaff.services.map((srv, index) => {
+                      const serviceName = typeof srv === 'object' ? (srv.title || srv.name) : (servicesList.find(s => s._id === srv)?.title || servicesList.find(s => s._id === srv)?.name || srv);
+                      return (
+                        <span 
+                          key={index} 
+                          className="px-3 py-1 bg-green-500/10 text-green-550 border border-green-500/20 rounded-full text-sm font-black uppercase tracking-wider"
+                        >
+                          {serviceName}
+                        </span>
+                      );
+                    })
+                  ) : (
+                    <span className="text-sm text-gray-405 font-bold uppercase">No services assigned</span>
+                  )}
+                </div>
+              </div>
+
               {/* Joined Date timestamp */}
               {viewingStaff.createdAt && (
-                <div className={`p-3 rounded-2xl text-[10px] font-bold uppercase tracking-wider flex items-center gap-2 justify-center border ${
+                <div className={`p-3 rounded-2xl text-sm font-bold uppercase tracking-wider flex items-center gap-2 justify-center border ${
                   isDarkMode ? 'bg-gray-900/10 border-white/5 text-gray-500' : 'bg-gray-50 border-gray-100 text-gray-400'
                 }`}>
                   <Calendar size={11} />

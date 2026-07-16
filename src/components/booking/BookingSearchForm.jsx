@@ -65,7 +65,7 @@ const BookingSearchForm = ({
           <button 
             type="submit"
             disabled={loading}
-            className="flex-1 lg:flex-none bg-primary hover:bg-primary/95 text-white px-8 py-3.5 rounded-2xl font-black uppercase text-[10px] flex items-center justify-center gap-2 transition-all shadow-md shadow-primary/20 cursor-pointer disabled:opacity-55"
+            className="flex-1 lg:flex-none bg-primary hover:bg-primary/95 text-white px-8 py-3.5 rounded-2xl font-black uppercase text-sm flex items-center justify-center gap-2 transition-all shadow-md shadow-primary/20 cursor-pointer disabled:opacity-55"
           >
             <Search size={14} /> Find Lounges
           </button>

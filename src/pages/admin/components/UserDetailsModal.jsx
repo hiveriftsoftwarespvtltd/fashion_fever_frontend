@@ -1,24 +1,41 @@
 import React, { useState, useEffect } from 'react';
-import { Loader2, X, Camera, Video, TicketPercent, Pencil, Trash2 } from 'lucide-react';
+import { Loader2, X } from 'lucide-react';
 import { toast } from '../../../utils/toast';
-import { getUserById, getInfluencerById, deleteCoupon } from '../../../api/adminService';
+import { 
+  getUserById, 
+  getUserWalletBalance, 
+  getUserWalletTransactions 
+} from '../../../api/adminService';
 import { useTheme } from '../../../context/ThemeContext';
 
 /**
- * User Details Modal
+ * User Details Modal with integrated Wallet Balances and Transactions ledger
  */
 export const UserDetailsModal = ({ userId, onClose }) => {
   const { isDarkMode } = useTheme();
   const [user, setUser] = useState(null);
+  const [wallet, setWallet] = useState(null);
+  const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchDetail = async () => {
       setLoading(true);
       try {
-        const response = await getUserById(userId);
-        if (response.success) setUser(response.data);
-      } catch (err) { console.error(err); }
+        const [userRes, walletRes, txRes] = await Promise.all([
+          getUserById(userId),
+          getUserWalletBalance(userId),
+          getUserWalletTransactions(userId)
+        ]);
+        if (userRes.success) setUser(userRes.data);
+        if (walletRes.success) setWallet(walletRes.data);
+        if (txRes.success) {
+          const list = txRes.data?.data ?? txRes.data ?? [];
+          setTransactions(Array.isArray(list) ? list : []);
+        }
+      } catch (err) { 
+        console.error(err); 
+      }
       setLoading(false);
     };
     if (userId) fetchDetail();
@@ -27,58 +44,159 @@ export const UserDetailsModal = ({ userId, onClose }) => {
   if (!userId) return null;
 
   return (
-    <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-      <div className={`w-full max-w-md rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white'}`}>
+    <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+      <div className={`w-full max-w-xl rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white'}`}>
         {loading ? (
           <div className="h-64 flex flex-col items-center justify-center">
             <Loader2 className="animate-spin text-primary mb-3" size={32} />
-            <span className="text-xs font-bold text-gray-400 uppercase">Loading Profile...</span>
+            <span className="text-xs font-bold text-gray-400 uppercase tracking-widest animate-pulse">Loading Profile...</span>
           </div>
         ) : user ? (
-          <div className="p-8">
-            <div className="flex justify-between items-start mb-8 text-left">
-              <div className="flex items-center gap-4">
-                <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-xl font-bold shadow-sm ${isDarkMode ? 'bg-gray-900 text-gray-500' : 'bg-gray-50 text-primary'}`}>
-                  {user.name?.charAt(0)}
+          <div className="flex flex-col max-h-[85vh] overflow-hidden">
+            
+            {/* Modal Header */}
+            <div className={`p-6 border-b flex justify-between items-center ${isDarkMode ? 'border-white/5 bg-gray-900/10' : 'border-gray-100 bg-gray-50/50'}`}>
+              <div className="flex items-center gap-3">
+                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-lg font-bold shadow-sm ${isDarkMode ? 'bg-gray-900 text-gray-400' : 'bg-white border border-gray-100 text-primary'}`}>
+                  {user.name?.charAt(0).toUpperCase()}
                 </div>
-                <div>
-                  <h2 className={`text-lg font-bold leading-tight ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>{user.name}</h2>
-                  <p className="text-xs font-bold text-gray-400 uppercase">{user.email}</p>
+                <div className="text-left">
+                  <h2 className={`text-sm font-black leading-tight ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>{user.name}</h2>
+                  <p className="text-sm font-bold text-gray-400 uppercase tracking-wider">{user.email}</p>
                 </div>
               </div>
-              <button onClick={onClose} className={`p-2 rounded-xl transition-all ${isDarkMode ? 'hover:bg-white/5 text-gray-500' : 'hover:bg-gray-50 text-gray-400'}`}>
+              <button onClick={onClose} className={`p-2 rounded-xl transition-all cursor-pointer ${isDarkMode ? 'hover:bg-white/5 text-gray-500' : 'hover:bg-gray-50 text-gray-400'}`}>
                 <X size={18} />
               </button>
             </div>
 
-            <div className="space-y-3">
-              {[
-                { label: 'Access Role', value: user.role, isTag: true },
-                { label: 'Status', value: user.isActive ? 'Active' : 'Inactive', isStatus: true },
-                { label: 'Registration', value: new Date(user.createdAt).toLocaleDateString() },
-                { label: 'System ID', value: user._id, isMono: true }
-              ].map((item, i) => (
-                <div key={i} className={`flex items-center justify-between p-4 rounded-2xl text-left ${isDarkMode ? 'bg-gray-900/50' : 'bg-gray-50'}`}>
-                  <span className="text-xs font-bold text-gray-400 uppercase">{item.label}</span>
-                  {item.isTag ? (
-                    <span className="px-3 py-1 rounded-lg bg-primary/10 text-primary text-xs font-bold uppercase">{item.value}</span>
-                  ) : item.isStatus ? (
-                    <div className="flex items-center gap-2">
-                      <div className={`w-1.5 h-1.5 rounded-full ${user.isActive ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                      <span className={`text-xs font-bold uppercase ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>{item.value}</span>
-                    </div>
-                  ) : (
-                    <span className={`text-xs font-bold ${isDarkMode ? 'text-gray-300' : 'text-gray-600'} ${item.isMono ? 'font-mono opacity-50' : 'uppercase'}`}>
-                      {item.value}
+            {/* Scrollable Content */}
+            <div className="p-6 overflow-y-auto space-y-6 flex-grow scrollbar-thin">
+              
+              {/* Profile Details Cards */}
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { label: 'Access Role', value: user.role, isTag: true },
+                  { label: 'Status', value: user.isActive ? 'Active' : 'Inactive', isStatus: true },
+                  { label: 'Registration', value: new Date(user.createdAt).toLocaleDateString() },
+                  { label: 'System ID', value: user._id, isMono: true }
+                ].map((item, i) => (
+                  <div key={i} className={`flex flex-col justify-center p-4 rounded-2xl text-left ${isDarkMode ? 'bg-gray-900/50' : 'bg-gray-50'}`}>
+                    <span className="text-[8px] font-black text-gray-400 uppercase tracking-wider mb-1">{item.label}</span>
+                    {item.isTag ? (
+                      <span className="inline-block w-fit px-2.5 py-0.5 rounded-lg bg-primary/10 text-primary text-sm font-bold uppercase">{item.value}</span>
+                    ) : item.isStatus ? (
+                      <div className="flex items-center gap-1.5">
+                        <div className={`w-1.5 h-1.5 rounded-full ${user.isActive ? 'bg-green-500 shadow-[0_0_6px_rgba(34,197,94,0.4)]' : 'bg-red-500 shadow-[0_0_6px_rgba(239,68,68,0.4)]'}`}></div>
+                        <span className={`text-sm font-bold uppercase ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>{item.value}</span>
+                      </div>
+                    ) : (
+                      <span className={`text-sm font-bold ${isDarkMode ? 'text-gray-300' : 'text-gray-600'} ${item.isMono ? 'font-mono opacity-50' : 'uppercase'}`}>
+                        {item.value}
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {/* Wallet Summary Card */}
+              {wallet && (
+                <div className={`p-5 rounded-2xl border text-left transition-colors duration-300 ${
+                  isDarkMode ? 'bg-gray-900/40 border-white/5' : 'bg-emerald-50/10 border-emerald-100/50'
+                }`}>
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-sm font-black uppercase text-gray-400 tracking-wider">
+                      Customer Wallet Balance
                     </span>
-                  )}
+                    <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase ${
+                      isDarkMode ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-emerald-100 text-emerald-800'
+                    }`}>
+                      Liquid
+                    </span>
+                  </div>
+                  
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="flex flex-col">
+                      <span className="text-[8px] font-black text-gray-400 uppercase">Available</span>
+                      <span className={`text-sm font-black ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                        ₹{(wallet.balance || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </span>
+                    </div>
+                    <div className="flex flex-col border-l border-gray-100 dark:border-white/5 pl-3">
+                      <span className="text-[8px] font-black text-gray-400 uppercase">Total Credits</span>
+                      <span className="text-sm font-bold text-emerald-500">
+                        ₹{(wallet.totalCredits || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </span>
+                    </div>
+                    <div className="flex flex-col border-l border-gray-100 dark:border-white/5 pl-3">
+                      <span className="text-[8px] font-black text-gray-400 uppercase">Total Debits</span>
+                      <span className="text-sm font-bold text-rose-500">
+                        ₹{(wallet.totalDebits || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </span>
+                    </div>
+                  </div>
                 </div>
-              ))}
+              )}
+
+              {/* Transactions History Ledger */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between border-b pb-2 border-gray-100 dark:border-white/5">
+                  <span className="text-sm font-black uppercase text-gray-400 tracking-wider">
+                    Transaction Audit Ledger
+                  </span>
+                  <span className="text-[9px] text-gray-400 font-bold uppercase">
+                    {(transactions || []).length} Records
+                  </span>
+                </div>
+                
+                {(!transactions || transactions.length === 0) ? (
+                  <div className="py-6 text-center text-xs font-bold text-gray-400 uppercase italic">
+                    No transactions recorded for this wallet.
+                  </div>
+                ) : (
+                  <div className="space-y-2 max-h-56 overflow-y-auto pr-1 scrollbar-thin">
+                    {transactions.map((tx) => (
+                      <div 
+                        key={tx._id}
+                        className={`p-3 rounded-xl border flex items-center justify-between gap-3 text-xs transition-all ${
+                          isDarkMode 
+                            ? 'bg-gray-900/20 border-white/5 hover:border-white/10' 
+                            : 'bg-gray-50/50 border-gray-100 hover:border-gray-200 shadow-sm'
+                        }`}
+                      >
+                        <div className="flex flex-col gap-0.5 max-w-[70%] text-left">
+                          <span className={`font-bold ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>
+                            {tx.description || tx.reason || 'Transaction'}
+                          </span>
+                          <span className="text-[8px] text-gray-400 font-bold uppercase">
+                            {new Date(tx.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                        </div>
+                        
+                        <div className="text-right flex flex-col items-end gap-0.5 flex-shrink-0">
+                          <span className={`font-black text-xs ${
+                            tx.type === 'CREDIT' ? 'text-emerald-500' : 'text-rose-500'
+                          }`}>
+                            {tx.type === 'CREDIT' ? '+' : '-'}₹{(tx.amount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </span>
+                          <span className="text-[8px] text-gray-400 font-mono font-bold uppercase">
+                            Bal: ₹{(tx.balanceAfterTransaction || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
 
-            <button onClick={onClose} className="w-full mt-8 py-3 bg-primary text-white rounded-xl font-bold text-xs uppercase shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all cursor-pointer">
-              Close Profile
-            </button>
+            {/* Modal Footer */}
+            <div className={`p-4 border-t flex justify-end ${isDarkMode ? 'border-white/5 bg-gray-900/10' : 'border-gray-100 bg-gray-50/50'}`}>
+              <button onClick={onClose} className="px-6 py-2.5 bg-primary text-white rounded-xl font-bold text-xs uppercase shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all cursor-pointer">
+                Close Profile
+              </button>
+            </div>
+            
           </div>
         ) : null}
       </div>

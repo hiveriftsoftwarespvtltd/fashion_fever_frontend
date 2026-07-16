@@ -234,7 +234,7 @@ const AdminDashboard = ({
                       {stat.trend}
                     </span>
                   </div>
-                  <h3 className={`text-[10px] font-bold uppercase tracking-wider mb-1 relative z-10 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                  <h3 className={`text-sm font-bold uppercase tracking-wider mb-1 relative z-10 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                     {stat.label}
                   </h3>
                   <p className={`text-base lg:text-xl font-extrabold tracking-tight relative z-10 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
@@ -366,7 +366,7 @@ const AdminDashboard = ({
                         })}
                       </svg>
                       <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                        <span className={`text-[10px] font-bold uppercase ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Catalog</span>
+                        <span className={`text-sm font-bold uppercase ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Catalog</span>
                         <span className={`text-xl font-extrabold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>{totalItems}</span>
                       </div>
                     </div>
@@ -467,7 +467,7 @@ const AdminDashboard = ({
                             })}
                           </svg>
                           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                            <span className={`text-[10px] font-bold uppercase ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Total</span>
+                            <span className={`text-sm font-bold uppercase ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Total</span>
                             <span className={`text-xl font-extrabold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>{totalOrders}</span>
                           </div>
                         </div>
@@ -593,7 +593,7 @@ const AdminDashboard = ({
 
                             return (
                               <div key={idx} className="space-y-1">
-                                <div className="flex justify-between items-center text-[10px] font-bold uppercase text-gray-400">
+                                <div className="flex justify-between items-center text-sm font-bold uppercase text-gray-400">
                                   <span>{year} Sales</span>
                                   <span className="font-extrabold">{pct}%</span>
                                 </div>
@@ -636,7 +636,7 @@ const AdminDashboard = ({
                         setSelectedYear(yr);
                         fetchMonthlyData(yr);
                       }} 
-                      className={`text-[10px] font-bold uppercase px-3 py-1.5 rounded-xl border outline-none cursor-pointer transition-colors ${
+                      className={`text-sm font-bold uppercase px-3 py-1.5 rounded-xl border outline-none cursor-pointer transition-colors ${
                         isDarkMode ? 'bg-gray-900 border-white/5 text-white' : 'bg-gray-50 border-gray-100 text-gray-700'
                       }`}
                     >

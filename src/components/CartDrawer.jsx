@@ -10,13 +10,13 @@ const CartDrawer = ({ isOpen, onClose }) => {
   const { cart, isLoading, removeFromCart, updateQty, clearCart, cartTotal } = useCart();
   const [updatingId, setUpdatingId] = useState(null);
 
-  const totalOriginal = cart.reduce((acc, item) => {
+  const totalOriginal = Math.round(cart.reduce((acc, item) => {
     const price = item.originalPrice || item.price || 0;
     return acc + (price * item.qty);
-  }, 0);
+  }, 0) * 100) / 100;
 
-  const totalSales = cartTotal;
-  const discount = totalOriginal - totalSales;
+  const totalSales = Math.round(cartTotal * 100) / 100;
+  const discount = Math.round((totalOriginal - totalSales) * 100) / 100;
 
   return (
     <>
@@ -110,9 +110,9 @@ const CartDrawer = ({ isOpen, onClose }) => {
                       
                       <div className="flex items-center justify-between mt-3">
                         <div className="flex items-center gap-2">
-                          <span className="text-sm font-bold text-gray-900">₹{item.price}</span>
+                          <span className="text-sm font-bold text-gray-900">₹{Number(item.price).toFixed(2)}</span>
                           {item.originalPrice > item.price && (
-                            <span className="text-xs font-bold text-gray-400 line-through">₹{item.originalPrice}</span>
+                            <span className="text-xs font-bold text-gray-400 line-through">₹{Number(item.originalPrice).toFixed(2)}</span>
                           )}
                         </div>
                         
@@ -176,12 +176,12 @@ const CartDrawer = ({ isOpen, onClose }) => {
                   <div className="space-y-3">
                     <div className="flex justify-between text-xs font-bold uppercase">
                       <span className="text-gray-500">Bag Total</span>
-                      <span className="text-gray-800">₹{totalOriginal}</span>
+                      <span className="text-gray-800">₹{totalOriginal.toFixed(2)}</span>
                     </div>
-                    {discount > 0 && (
+                    {discount > 0.01 && (
                       <div className="flex justify-between text-xs font-bold uppercase">
                         <span className="text-gray-500">Bag Discount</span>
-                        <span className="text-green-600">- ₹{discount}</span>
+                        <span className="text-green-600">- ₹{discount.toFixed(2)}</span>
                       </div>
                     )}
                     <div className="flex justify-between text-xs font-bold uppercase">
@@ -191,7 +191,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
                     <div className="h-[1px] bg-gray-50 my-2"></div>
                     <div className="flex justify-between text-sm font-bold uppercase">
                       <span className="text-gray-900">Total Payable</span>
-                      <span className="text-primary font-extrabold">₹{totalSales}</span>
+                      <span className="text-primary font-extrabold">₹{totalSales.toFixed(2)}</span>
                     </div>
                   </div>
                 </div>
@@ -215,7 +215,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
             <div className="p-4 bg-white border-t border-gray-100 shadow-[0_-10px_20px_rgba(0,0,0,0.02)] sticky bottom-0 z-20">
               <div className="flex items-center justify-between mb-4 px-2">
                  <div className="flex flex-col">
-                   <span className="text-sm font-bold text-gray-900">₹{totalSales}</span>
+                   <span className="text-sm font-bold text-gray-900">₹{totalSales.toFixed(2)}</span>
                    <span className="text-xs font-bold text-primary uppercase">View Details</span>
                  </div>
                  <button 

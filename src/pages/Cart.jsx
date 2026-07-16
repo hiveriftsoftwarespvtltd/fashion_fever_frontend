@@ -49,7 +49,7 @@ const Cart = () => {
      </div>
      <div className="flex-grow flex flex-col sm:flex-row items-center justify-between w-full gap-4">
      <div className="text-center sm:text-left">
-      <span className="text-[10px] font-bold uppercase text-primary mb-1 block">{item.brand}</span>
+      <span className="text-sm font-bold uppercase text-primary mb-1 block">{item.brand}</span>
       <h3 className="text-lg font-bold text-gray-900 leading-tight">{item.name}</h3>
       {item.shade && <p className="text-xs font-bold text-gray-400 uppercase mt-1">Shade: {item.shade}</p>}
      </div>
@@ -62,7 +62,7 @@ const Cart = () => {
 
      <div className="text-center sm:text-right min-w-[100px]">
       <p className="text-xl font-bold text-gray-900 ">₹{item.price * item.quantity}</p>
-      <button className="text-[10px] font-bold uppercase text-red-400 hover:text-red-600 transition-all mt-2 flex items-center gap-1 mx-auto sm:ml-auto">
+      <button className="text-sm font-bold uppercase text-red-400 hover:text-red-600 transition-all mt-2 flex items-center gap-1 mx-auto sm:ml-auto">
        <Trash2 size={12} /> Remove
       </button>
      </div>
@@ -80,7 +80,7 @@ const Cart = () => {
     <div className="relative group">
      <Tag className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary transition-colors" size={18} />
      <input type="text" placeholder="Coupon Code" className="w-full pl-12 pr-4 py-4 bg-gray-50 border-none rounded-xl font-bold text-xs outline-none focus:ring-2 focus:ring-primary/10 uppercase " />
-     <button className="absolute right-2 top-1/2 -translate-y-1/2 bg-gray-900 text-white px-4 py-2 rounded-lg font-bold uppercase text-[10px] hover:bg-black transition-all">Apply</button>
+     <button className="absolute right-2 top-1/2 -translate-y-1/2 bg-gray-900 text-white px-4 py-2 rounded-lg font-bold uppercase text-sm hover:bg-black transition-all">Apply</button>
     </div>
 
     <div className="space-y-4 pt-4">
@@ -107,7 +107,7 @@ const Cart = () => {
      Checkout Now <ChevronRight size={18} />
     </Link>
 
-    <div className="flex items-center justify-center gap-2 text-[10px] font-bold text-gray-300 uppercase pt-4">
+    <div className="flex items-center justify-center gap-2 text-sm font-bold text-gray-300 uppercase pt-4">
      <ShieldCheck size={14} /> 100% Secure Payments
     </div>
    </div>

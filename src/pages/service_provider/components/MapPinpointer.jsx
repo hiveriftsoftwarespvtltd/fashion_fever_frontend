@@ -270,7 +270,7 @@ const MapPinpointer = ({ latitude, longitude, onCoordinatesChange, isDarkMode })
         {!mapLoaded && (
           <div className="absolute inset-0 bg-gray-500/5 backdrop-blur-[1px] flex flex-col items-center justify-center text-center p-6 z-10">
             <Loader2 size={28} className="animate-spin text-primary mb-2" />
-            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+            <p className="text-sm font-black text-gray-400 uppercase tracking-widest">
               Initializing Map Tiles...
             </p>
           </div>

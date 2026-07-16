@@ -6,7 +6,9 @@ import {
   IndianRupee,
   Store,
   LogOut,
-  X
+  X,
+  Wallet,
+  Landmark
 } from 'lucide-react';
 
 import { useTheme } from '../../../context/ThemeContext';
@@ -18,6 +20,8 @@ const VendorSidebar = ({ activeTab, setActiveTab, isSidebarOpen, setIsSidebarOpe
     { id: 'products', icon: <Package size={18} />, label: 'Products' },
     { id: 'orders', icon: <ShoppingCart size={18} />, label: 'Orders' },
     { id: 'earnings', icon: <IndianRupee size={18} />, label: 'Earnings' },
+    { id: 'wallet', icon: <Wallet size={18} />, label: 'Wallet Ledger' },
+    { id: 'payout', icon: <Landmark size={18} />, label: 'Bank Details' },
     { id: 'profile', icon: <Store size={18} />, label: 'Store Profile' }
   ];
 

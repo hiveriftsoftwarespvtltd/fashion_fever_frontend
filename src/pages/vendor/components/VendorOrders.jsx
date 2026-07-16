@@ -64,7 +64,7 @@ const VendorOrders = ({
                     <td className="px-6 py-4">
                       <div className="flex flex-col">
                         <span className={`font-bold text-sm ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>{order.userId?.name || 'User'}</span>
-                        <span className={`text-[10px] font-mono ${isDarkMode ? 'text-gray-550' : 'text-gray-400'}`}>{order.userId?.email}</span>
+                        <span className={`text-sm font-mono ${isDarkMode ? 'text-gray-550' : 'text-gray-400'}`}>{order.userId?.email}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4">
@@ -72,7 +72,7 @@ const VendorOrders = ({
                         <span className={`text-sm font-bold ${isDarkMode ? 'text-gray-250' : 'text-gray-800'}`}>
                           {isDateValid ? orderDate.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : 'N/A'}
                         </span>
-                        <span className={`text-[10px] uppercase font-bold ${isDarkMode ? 'text-gray-550' : 'text-gray-400'}`}>
+                        <span className={`text-sm uppercase font-bold ${isDarkMode ? 'text-gray-550' : 'text-gray-400'}`}>
                           {isDateValid ? orderDate.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : ''}
                         </span>
                       </div>

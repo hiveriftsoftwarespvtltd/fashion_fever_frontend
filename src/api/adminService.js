@@ -42,6 +42,34 @@ export const getUserById = async (userId) => {
   }
 };
 
+export const getUserWalletBalance = async (userId) => {
+  try {
+    const response = await apiClient.get(`/wallet/admin/user/${userId}/balance`);
+    return response.data;
+  } catch (error) {
+    console.error('Fetch user wallet balance error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to fetch user wallet balance.',
+      statusCode: 500
+    };
+  }
+};
+
+export const getUserWalletTransactions = async (userId) => {
+  try {
+    const response = await apiClient.get(`/wallet/admin/user/${userId}/transactions`);
+    return response.data;
+  } catch (error) {
+    console.error('Fetch user wallet transactions error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to fetch user wallet transactions.',
+      statusCode: 500
+    };
+  }
+};
+
 export const toggleUserStatus = async (userId) => {
   try {
     const response = await apiClient.patch(`/admin/users/toggle-active/${userId}`);
@@ -1428,8 +1456,821 @@ export const getHomeContentDetails = async (id) => {
   }
 };
 
+/**
+ * Approve or Reject an Educator profile
+ * Method: PUT
+ * URL: /educator/approve/:educatorId
+ * @param {string} educatorId
+ * @param {boolean} isApproved
+ */
+export const approveEducator = async (educatorId, isApproved) => {
+  try {
+    const response = await apiClient.put(`/educator/approve/${educatorId}`, { isApproved });
+    return response.data;
+  } catch (error) {
+    console.error('Approve educator error:', error.response || error);
+    return error.response?.data || {
+      success: false,
+      message: error.response?.data?.message || error.message || 'Failed to update educator status.',
+      statusCode: error.response?.status || 500
+    };
+  }
+};
 
+/**
+ * Fetch all pending educator approval profiles
+ * Method: GET
+ * URL: /educator/pending-approvals
+ */
+export const getPendingEducators = async () => {
+  try {
+    const response = await apiClient.get('/educator/pending-approvals');
+    return response.data;
+  } catch (error) {
+    console.error('Fetch pending educators error:', error.response || error);
+    return error.response?.data || {
+      success: false,
+      message: error.response?.data?.message || error.message || 'Failed to fetch pending educators.',
+      statusCode: error.response?.status || 500
+    };
+  }
+};
 
+/**
+ * Toggle Educator Active status
+ * Method: PUT
+ * URL: /educator/toggle-active/:educatorId
+ * @param {string} educatorId
+ * @param {boolean} isActive
+ */
+export const toggleEducatorActive = async (educatorId, isActive) => {
+  try {
+    const response = await apiClient.put(`/educator/toggle-active/${educatorId}`, { isActive });
+    return response.data;
+  } catch (error) {
+    console.error('Toggle educator active error:', error.response || error);
+    return error.response?.data || {
+      success: false,
+      message: error.response?.data?.message || error.message || 'Failed to toggle educator status.',
+      statusCode: error.response?.status || 500
+    };
+  }
+};
+
+/**
+ * Fetch all educators list
+ * Method: GET
+ * URL: /educator/list
+ */
+export const getAllEducators = async () => {
+  try {
+    const response = await apiClient.get('/educator/list');
+    return response.data;
+  } catch (error) {
+    console.error('Fetch all educators error:', error.response || error);
+    return error.response?.data || {
+      success: false,
+      message: error.response?.data?.message || error.message || 'Failed to fetch educators.',
+      statusCode: error.response?.status || 500
+    };
+  }
+};
+
+/**
+ * Add a new Course Category
+ * Method: POST
+ * URL: /courses/add-course-category
+ * @param {FormData} formData
+ */
+export const addCourseCategory = async (formData) => {
+  try {
+    const response = await apiClient.post('/courses/add-course-category', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Add course category error:', error.response || error);
+    return error.response?.data || {
+      success: false,
+      message: error.response?.data?.message || error.message || 'Failed to add course category.',
+      statusCode: error.response?.status || 500
+    };
+  }
+};
+
+/**
+ * Get all Course Categories
+ * Method: GET
+ * URL: /courses/get-all-course-categories
+ */
+export const getCourseCategories = async () => {
+  try {
+    const response = await apiClient.get('/courses/get-all-course-categories');
+    return response.data;
+  } catch (error) {
+    console.error('Get course categories error:', error.response || error);
+    return error.response?.data || {
+      success: false,
+      message: error.response?.data?.message || error.message || 'Failed to fetch course categories.',
+      statusCode: error.response?.status || 500
+    };
+  }
+};
+
+/**
+ * Get Course Category Details by ID
+ * Method: GET
+ * URL: /courses/course-category-details/:id
+ * @param {string} id - Course Category ID
+ */
+export const getCourseCategoryDetails = async (id) => {
+  try {
+    const response = await apiClient.get(`/courses/course-category-details/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Get course category details error:', error.response || error);
+    return error.response?.data || {
+      success: false,
+      message: error.response?.data?.message || error.message || 'Failed to fetch category details.',
+      statusCode: error.response?.status || 500
+    };
+  }
+};
+
+/**
+ * Delete a Course Category by ID
+ * Method: DELETE
+ * URL: /courses/delete-course-category/:id
+ * @param {string} id - Course Category ID
+ */
+export const deleteCourseCategory = async (id) => {
+  try {
+    const response = await apiClient.delete(`/courses/delete-course-category/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Delete course category error:', error.response || error);
+    return error.response?.data || {
+      success: false,
+      message: error.response?.data?.message || error.message || 'Failed to delete course category.',
+      statusCode: error.response?.status || 500
+    };
+  }
+};
+
+/**
+ * Fetch all cashback slabs
+ * Method: GET
+ * URL: /wallet/admin/cashback-slabs/list-cashback-slab
+ */
+export const getAllCashbackSlabs = async () => {
+  try {
+    const response = await apiClient.get('/wallet/admin/cashback-slabs/list-cashback-slab');
+    return response.data;
+  } catch (error) {
+    console.error('Fetch cashback slabs error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to fetch cashback slabs.',
+      statusCode: 500
+    };
+  }
+};
+
+/**
+ * Create a new cashback slab
+ * Method: POST
+ * URL: /wallet/admin/cashback-slabs/add-cashback-slab
+ */
+export const createCashbackSlab = async (data) => {
+  try {
+    const response = await apiClient.post('/wallet/admin/cashback-slabs/add-cashback-slab', data);
+    return response.data;
+  } catch (error) {
+    console.error('Create cashback slab error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to create cashback slab.',
+      statusCode: 500
+    };
+  }
+};
+
+/**
+ * Update an existing cashback slab
+ * Method: PUT
+ * URL: /wallet/admin/cashback-slabs/update-cashback-slab/:id
+ */
+export const updateCashbackSlab = async (id, data) => {
+  try {
+    const response = await apiClient.put(`/wallet/admin/cashback-slabs/update-cashback-slab/${id}`, data);
+    return response.data;
+  } catch (error) {
+    console.error('Update cashback slab error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to update cashback slab.',
+      statusCode: 500
+    };
+  }
+};
+
+/**
+ * Delete a cashback slab by ID
+ * Method: DELETE
+ * URL: /wallet/admin/cashback-slabs/delete-cashback-slab/:id
+ */
+export const deleteCashbackSlab = async (id) => {
+  try {
+    const response = await apiClient.delete(`/wallet/admin/cashback-slabs/delete-cashback-slab/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Delete cashback slab error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to delete cashback slab.',
+      statusCode: 500
+    };
+  }
+};
+
+/**
+ * Fetch users wallet balances
+ * Method: GET
+ * URL: /wallet/admin/balances/users
+ */
+export const getUsersBalances = async () => {
+  try {
+    const response = await apiClient.get('/wallet/admin/balances/users');
+    return response.data;
+  } catch (error) {
+    console.error('Fetch users balances error:', error);
+    return error.response?.data || { success: false, message: 'Failed to fetch users balances.' };
+  }
+};
+
+/**
+ * Fetch vendors wallet balances
+ * Method: GET
+ * URL: /wallet/admin/balances/vendors
+ */
+export const getVendorsBalances = async () => {
+  try {
+    const response = await apiClient.get('/wallet/admin/balances/vendors');
+    return response.data;
+  } catch (error) {
+    console.error('Fetch vendors balances error:', error);
+    return error.response?.data || { success: false, message: 'Failed to fetch vendors balances.' };
+  }
+};
+
+/**
+ * Fetch influencers wallet balances
+ * Method: GET
+ * URL: /wallet/admin/balances/influencers
+ */
+export const getInfluencersBalances = async () => {
+  try {
+    const response = await apiClient.get('/wallet/admin/balances/influencers');
+    return response.data;
+  } catch (error) {
+    console.error('Fetch influencers balances error:', error);
+    return error.response?.data || { success: false, message: 'Failed to fetch influencers balances.' };
+  }
+};
+
+/**
+ * Fetch service providers wallet balances
+ * Method: GET
+ * URL: /wallet/admin/balances/service-providers
+ */
+export const getServiceProvidersBalances = async () => {
+  try {
+    const response = await apiClient.get('/wallet/admin/balances/service-providers');
+    return response.data;
+  } catch (error) {
+    console.error('Fetch service providers balances error:', error);
+    return error.response?.data || { success: false, message: 'Failed to fetch service providers balances.' };
+  }
+};
+
+/**
+ * Fetch educators wallet balances
+ * Method: GET
+ * URL: /wallet/admin/balances/educators
+ */
+export const getEducatorsBalances = async () => {
+  try {
+    const response = await apiClient.get('/wallet/admin/balances/educators');
+    return response.data;
+  } catch (error) {
+    console.error('Fetch educators balances error:', error);
+    return error.response?.data || { success: false, message: 'Failed to fetch educators balances.' };
+  }
+};
+
+/**
+ * Fetch platform wallet balance details
+ * Method: GET
+ * URL: /wallet/admin/balances/platform
+ */
+export const getPlatformBalances = async () => {
+  try {
+    const response = await apiClient.get('/wallet/admin/balances/platform');
+    return response.data;
+  } catch (error) {
+    console.error('Fetch platform balances error:', error);
+    return error.response?.data || { success: false, message: 'Failed to fetch platform balances.' };
+  }
+};
+
+/**
+ * Fetch specific vendor wallet balance details
+ * Method: GET
+ * URL: /wallet/admin/vendor/:vendorId/balance
+ */
+export const getVendorWalletBalance = async (vendorId) => {
+  try {
+    const response = await apiClient.get(`/wallet/admin/vendor/${vendorId}/balance`);
+    return response.data;
+  } catch (error) {
+    console.error('Fetch vendor wallet balance error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to fetch vendor wallet balance.',
+      statusCode: 500
+    };
+  }
+};
+
+/**
+ * Fetch specific vendor wallet transactions details
+ * Method: GET
+ * URL: /wallet/admin/vendor/:vendorId/transactions
+ */
+export const getVendorWalletTransactions = async (vendorId) => {
+  try {
+    const response = await apiClient.get(`/wallet/admin/vendor/${vendorId}/transactions`);
+    return response.data;
+  } catch (error) {
+    console.error('Fetch vendor wallet transactions error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to fetch vendor wallet transactions.',
+      statusCode: 500
+    };
+  }
+};
+
+/**
+ * Fetch specific service provider wallet balance details
+ * Method: GET
+ * URL: /wallet/admin/service-provider/:serviceProviderId/balance
+ */
+export const getServiceProviderWalletBalance = async (serviceProviderId) => {
+  try {
+    const response = await apiClient.get(`/wallet/admin/service-provider/${serviceProviderId}/balance`);
+    return response.data;
+  } catch (error) {
+    console.error('Fetch service provider wallet balance error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to fetch service provider wallet balance.',
+      statusCode: 500
+    };
+  }
+};
+
+/**
+ * Fetch specific influencer wallet balance details
+ * Method: GET
+ * URL: /wallet/admin/influencer/:influencerId/balance
+ */
+export const getInfluencerWalletBalance = async (influencerId) => {
+  try {
+    const response = await apiClient.get(`/wallet/admin/influencer/${influencerId}/balance`);
+    return response.data;
+  } catch (error) {
+    console.error('Fetch influencer wallet balance error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to fetch influencer wallet balance.',
+      statusCode: 500
+    };
+  }
+};
+
+/**
+ * Fetch specific influencer wallet transactions details
+ * Method: GET
+ * URL: /wallet/admin/influencer/:influencerId/transactions
+ */
+export const getInfluencerWalletTransactions = async (influencerId) => {
+  try {
+    const response = await apiClient.get(`/wallet/admin/influencer/${influencerId}/transactions`);
+    return response.data;
+  } catch (error) {
+    console.error('Fetch influencer wallet transactions error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to fetch influencer wallet transactions.',
+      statusCode: 500
+    };
+  }
+};
+
+/**
+ * Fetch specific educator wallet balance details
+ * Method: GET
+ * URL: /wallet/admin/educator/:educatorId/balance
+ */
+export const getEducatorWalletBalance = async (educatorId) => {
+  try {
+    const response = await apiClient.get(`/wallet/admin/educator/${educatorId}/balance`);
+    return response.data;
+  } catch (error) {
+    console.error('Fetch educator wallet balance error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to fetch educator wallet balance.',
+      statusCode: 500
+    };
+  }
+};
+
+/**
+ * Fetch specific educator wallet transactions details
+ * Method: GET
+ * URL: /wallet/admin/educator/:educatorId/transactions
+ */
+export const getEducatorWalletTransactions = async (educatorId) => {
+  try {
+    const response = await apiClient.get(`/wallet/admin/educator/${educatorId}/transactions`);
+    return response.data;
+  } catch (error) {
+    console.error('Fetch educator wallet transactions error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to fetch educator wallet transactions.',
+      statusCode: 500
+    };
+  }
+};
+
+/**
+ * Fetch all support tickets
+ * Method: GET
+ * URL: /ticket/get-all-tickets
+ */
+export const getAllTickets = async (params = {}) => {
+  try {
+    const response = await apiClient.get('/ticket/get-all-tickets', { params });
+    return response.data;
+  } catch (error) {
+    console.error('Fetch all tickets error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to fetch tickets.',
+      statusCode: 500
+    };
+  }
+};
+
+/**
+ * Update support ticket status
+ * Method: PUT
+ * URL: /ticket/update-status/:ticketId
+ */
+export const updateTicketStatus = async (ticketId, payload) => {
+  try {
+    const response = await apiClient.put(`/ticket/update-status/${ticketId}`, payload);
+    return response.data;
+  } catch (error) {
+    console.error('Update ticket status error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to update ticket status.',
+      statusCode: 500
+    };
+  }
+};
+
+/**
+ * Delete support ticket
+ * Method: DELETE
+ * URL: /ticket/delete/:ticketId
+ */
+export const deleteTicket = async (ticketId) => {
+  try {
+    const response = await apiClient.delete(`/ticket/delete/${ticketId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Delete ticket error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to delete ticket.',
+      statusCode: 500
+    };
+  }
+};
+
+/**
+ * Add a new sub-admin
+ * Method: POST
+ * URL: /admin/sub-admins/add
+ */
+export const addSubAdmin = async (payload) => {
+  try {
+    const response = await apiClient.post('/admin/sub-admins/add', payload);
+    return response.data;
+  } catch (error) {
+    console.error('Add sub-admin error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to add sub-admin.',
+      statusCode: 500
+    };
+  }
+};
+
+/**
+ * Get all sub-admins
+ * Method: GET
+ * URL: /admin/sub-admins/all
+ */
+export const getSubAdmins = async () => {
+  try {
+    const response = await apiClient.get('/admin/sub-admins/all');
+    return response.data;
+  } catch (error) {
+    console.error('Get sub-admins error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to fetch sub-admins.',
+      statusCode: 500
+    };
+  }
+};
+
+/**
+ * Update a sub-admin (full modification)
+ * Method: PUT
+ * URL: /admin/sub-admins/update-sub-admin/:id
+ */
+export const updateSubAdmin = async (id, payload) => {
+  try {
+    const response = await apiClient.put(`/admin/sub-admins/update-sub-admin/${id}`, payload);
+    return response.data;
+  } catch (error) {
+    console.error('Update sub-admin error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to update sub-admin.',
+      statusCode: 500
+    };
+  }
+};
+
+/**
+ * Delete a sub-admin
+ * Method: DELETE
+ * URL: /admin/sub-admins/:id
+ */
+export const deleteSubAdmin = async (id) => {
+  try {
+    const response = await apiClient.delete(`/admin/sub-admins/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Delete sub-admin error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to delete sub-admin.',
+      statusCode: 500
+    };
+  }
+};
+
+/**
+ * Get sub-admin details by ID
+ * Method: GET
+ * URL: /admin/sub-admins/sub-admin-details/:id
+ */
+export const getSubAdminDetails = async (id) => {
+  try {
+    const response = await apiClient.get(`/admin/sub-admins/sub-admin-details/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Get sub-admin details error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to fetch sub-admin details.',
+      statusCode: 500
+    };
+  }
+};
+
+/**
+ * Fetch affiliate dashboard stats for admin
+ * Method: GET
+ * URL: /affiliate-dashboard/admin
+ */
+export const getAdminAffiliateDashboard = async () => {
+  try {
+    const response = await apiClient.get('/affiliate-dashboard/admin');
+    return response.data;
+  } catch (error) {
+    console.error('Fetch admin affiliate dashboard error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to fetch admin affiliate dashboard stats.',
+      statusCode: 500
+    };
+  }
+};
+
+/**
+ * Fetch affiliate ranking leaderboard for admin
+ * Method: GET
+ * URL: /affiliate-dashboard/ranking
+ * Params: month, year
+ */
+export const getAffiliateRanking = async (month, year) => {
+  try {
+    const response = await apiClient.get('/affiliate-dashboard/ranking', {
+      params: { month, year }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Fetch affiliate ranking error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to fetch affiliate ranking leaderboard.',
+      statusCode: 500
+    };
+  }
+};
+
+/**
+ * Get logged-in admin profile details
+ * Method: GET
+ * URL: /admin/profile/me
+ */
+export const getAdminProfile = async () => {
+  try {
+    const response = await apiClient.get('/admin/profile/me');
+    return response.data;
+  } catch (error) {
+    console.error('Get admin profile error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to fetch admin profile.',
+      statusCode: 500
+    };
+  }
+};
+
+/**
+ * Fetch all notification campaigns
+ * Method: GET
+ * URL: /admin/notification/all-campaigns
+ * Params: page, limit
+ */
+export const getAllCampaigns = async (page = 1, limit = 10) => {
+  try {
+    const response = await apiClient.get('/admin/notification/all-campaigns', {
+      params: { page, limit }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Fetch notification campaigns error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to fetch notification campaigns.',
+      statusCode: 500
+    };
+  }
+};
+
+/**
+ * Fetch all notifications
+ * Method: GET
+ * URL: /admin/notification/all-notifications
+ * Params: page, limit
+ */
+export const getAllNotifications = async (page = 1, limit = 10) => {
+  try {
+    const response = await apiClient.get('/admin/notification/all-notifications', {
+      params: { page, limit }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Fetch all notifications error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to fetch all notifications.',
+      statusCode: 500
+    };
+  }
+};
+
+/**
+ * Create a new notification campaign
+ * Method: POST
+ * URL: /admin/notification/add-campaign
+ * Body: { title, body, moduleType, action, data, sendOption, actionUrl, targetRoles, [scheduledAt], [isRecurring] }
+ */
+export const addCampaign = async (payload) => {
+  try {
+    const response = await apiClient.post('/admin/notification/add-campaign', payload);
+    return response.data;
+  } catch (error) {
+    console.error('Create campaign error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to create campaign.',
+      statusCode: 500
+    };
+  }
+};
+
+/**
+ * Update a notification campaign
+ * Method: PUT
+ * URL: /admin/notification/update-campaign/:id
+ * Body: { title, body, action, actionUrl, scheduledAt, targetRoles, sendOption }
+ */
+export const updateCampaign = async (id, payload) => {
+  try {
+    const response = await apiClient.put(`/admin/notification/update-campaign/${id}`, payload);
+    return response.data;
+  } catch (error) {
+    console.error('Update campaign error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to update campaign.',
+      statusCode: 500
+    };
+  }
+};
+
+/**
+ * Delete a notification campaign
+ * Method: DELETE
+ * URL: /admin/notification/delete-campaign/:id
+ */
+export const deleteCampaign = async (id) => {
+  try {
+    const response = await apiClient.delete(`/admin/notification/delete-campaign/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Delete campaign error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to delete campaign.',
+      statusCode: 500
+    };
+  }
+};
+
+/**
+ * Fetch all service leads for admin panel
+ * Method: GET
+ * URL: /service-leads/admin/all
+ */
+export const getAllServiceLeadsAdmin = async () => {
+  try {
+    const response = await apiClient.get('/service-leads/admin/all');
+    return response.data;
+  } catch (error) {
+    console.error('Fetch all service leads admin error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to fetch service leads.',
+      statusCode: 500
+    };
+  }
+};
+
+/**
+ * Delete a service lead by ID (Admin only)
+ * Method: DELETE
+ * URL: /service-leads/admin/delete-lead/:id
+ * @param {string} id - The Lead ID
+ */
+export const deleteServiceLeadAdmin = async (id) => {
+  try {
+    const response = await apiClient.delete(`/service-leads/admin/delete-lead/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Delete service lead admin error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to delete service lead.',
+      statusCode: 500
+    };
+  }
+};
 
 
 

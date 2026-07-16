@@ -70,11 +70,11 @@ const formatDuration = (days) => {
 
 const BoolBadge = ({ value, isDarkMode }) =>
   value ? (
-    <span className="inline-flex items-center gap-1 text-emerald-500 font-bold text-[10px]">
+    <span className="inline-flex items-center gap-1 text-emerald-500 font-bold text-sm">
       <CheckCircle2 size={13} /> Yes
     </span>
   ) : (
-    <span className={`inline-flex items-center gap-1 font-bold text-[10px] ${isDarkMode ? 'text-gray-600' : 'text-gray-300'}`}>
+    <span className={`inline-flex items-center gap-1 font-bold text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-300'}`}>
       <XCircle size={13} /> No
     </span>
   );
@@ -204,7 +204,7 @@ const SubscriptionPlans = ({ isDarkMode }) => {
               <span className={`text-sm font-bold uppercase tracking-wide ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
                 {plan.label || plan.name}
               </span>
-              <span className="text-[10px] font-bold text-gray-400 uppercase">
+              <span className="text-sm font-bold text-gray-400 uppercase">
                 Rank #{plan.priorityRank ?? '—'}
               </span>
             </div>
@@ -221,7 +221,7 @@ const SubscriptionPlans = ({ isDarkMode }) => {
             <span className={`text-sm font-black ${isFree ? 'text-emerald-500' : isDarkMode ? 'text-white' : 'text-gray-800'}`}>
               {isFree ? 'FREE' : `₹${plan.price.toLocaleString('en-IN')}`}
             </span>
-            <span className="text-[10px] uppercase font-bold text-gray-400">
+            <span className="text-sm uppercase font-bold text-gray-400">
               / {formatDuration(plan.durationDays)}
             </span>
           </div>
@@ -232,13 +232,13 @@ const SubscriptionPlans = ({ isDarkMode }) => {
       header: 'Limits (Service / Staff / Leads)',
       render: (plan) => (
         <div className="flex flex-wrap items-center gap-2">
-          <span className={`px-2.5 py-1 rounded-xl bg-primary/10 text-primary text-[10px] font-black uppercase tracking-wider`}>
+          <span className={`px-2.5 py-1 rounded-xl bg-primary/10 text-primary text-sm font-black uppercase tracking-wider`}>
             {plan.maxServices ?? '—'} Services
           </span>
-          <span className={`px-2.5 py-1 rounded-xl bg-violet-500/10 text-violet-500 text-[10px] font-black uppercase tracking-wider`}>
+          <span className={`px-2.5 py-1 rounded-xl bg-violet-500/10 text-violet-500 text-sm font-black uppercase tracking-wider`}>
             {plan.maxStaff ?? '—'} Staff
           </span>
-          <span className={`px-2.5 py-1 rounded-xl bg-amber-500/10 text-amber-500 text-[10px] font-black uppercase tracking-wider`}>
+          <span className={`px-2.5 py-1 rounded-xl bg-amber-500/10 text-amber-500 text-sm font-black uppercase tracking-wider`}>
             {plan.monthlyLeadLimit ?? '—'} Leads
           </span>
         </div>
@@ -257,15 +257,15 @@ const SubscriptionPlans = ({ isDarkMode }) => {
       render: (plan) => (
         <div className="flex flex-wrap gap-x-4 gap-y-1.5 max-w-xs">
           <div className="flex items-center gap-1.5">
-            <span className={`text-[10px] font-bold ${isDarkMode ? 'text-gray-500' : 'text-gray-400'} uppercase`}>Featured:</span>
+            <span className={`text-sm font-bold ${isDarkMode ? 'text-gray-500' : 'text-gray-400'} uppercase`}>Featured:</span>
             <BoolBadge value={plan.featuredListing} isDarkMode={isDarkMode} />
           </div>
           <div className="flex items-center gap-1.5">
-            <span className={`text-[10px] font-bold ${isDarkMode ? 'text-gray-500' : 'text-gray-400'} uppercase`}>Support:</span>
+            <span className={`text-sm font-bold ${isDarkMode ? 'text-gray-500' : 'text-gray-400'} uppercase`}>Support:</span>
             <BoolBadge value={plan.prioritySupport} isDarkMode={isDarkMode} />
           </div>
           <div className="flex items-center gap-1.5">
-            <span className={`text-[10px] font-bold ${isDarkMode ? 'text-gray-500' : 'text-gray-400'} uppercase`}>Analytics:</span>
+            <span className={`text-sm font-bold ${isDarkMode ? 'text-gray-500' : 'text-gray-400'} uppercase`}>Analytics:</span>
             <BoolBadge value={plan.analyticsAccess} isDarkMode={isDarkMode} />
           </div>
         </div>
@@ -276,7 +276,7 @@ const SubscriptionPlans = ({ isDarkMode }) => {
       render: (plan) => (
         <div className="flex items-center gap-2">
           <div className={`w-1.5 h-1.5 rounded-full ${plan.isActive ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]' : 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]'}`}></div>
-          <span className="text-[10px] font-semibold uppercase text-gray-400">{plan.isActive ? 'Active' : 'Inactive'}</span>
+          <span className="text-sm font-semibold uppercase text-gray-400">{plan.isActive ? 'Active' : 'Inactive'}</span>
         </div>
       )
     },

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
-import { Mail, Lock, User, ArrowRight, Eye, EyeOff, Loader2, ShieldCheck, KeyRound } from 'lucide-react';
+import { Mail, Lock, User, ArrowRight, Eye, EyeOff, Loader2, ShieldCheck, KeyRound, Phone, ChevronDown } from 'lucide-react';
 import { registerUser, verifyEmail, loginUser, verifyLoginOtp, sendForgotPasswordOtp, verifyForgotPasswordOtp, sendVerifyEmailOtp } from '../api/authService';
 
 const Auth = () => {
@@ -13,13 +13,15 @@ const Auth = () => {
     email: '',
     password: '',
     name: '',
-    role: 'user' // Default role
+    roles: ['user'], // Default roles as an array
+    phone: '' // Added phone
   });
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
   const [showOTP, setShowOTP] = useState(false);
   const [otp, setOtp] = useState('');
+  const [isRolesDropdownOpen, setIsRolesDropdownOpen] = useState(false);
 
   // Forgot Password States
   const [isForgotPassword, setIsForgotPassword] = useState(false);
@@ -35,8 +37,19 @@ const Auth = () => {
     { id: 'user', name: 'User' },
     { id: 'vendor', name: 'Vendor' },
     { id: 'service_provider', name: 'Service Provider' },
-    { id: 'distributor', name: 'Distributor' },
+   
+    { id: 'educator', name: 'Educator' },
   ];
+
+  const handleRoleCheckboxChange = (roleId) => {
+    setFormData(prev => {
+      const currentRoles = prev.roles || [];
+      const updatedRoles = currentRoles.includes(roleId)
+        ? currentRoles.filter(r => r !== roleId)
+        : [...currentRoles, roleId];
+      return { ...prev, roles: updatedRoles };
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -49,17 +62,37 @@ const Auth = () => {
           email: formData.email,
           password: formData.password
         });
-        const result = response.data || response;
+        const result = response;
 
         if (response.success && result.success) {
           setMessage({
             type: 'success',
-            text: result.message || 'OTP sent successfully'
+            text: result.message || 'Login successful!'
           });
+          
+          const sessionData = {
+            user: result.data.safeUser,
+            token: result.data.access_token,
+            isLoggedIn: true
+          };
+          login(sessionData);
+
           setTimeout(() => {
-            setShowOTP(true);
-            setMessage({ type: '', text: '' });
-          }, 2000);
+            const user = result.data.safeUser;
+            let role = user.role || (Array.isArray(user.roles) ? (user.roles.find(r => r !== 'user') || 'user') : 'user');
+            if (role === 'super_admin') role = 'admin';
+            if (role === 'admin') navigate('/admin?tab=dashboard');
+            else if (role === 'vendor') {
+              if (user.vendorId) navigate('/vendor/dashboard');
+              else navigate('/vendor/register');
+            }
+            else if (role === 'influencer') navigate('/influencer/dashboard');
+            else if (role === 'distributor') navigate('/distributor/dashboard');
+            else if (role === 'service_provider') navigate('/service-provider/dashboard');
+            else if (role === 'educator') {
+              navigate('/educator/dashboard');
+            } else navigate('/');
+          }, 1500);
         } else {
           setMessage({
             type: 'error',
@@ -76,8 +109,15 @@ const Auth = () => {
       }
     } else {
       try {
-        const response = await registerUser(formData);
-        const result = response.data || response;
+        const payload = {
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          password: formData.password,
+          roles: formData.roles && formData.roles.length > 0 ? formData.roles : ['user']
+        };
+        const response = await registerUser(payload);
+        const result = response;
 
         if (response.success && result.success) {
           setMessage({
@@ -120,7 +160,7 @@ const Auth = () => {
         ? await verifyLoginOtp(payload)
         : await verifyEmail(payload);
 
-      const result = response.data || response;
+      const result = response;
 
       if (response.success && result.success) {
         setMessage({
@@ -138,7 +178,8 @@ const Auth = () => {
 
           setTimeout(() => {
             const user = result.data.safeUser;
-            const role = user.role;
+            let role = user.role || (Array.isArray(user.roles) ? (user.roles.find(r => r !== 'user') || 'user') : 'user');
+            if (role === 'super_admin') role = 'admin';
             if (role === 'admin') navigate('/admin?tab=dashboard');
             else if (role === 'vendor') {
               if (user.vendorId) navigate('/vendor/dashboard');
@@ -147,7 +188,9 @@ const Auth = () => {
             else if (role === 'influencer') navigate('/influencer/dashboard');
             else if (role === 'distributor') navigate('/distributor/dashboard');
             else if (role === 'service_provider') navigate('/service-provider/dashboard');
-            else navigate('/');
+            else if (role === 'educator') {
+              navigate('/educator/dashboard');
+            } else navigate('/');
           }, 1500);
         } else {
           setTimeout(() => {
@@ -178,7 +221,7 @@ const Auth = () => {
     setMessage({ type: '', text: '' });
     try {
       const response = await sendVerifyEmailOtp({ email: formData.email });
-      const result = response.data || response;
+      const result = response;
       if (response.success && result.success) {
         setMessage({ type: 'success', text: result.message || 'OTP resent successfully!' });
       } else {
@@ -199,7 +242,7 @@ const Auth = () => {
     try {
       if (forgotStep === 1) {
         const response = await sendForgotPasswordOtp({ email: resetData.email });
-        const result = response.data || response;
+        const result = response;
         if (response.success && result.success) {
           setMessage({ type: 'success', text: result.message || 'OTP sent successfully!' });
           setForgotStep(2);
@@ -214,7 +257,7 @@ const Auth = () => {
         }
 
         const response = await verifyForgotPasswordOtp(resetData);
-        const result = response.data || response;
+        const result = response;
         if (response.success && result.success) {
           setMessage({ type: 'success', text: 'Password reset successful!' });
           setTimeout(() => {
@@ -465,21 +508,66 @@ const Auth = () => {
                     />
                   </div>
 
+                  <div className="relative">
+                    <span className="absolute left-4 text-xs font-bold text-gray-400 uppercase -top-2 bg-white px-1 whitespace-nowrap z-10 pointer-events-none">Select Roles</span>
+                    <button
+                      type="button"
+                      onClick={() => setIsRolesDropdownOpen(!isRolesDropdownOpen)}
+                      style={{ border: '1px solid #e5e7eb' }}
+                      className="flex justify-between items-center w-full pl-4 pr-3 py-3 border border-solid border-gray-200 rounded-xl bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary sm:text-sm transition-all font-bold cursor-pointer"
+                    >
+                      <span className="truncate">
+                        {roles.filter(r => formData.roles?.includes(r.id)).map(r => r.name).join(', ') || 'Select Roles'}
+                      </span>
+                      <ChevronDown size={18} className="text-gray-400 shrink-0 ml-2" />
+                    </button>
+
+                    {isRolesDropdownOpen && (
+                      <>
+                        <div 
+                          className="fixed inset-0 z-10" 
+                          onClick={() => setIsRolesDropdownOpen(false)}
+                        />
+                        <div className="absolute z-20 mt-1.5 w-full bg-white border border-gray-200 rounded-xl shadow-lg p-2 max-h-60 overflow-y-auto space-y-1 animate-in fade-in slide-in-from-top-1 duration-200">
+                          {roles.map(role => {
+                            const isChecked = formData.roles?.includes(role.id);
+                            return (
+                              <label 
+                                key={role.id} 
+                                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer select-none transition-colors ${
+                                  isChecked 
+                                    ? 'bg-primary/5 text-primary' 
+                                    : 'hover:bg-gray-50 text-gray-600'
+                                }`}
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={isChecked}
+                                  onChange={() => handleRoleCheckboxChange(role.id)}
+                                  className="h-4 w-4 rounded text-primary focus:ring-primary border-gray-300 cursor-pointer"
+                                />
+                                <span className="text-sm font-bold">{role.name}</span>
+                              </label>
+                            );
+                          })}
+                        </div>
+                      </>
+                    )}
+                  </div>
+
                   <div className="relative group">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-focus-within:text-primary transition-colors">
-                      <User size={18} className="opacity-0" />
-                      <span className="absolute left-10 text-xs font-bold text-gray-400 uppercase -top-2 bg-white px-1">Select Role</span>
+                      <Phone size={18} />
                     </div>
-                    <select
-                      name="role"
-                      value={formData.role}
+                    <input
+                      name="phone"
+                      type="tel"
+                      required
+                      value={formData.phone}
                       onChange={handleInputChange}
-                      className="block w-full pl-3 pr-3 py-3 border border-gray-200 rounded-xl leading-5 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary sm:text-sm transition-all appearance-none font-bold"
-                    >
-                      {roles.map(role => (
-                        <option key={role.id} value={role.id}>{role.name}</option>
-                      ))}
-                    </select>
+                      className="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-xl leading-5 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary sm:text-sm transition-all font-bold"
+                      placeholder="Phone Number"
+                    />
                   </div>
                 </>
               )}
@@ -575,7 +663,7 @@ const Auth = () => {
                 <div className="w-full border-t border-gray-100"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-white text-gray-400 font-bold uppercase text-[10px]">
+                <span className="px-4 bg-white text-gray-400 font-bold uppercase text-sm">
                   {isLogin ? 'New to Wakeup?' : 'Already have an account?'}
                 </span>
               </div>

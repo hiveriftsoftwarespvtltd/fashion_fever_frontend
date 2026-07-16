@@ -3,24 +3,32 @@ import { ShoppingBag, Heart, Star, Loader2, ChevronLeft, ChevronRight } from 'lu
 import { getProducts } from '../api/productService';
 import { addToCart } from '../api/cartService';
 import { addToWishlist, getWishlist, removeFromWishlist } from '../api/wishlistService';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { toast } from '../utils/toast';
 import { useCart } from '../context/CartContext';
+import ProductCard from './shared/ProductCard';
 
 const ProductSection = () => {
+  const navigate = useNavigate();
   const { cart, addToCart: addGlobalCart, removeFromCart, updateQty } = useCart();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [addingId, setAddingId] = useState(null);
   const [wishlistIds, setWishlistIds] = useState([]);
+
   const scrollRef    = useRef(null);
   const rafRef       = useRef(null);
   const isPausedRef  = useRef(false);
 
   const scrollBy = (dir) => {
     isPausedRef.current = true;
-    scrollRef.current?.scrollBy({ left: dir * 260, behavior: 'smooth' });
-    setTimeout(() => { isPausedRef.current = false; }, 900);
+    const el = scrollRef.current;
+    if (el) {
+      // Scroll by one viewport page width (adjusted slightly)
+      const offset = el.clientWidth * 0.8 * dir;
+      el.scrollBy({ left: offset, behavior: 'smooth' });
+    }
+    setTimeout(() => { isPausedRef.current = false; }, 1000);
   };
 
   // ── Smooth auto-scroll via RAF ──────────────────────────────────
@@ -48,7 +56,7 @@ const ProductSection = () => {
     const el = scrollRef.current;
     if (!el) return;
     const pause  = () => { isPausedRef.current = true; };
-    const resume = () => { setTimeout(() => { isPausedRef.current = false; }, 1000); };
+    const resume = () => { setTimeout(() => { isPausedRef.current = false; }, 1200); };
     el.addEventListener('touchstart', pause,  { passive: true });
     el.addEventListener('touchend',   resume, { passive: true });
     return () => {
@@ -160,7 +168,6 @@ const ProductSection = () => {
   };
 
   const getImageUrl = (variant, product) => {
-    // Multi-dimensional array structures image dynamic fallbacks paths checks
     if (variant?.thumbnail?.url) return variant.thumbnail.url;
     if (typeof variant?.thumbnail === 'string') return variant.thumbnail;
     if (product?.images?.[0]?.url) return product.images[0].url;
@@ -197,7 +204,7 @@ const ProductSection = () => {
           {/* ← Prev */}
           <button
             onClick={() => scrollBy(-1)}
-            className="absolute left-0 top-1/2 -translate-y-6 z-20 w-10 h-10 rounded-full bg-white border border-gray-100 shadow-md flex items-center justify-center text-gray-600 hover:text-primary hover:border-primary transition-all duration-200 hover:scale-105"
+            className="absolute left-0 top-1/2 -translate-y-6 z-20 w-10 h-10 rounded-full bg-white border border-gray-100 shadow-md flex items-center justify-center text-gray-600 hover:text-primary hover:border-primary transition-all duration-200 hover:scale-105 cursor-pointer"
             aria-label="Previous"
           >
             <ChevronLeft className="w-5 h-5" />
@@ -206,7 +213,7 @@ const ProductSection = () => {
           {/* → Next */}
           <button
             onClick={() => scrollBy(1)}
-            className="absolute right-0 top-1/2 -translate-y-6 z-20 w-10 h-10 rounded-full bg-white border border-gray-100 shadow-md flex items-center justify-center text-gray-600 hover:text-primary hover:border-primary transition-all duration-200 hover:scale-105"
+            className="absolute right-0 top-1/2 -translate-y-6 z-20 w-10 h-10 rounded-full bg-white border border-gray-100 shadow-md flex items-center justify-center text-gray-600 hover:text-primary hover:border-primary transition-all duration-200 hover:scale-105 cursor-pointer"
             aria-label="Next"
           >
             <ChevronRight className="w-5 h-5" />
@@ -220,146 +227,21 @@ const ProductSection = () => {
             onMouseEnter={() => { isPausedRef.current = true; }}
             onMouseLeave={() => { isPausedRef.current = false; }}
           >
-          {products.map((product) => {
-            const firstVariant = product.variants?.[0];
-            const uniqueId = firstVariant?._id || product._id;
-            const isItemWishlisted = wishlistIds.includes(firstVariant?._id);
-
-            return (
-              <div
-                key={product._id}
-                className="group flex flex-col flex-shrink-0 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden w-[200px] sm:w-[220px] lg:w-[240px]"
-              >
-                {/* Image Wrapper Block */}
-                <div className="relative aspect-[4/3] sm:aspect-square overflow-hidden bg-gray-50">
-                  <Link to={`/product/${product._id}`}>
-                    <img 
-                      src={getImageUrl(firstVariant, product)} 
-                      alt={product.name} 
-                      className="w-full h-full object-cover transition-transform duration-700 ease-in-out group-hover:scale-105"
-                      onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=400&h=500&fit=crop'; }}
-                    />
-                  </Link>
-                  
-                  {/* Floating Action Badge */}
-                  <div className="absolute top-2 right-2 sm:top-3 sm:right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 z-10">
-                    <button 
-                      onClick={() => handleAddToWishlist(product._id, firstVariant?._id)}
-                      className={`w-7 h-7 sm:w-9 sm:h-9 rounded-full flex items-center justify-center shadow-md transition-all active:scale-95 bg-white/90 backdrop-blur-md cursor-pointer ${
-                        isItemWishlisted ? 'text-primary' : 'text-gray-400 hover:text-primary'
-                      }`}
-                    >
-                      <Heart 
-                        size={14} 
-                        fill={isItemWishlisted ? "currentColor" : "none"} 
-                        className={isItemWishlisted ? "fill-primary animate-bounce-short" : ""}
-                      />
-                    </button>
-                  </div>
+            {products.map((product) => {
+              const firstVariant = product.variants?.[0];
+              return (
+                <div
+                  key={product._id}
+                  className="flex-shrink-0 w-[calc((100%-1rem)/2)] sm:w-[calc((100%-1.5rem)/2)] md:w-[calc((100%-2rem)/3)] lg:w-[calc((100%-3rem)/4)] xl:w-[calc((100%-4rem)/5)]"
+                >
+                  <ProductCard
+                    product={product}
+                    isWishlisted={wishlistIds.includes(firstVariant?._id)}
+                    onWishlistToggle={() => handleAddToWishlist(product._id, firstVariant?._id)}
+                  />
                 </div>
-
-                {/* Content Details Grid */}
-                <div className="p-2.5 sm:p-4 flex-grow flex flex-col justify-between text-left bg-white">
-                  <div>
-                    <div className="flex justify-between items-start mb-1 sm:mb-1.5">
-                      <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-primary/80">
-                        {product.brand || 'WakeUp Luxe'}
-                      </span>
-                      {/* Ratings Star Row */}
-                      <div className="flex items-center gap-0.5 sm:gap-1 bg-gray-50 px-1 sm:px-1.5 py-0.5 rounded-md border border-gray-100">
-                        <Star size={9} fill="currentColor" className="text-yellow-500" />
-                        <span className="text-[9px] sm:text-[10px] font-bold text-gray-700">{product.rating || '4.2'}</span>
-                      </div>
-                    </div>
-                    
-                    <Link to={`/product/${product._id}`}>
-                      <h3 className="text-xs sm:text-sm font-bold text-gray-800 line-clamp-2 hover:text-primary transition-colors leading-snug mb-1 sm:mb-2">
-                        {product.name}
-                      </h3>
-                    </Link>
-
-                    {/* Pricing Fields */}
-                    <div className="flex items-center flex-wrap gap-1.5 sm:gap-2 mb-2 sm:mb-4">
-                      <span className="text-sm sm:text-lg font-black text-gray-900">₹{firstVariant?.salesPrice || firstVariant?.price || 0}</span>
-                      {firstVariant?.salesPrice < firstVariant?.price && (
-                        <>
-                          <span className="text-[10px] sm:text-xs font-medium text-gray-400 line-through">₹{firstVariant.price}</span>
-                          <span className="text-[8px] sm:text-[10px] font-bold text-green-700 bg-green-100/80 px-1 sm:px-1.5 py-0.5 rounded uppercase tracking-wide ml-0 sm:ml-1">
-                            {Math.round(((firstVariant.price - firstVariant.salesPrice) / firstVariant.price) * 100)}% Off
-                          </span>
-                        </>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Quantity In-Bag Management Controls Toggle */}
-                  <div className="mt-auto">
-                    {(() => {
-                      const cartItem = cart?.find(item => item.id === firstVariant?._id);
-                      const isInCart = !!cartItem;
-                      
-                      return isInCart ? (
-                        <div className="w-full h-10 border border-primary/20 rounded-lg flex items-center justify-between overflow-hidden bg-primary/5 text-primary text-xs font-bold uppercase select-none shadow-sm">
-                          <button
-                            onClick={() => {
-                              if (cartItem.qty === 1) {
-                                removeFromCart(cartItem.id);
-                                toast.success("Removed from Bag");
-                              } else {
-                                updateQty(cartItem.id, -1, product._id);
-                              }
-                            }}
-                            className="w-10 h-full flex items-center justify-center hover:bg-primary/10 text-lg transition-colors cursor-pointer"
-                          >
-                            -
-                          </button>
-                          <span className="flex-grow text-center text-[11px] tracking-normal font-bold">
-                            {cartItem.qty} IN BAG
-                          </span>
-                          <button
-                            onClick={() => {
-                              if (firstVariant?.stock && cartItem.qty >= firstVariant.stock) {
-                                toast.error("Maximum available stock reached!");
-                              } else {
-                                updateQty(cartItem.id, 1, product._id);
-                              }
-                            }}
-                            className="w-10 h-full flex items-center justify-center hover:bg-primary/10 text-lg transition-colors cursor-pointer"
-                          >
-                            +
-                          </button>
-                        </div>
-                      ) : (
-                        <button 
-                          onClick={async () => {
-                            const cartItemLocal = {
-                              id: firstVariant?._id,
-                              name: `${product.name} ${firstVariant?.attributes?.color ? `(${firstVariant.attributes.color})` : ''}`,
-                              price: firstVariant?.salesPrice || firstVariant?.price || 0,
-                              image: firstVariant?.thumbnail?.url || (product.images?.[0]?.url || product.images?.[0]) || '',
-                            };
-                            addGlobalCart(cartItemLocal, firstVariant?._id, product._id);
-                            toast.success("Added to Bag!");
-                            await handleAddToCart(product._id, firstVariant?._id);
-                          }}
-                          disabled={addingId === firstVariant?._id || (firstVariant?.stock !== undefined && firstVariant.stock <= 0)}
-                          className="w-full bg-gray-900 text-white hover:bg-primary py-2.5 rounded-lg text-[11px] font-bold uppercase transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed tracking-wider shadow-md hover:shadow-lg cursor-pointer"
-                        >
-                          {addingId === firstVariant?._id ? (
-                            <Loader2 size={14} className="animate-spin" />
-                          ) : (firstVariant?.stock !== undefined && firstVariant.stock <= 0) ? (
-                            "Out of Stock"
-                          ) : (
-                            "Add to Bag"
-                          )}
-                        </button>
-                      );
-                    })()}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+              );
+            })}
           </div>
         </div>
       </div>

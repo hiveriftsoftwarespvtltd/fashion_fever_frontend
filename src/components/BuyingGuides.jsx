@@ -1,5 +1,10 @@
 import React, { useRef } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import buyingguid3 from '../assets/buyingguid3.png';
+import buyingguid from '../assets/buyingguid.png';
+import buyingguid4 from '../assets/buyingguid4.png';
+import buyingguid2 from '../assets/buyingguid2.png';
 
 const BuyingGuides = () => {
  const scrollRef = useRef(null);
@@ -7,12 +12,10 @@ const BuyingGuides = () => {
  const dealsRef = useRef(null);
 
  const guides = [
-  "https://images-static.nykaa.com/uploads/d34d6043-8de4-464f-b624-81853bde56a0.jpg?tr=cm-pad_resize,w-300",
-  "https://images-static.nykaa.com/uploads/2b98013d-a3b9-456c-8fbb-5a441db61a44.jpg?tr=cm-pad_resize,w-300",
-  "https://images-static.nykaa.com/uploads/98a83a53-a37f-44e2-bf73-2f352136fd7b.jpg?tr=cm-pad_resize,w-300",
-  "https://images-static.nykaa.com/uploads/963fc0f3-5279-4701-9cf8-90579aa6726d.jpg?tr=cm-pad_resize,w-300",
-  "https://images-static.nykaa.com/uploads/fc1a4d2c-040e-45e9-bbed-0d22467cd112.jpg?tr=cm-pad_resize,w-300",
-  "https://images-static.nykaa.com/uploads/fc1a4d2c-040e-45e9-bbed-0d22467cd112.jpg?tr=cm-pad_resize,w-300"
+  buyingguid3,
+  buyingguid,
+  buyingguid4,
+  buyingguid2
  ];
 
  const brands = [

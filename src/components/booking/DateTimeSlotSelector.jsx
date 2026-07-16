@@ -34,6 +34,21 @@ const DateTimeSlotSelector = ({
     return dates;
   };
 
+  // Helper to format ISO time string to only time (e.g. 03:30 AM)
+  const formatSlotTime = (isoString) => {
+    if (!isoString) return '';
+    try {
+      const date = new Date(isoString);
+      return date.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      });
+    } catch (e) {
+      return isoString;
+    }
+  };
+
   return (
     <div ref={scheduleRef} className="space-y-6 scroll-mt-24">
       <div className="flex justify-between items-center border-b border-gray-200/60 pb-3">
@@ -54,7 +69,7 @@ const DateTimeSlotSelector = ({
           
           {/* Date scroller header */}
           <div className="space-y-2">
-            <span className="text-[10px] font-black uppercase text-gray-400">Select Date</span>
+            <span className="text-sm font-black uppercase text-gray-400">Select Date</span>
             <div className="flex gap-2.5 overflow-x-auto pb-2 scrollbar-thin">
               {getNext7Days().map((d) => {
                 const isSel = selectedDate === d.dateString;
@@ -84,7 +99,7 @@ const DateTimeSlotSelector = ({
 
           {/* Available Time Slots Grid */}
           <div className="space-y-3 pt-4 border-t border-gray-100">
-            <span className="text-[10px] font-black uppercase text-gray-400 block">Available Slots</span>
+            <span className="text-sm font-black uppercase text-gray-400 block">Available Slots</span>
             
             {slotsLoading ? (
               <div className="py-12 bg-white rounded-3xl flex flex-col items-center justify-center text-center p-6">
@@ -106,7 +121,7 @@ const DateTimeSlotSelector = ({
                       type="button"
                       disabled={!isAvail}
                       onClick={() => setSelectedSlot(slot)}
-                      className={`py-4 px-2 rounded-2xl text-[10px] font-black uppercase border-2 text-center transition-all cursor-pointer flex flex-col justify-center items-center gap-1 ${
+                      className={`py-4 px-2 rounded-2xl text-sm font-black uppercase border-2 text-center transition-all cursor-pointer flex flex-col justify-center items-center gap-1 ${
                         isSel 
                           ? 'bg-primary border-primary text-white shadow-lg shadow-primary/25 scale-[1.02]' 
                           : isAvail
@@ -114,7 +129,7 @@ const DateTimeSlotSelector = ({
                           : 'bg-gray-100 border-transparent text-gray-350 cursor-not-allowed opacity-50'
                       }`}
                     >
-                      <span className="leading-none">{slot.startTime} - {slot.endTime}</span>
+                      <span className="leading-none">{formatSlotTime(slot.startTime)} - {formatSlotTime(slot.endTime)}</span>
                       <span className={`text-[7px] font-black px-1.5 py-0.5 rounded uppercase leading-none mt-1 ${
                         isSel 
                           ? 'bg-white/20 text-white' 
@@ -141,7 +156,7 @@ const DateTimeSlotSelector = ({
               <ShieldCheck size={18} />
             </div>
             <div>
-              <p className="text-[10px] font-black text-green-700 uppercase leading-none mb-1">
+              <p className="text-sm font-black text-green-700 uppercase leading-none mb-1">
                 Instant Confirmation
               </p>
               <p className="text-[8px] font-extrabold text-green-600/75 uppercase leading-none">

@@ -67,7 +67,7 @@ export const CommissionSlabDetailsModal = ({ slabId, onClose }) => {
                 </div>
                 <div>
                   <h3 className="text-lg font-black uppercase tracking-wide">Slab Details</h3>
-                  <p className="text-[10px] font-bold text-gray-400 uppercase">Interactive view of commission structure</p>
+                  <p className="text-sm font-bold text-gray-400 uppercase">Interactive view of commission structure</p>
                 </div>
               </div>
               <button 
@@ -87,7 +87,7 @@ export const CommissionSlabDetailsModal = ({ slabId, onClose }) => {
               <span className="text-5xl font-black text-primary tracking-tighter">
                 {slab.commissionRate}%
               </span>
-              <p className="text-[10px] font-black uppercase text-gray-400 mt-2 tracking-wider">
+              <p className="text-sm font-black uppercase text-gray-400 mt-2 tracking-wider">
                 Payout Commission Rate
               </p>
             </div>
@@ -98,7 +98,7 @@ export const CommissionSlabDetailsModal = ({ slabId, onClose }) => {
               <div className={`p-4 rounded-2xl border text-left ${
                 isDarkMode ? 'bg-gray-900/30 border-white/5' : 'bg-gray-50 border-gray-100'
               }`}>
-                <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
+                <span className="text-sm font-black text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
                   <TrendingUp size={12} className="text-primary" /> Active Sales Target Range
                 </span>
                 <div className="flex items-baseline gap-2 mt-2">
@@ -116,7 +116,7 @@ export const CommissionSlabDetailsModal = ({ slabId, onClose }) => {
               <div className={`flex items-center justify-between p-4 rounded-2xl border text-left ${
                 isDarkMode ? 'bg-gray-900/30 border-white/5' : 'bg-gray-50 border-gray-100'
               }`}>
-                <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider">
+                <span className="text-sm font-black text-gray-400 uppercase tracking-wider">
                   Slab System Status
                 </span>
                 <div className="flex items-center gap-2">
@@ -135,20 +135,20 @@ export const CommissionSlabDetailsModal = ({ slabId, onClose }) => {
               <div className={`p-4 rounded-2xl border text-left space-y-3 ${
                 isDarkMode ? 'bg-gray-900/30 border-white/5' : 'bg-gray-50 border-gray-100'
               }`}>
-                <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
+                <span className="text-sm font-black text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
                   <Calendar size={12} className="text-primary" /> Audit Timeline
                 </span>
                 <div className="space-y-2 border-l border-gray-200 dark:border-gray-700 pl-3 ml-1.5 pt-0.5">
                   <div className="relative">
                     <div className="absolute -left-[16.5px] top-1 w-2.5 h-2.5 rounded-full bg-primary border-2 border-white dark:border-gray-800" />
-                    <p className="text-[10px] font-bold text-gray-400 uppercase">Created On</p>
+                    <p className="text-sm font-bold text-gray-400 uppercase">Created On</p>
                     <p className={`text-xs font-bold ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                       {new Date(slab.createdAt).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}
                     </p>
                   </div>
                   <div className="relative pt-2">
                     <div className="absolute -left-[16.5px] top-3 w-2.5 h-2.5 rounded-full bg-pink-400 border-2 border-white dark:border-gray-800" />
-                    <p className="text-[10px] font-bold text-gray-400 uppercase">Last Updated</p>
+                    <p className="text-sm font-bold text-gray-400 uppercase">Last Updated</p>
                     <p className={`text-xs font-bold ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                       {new Date(slab.updatedAt).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}
                     </p>

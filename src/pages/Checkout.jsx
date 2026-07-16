@@ -10,9 +10,11 @@ import {
   User,
   ShoppingBag,
   Loader2,
-  Truck
+  Truck,
+  Wallet
 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { useWallet } from '../context/WalletContext';
 import { getCartDetails, getCoupons, validateCoupon, placeOrder } from '../api/cartService';
 import { addAddress, getAddresses, editAddress, deleteAddress } from '../api/authService';
 import { toast } from '../utils/toast';
@@ -23,6 +25,7 @@ const Checkout = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState('cod');
+  const { balanceData, refreshWalletBalance } = useWallet();
   const { cartId, cart, clearCart } = useCart();
   const [isConfirmingOrder, setIsConfirmingOrder] = useState(false);
   const [detailedCart, setDetailedCart] = useState(null);
@@ -87,6 +90,13 @@ const Checkout = () => {
       }
     });
     return Object.values(merged);
+  };
+
+  const getFinalTotal = () => {
+    const baseTotal = detailedCart?.cartSummary?.finalTotal || cart?.reduce((acc, item) => acc + (item.price * item.qty), 0) || 0;
+    const codCharge = paymentMethod === 'cod' ? (detailedCart?.cartSummary?.codCharge || 0) : 0;
+    const discount = appliedCoupon?.discount || 0;
+    return Math.max(0, baseTotal + codCharge - discount);
   };
 
   // Dynamic Product Hydration inside Checkout from /cart/cart-details/:addressId
@@ -234,6 +244,15 @@ const Checkout = () => {
       return;
     }
 
+    if (paymentMethod === 'wallet') {
+      const orderTotal = getFinalTotal();
+      const currentBalance = balanceData?.balance || 0;
+      if (currentBalance < orderTotal) {
+        toast.error("Insufficient wallet balance. Please choose another payment method.");
+        return;
+      }
+    }
+
     setIsConfirmingOrder(true);
     
     Swal.fire({
@@ -270,7 +289,7 @@ const Checkout = () => {
 
       const payload = {
         addressId: selectedAddressId,
-        paymentMethod: "CashOnDelivery",
+        paymentMethod: paymentMethod === 'wallet' ? 'Wallet' : 'CashOnDelivery',
         couponCode: appliedCoupon?.code || null,
         notes: orderNotes,
         items: orderItems
@@ -284,12 +303,19 @@ const Checkout = () => {
 
       if (success) {
         await clearCart(); // Clear local and database cart
+        if (paymentMethod === 'wallet') {
+          await refreshWalletBalance(); // Refresh global wallet balance dynamically
+        }
         
         Swal.fire({
           title: 'Order Placed Successfully! 🎉',
           html: `
             <div class="space-y-4 text-left font-outfit mt-2">
-              <p class="text-xs text-gray-600 font-medium leading-relaxed">Thank you for shopping with WakeUp Makeup. Your order is secured under Cash on Delivery (COD).</p>
+              <p class="text-xs text-gray-600 font-medium leading-relaxed">
+                ${paymentMethod === 'wallet' 
+                  ? 'Thank you for shopping with WakeUp Makeup. Your payment has been processed successfully using your Wallet balance.' 
+                  : 'Thank you for shopping with WakeUp Makeup. Your order is secured under Cash on Delivery (COD).'}
+              </p>
               <div class="bg-gray-50/80 p-5 rounded-2xl border border-gray-100/60 text-xs font-bold text-gray-500 uppercase space-y-2">
                 <div class="flex justify-between border-b border-gray-200/40 pb-2">
                   <span>Order ID:</span>
@@ -305,7 +331,9 @@ const Checkout = () => {
                 </div>
                 <div class="flex justify-between">
                   <span>Payment Mode:</span>
-                  <span class="text-primary font-black">COD (Cash on Delivery)</span>
+                  <span class="text-primary font-black">
+                    ${paymentMethod === 'wallet' ? 'Wallet Payment (Paid)' : 'COD (Cash on Delivery)'}
+                  </span>
                 </div>
               </div>
             </div>
@@ -402,7 +430,7 @@ const Checkout = () => {
                 {!isFormOpen && addresses.length > 0 ? (
                   /* Saved Addresses List View */
                   <div className="space-y-5">
-                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-wider">Select a Delivery Address</p>
+                    <p className="text-sm font-black text-gray-400 uppercase tracking-wider">Select a Delivery Address</p>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {addresses.map((addr) => {
@@ -506,7 +534,7 @@ const Checkout = () => {
                         <div className="w-8 h-8 rounded-xl bg-gray-50 group-hover:bg-primary/5 flex items-center justify-center border border-gray-100 group-hover:border-primary/20 transition-all">
                           <Plus size={16} />
                         </div>
-                        <span className="text-[10px] font-black uppercase">Add New Address</span>
+                        <span className="text-sm font-black uppercase">Add New Address</span>
                       </button>
                     </div>
 
@@ -521,7 +549,7 @@ const Checkout = () => {
                   /* Edit / Add Address Form View */
                   <div className="space-y-6">
                     <div className="flex justify-between items-center">
-                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-wider">
+                      <p className="text-sm font-black text-gray-400 uppercase tracking-wider">
                         {editingAddressId ? 'Modify Address (PATCH Mode)' : 'New Address'}
                       </p>
                       {addresses.length > 0 && (
@@ -530,7 +558,7 @@ const Checkout = () => {
                             setIsFormOpen(false);
                             setEditingAddressId(null);
                           }}
-                          className="text-[10px] font-black text-primary hover:text-primary-hover uppercase tracking-wider underline cursor-pointer"
+                          className="text-sm font-black text-primary hover:text-primary-hover uppercase tracking-wider underline cursor-pointer"
                         >
                           Back to Saved List
                         </button>
@@ -663,7 +691,7 @@ const Checkout = () => {
                             setIsFormOpen(false);
                             setEditingAddressId(null);
                           }}
-                          className="px-6 py-4 border-2 border-gray-100 hover:bg-gray-50 rounded-xl font-black uppercase text-[10px] transition-all cursor-pointer text-gray-500"
+                          className="px-6 py-4 border-2 border-gray-100 hover:bg-gray-50 rounded-xl font-black uppercase text-sm transition-all cursor-pointer text-gray-500"
                         >
                           Cancel
                         </button>
@@ -735,23 +763,90 @@ const Checkout = () => {
                 </div>
 
                 <div className="space-y-4">
-                  <div className="w-full p-5 rounded-2xl border-2 border-primary bg-primary/[0.02] flex items-center justify-between">
-                    <div className="flex items-center gap-3.5">
-                      <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-                        <Truck size={20} className="stroke-[2.5]" />
+                  {/* Select Payment Method Options */}
+                  <div className="space-y-3">
+                    {/* Option 1: Cash on Delivery */}
+                    <div 
+                      onClick={() => setPaymentMethod('cod')}
+                      className={`w-full p-5 rounded-2xl border-2 flex items-center justify-between cursor-pointer transition-all ${
+                        paymentMethod === 'cod' 
+                          ? 'border-primary bg-primary/[0.02]' 
+                          : 'border-gray-100 hover:border-gray-200 bg-white'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3.5">
+                        <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                          <Truck size={20} className="stroke-[2.5]" />
+                        </div>
+                        <div>
+                          <span className="text-xs font-black uppercase text-gray-800 block">Cash on Delivery (COD)</span>
+                          <span className="text-[9px] font-bold text-gray-400 uppercase mt-0.5 block">Pay cash or scan QR upon delivery</span>
+                        </div>
                       </div>
-                      <div>
-                        <span className="text-xs font-black uppercase text-gray-800 block">Cash on Delivery (COD)</span>
-                        <span className="text-[9px] font-bold text-gray-400 uppercase mt-0.5 block">Pay cash or scan QR upon delivery</span>
+                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
+                        paymentMethod === 'cod' ? 'border-primary' : 'border-gray-300'
+                      }`}>
+                        {paymentMethod === 'cod' && <div className="w-2.5 h-2.5 bg-primary rounded-full"></div>}
                       </div>
                     </div>
-                    <div className="w-5 h-5 rounded-full border-2 border-primary flex items-center justify-center">
-                      <div className="w-2.5 h-2.5 bg-primary rounded-full"></div>
-                    </div>
+
+                    {/* Option 2: Pay using Wallet */}
+                    {(() => {
+                      const orderTotal = getFinalTotal();
+                      const walletBal = balanceData?.balance || 0;
+                      const hasSufficientBal = walletBal >= orderTotal;
+
+                      return (
+                        <div 
+                          onClick={() => {
+                            if (hasSufficientBal) {
+                              setPaymentMethod('wallet');
+                            } else {
+                              toast.warning(`Insufficient wallet balance. Total required: ₹${orderTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}, wallet balance: ₹${walletBal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`);
+                            }
+                          }}
+                          className={`w-full p-5 rounded-2xl border-2 flex items-center justify-between transition-all ${
+                            !hasSufficientBal 
+                              ? 'border-gray-100 opacity-60 bg-gray-50/50 cursor-not-allowed'
+                              : paymentMethod === 'wallet'
+                                ? 'border-primary bg-primary/[0.02] cursor-pointer'
+                                : 'border-gray-100 hover:border-gray-200 bg-white cursor-pointer'
+                          }`}
+                        >
+                          <div className="flex items-center gap-3.5">
+                            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                              <Wallet size={20} className="stroke-[2.5]" />
+                            </div>
+                            <div>
+                              <span className="text-xs font-black uppercase text-gray-800 block">Pay using Wallet</span>
+                              <span className="text-[9px] font-bold text-gray-400 uppercase mt-0.5 block">
+                                Available Balance: ₹{walletBal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                              </span>
+                              {!hasSufficientBal && (
+                                <span className="text-[8px] font-bold text-red-500 uppercase mt-1 block">
+                                  ⚠️ Insufficient Balance (Short of ₹{(orderTotal - walletBal).toLocaleString('en-IN', { minimumFractionDigits: 2 })})
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
+                            !hasSufficientBal 
+                              ? 'border-gray-200' 
+                              : paymentMethod === 'wallet' 
+                                ? 'border-primary' 
+                                : 'border-gray-300'
+                          }`}>
+                            {paymentMethod === 'wallet' && <div className="w-2.5 h-2.5 bg-primary rounded-full"></div>}
+                          </div>
+                        </div>
+                      );
+                    })()}
                   </div>
 
-                  <div className="p-4 bg-gray-50 border border-gray-100 rounded-2xl text-[10px] text-gray-500 font-bold uppercase leading-relaxed">
-                    ⚠️ We currently support only Cash on Delivery (COD) for all locations. Please ensure you have the exact final amount ready at the time of delivery.
+                  <div className="p-4 bg-gray-50 border border-gray-100 rounded-2xl text-sm text-gray-500 font-bold uppercase leading-relaxed">
+                    {paymentMethod === 'wallet' 
+                      ? '✓ You have selected Wallet Payment. The order amount will be deducted directly from your wallet balance upon confirmation.' 
+                      : '⚠️ We currently support Cash on Delivery (COD) and Wallet payment. Please choose your preferred payment mode.'}
                   </div>
 
                   <div className="space-y-1.5 mt-4">
@@ -766,7 +861,7 @@ const Checkout = () => {
                 </div>
 
                 <div className="flex gap-3 pt-4 border-t border-gray-50">
-                  <button onClick={() => setStep(1)} className="px-6 py-3.5 border-2 border-gray-100 hover:bg-gray-50 rounded-xl font-black uppercase text-[10px] transition-all cursor-pointer text-gray-500">Back</button>
+                  <button onClick={() => setStep(1)} className="px-6 py-3.5 border-2 border-gray-100 hover:bg-gray-50 rounded-xl font-black uppercase text-sm transition-all cursor-pointer text-gray-500">Back</button>
                   <button onClick={() => setStep(3)} className="flex-grow bg-primary text-white py-4 rounded-xl font-black uppercase text-xs shadow-lg shadow-primary/25 flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-95 transition-all cursor-pointer">
                     Review Order & Proceed <ChevronRight size={16} className="stroke-[3]" />
                   </button>
@@ -782,7 +877,7 @@ const Checkout = () => {
                 </div>
                 <div>
                   <h2 className="text-xl font-black uppercase text-gray-900 ">Everything Looks Perfect!</h2>
-                  <p className="text-[10px] font-bold text-gray-400 uppercase  mt-1">Review your order details before confirmation</p>
+                  <p className="text-sm font-bold text-gray-400 uppercase  mt-1">Review your order details before confirmation</p>
                 </div>
                 
                 <div className="bg-gray-50/80 p-5 rounded-2xl text-left space-y-3 border border-gray-100 text-xs font-bold text-gray-600">
@@ -798,7 +893,7 @@ const Checkout = () => {
                         <br />
                         {shippingForm.city}, {shippingForm.state} - {shippingForm.pincode}
                         <br />
-                        <span className="text-[10px] text-gray-400 font-bold uppercase">Phone: {shippingForm.phone1} {shippingForm.phone2 && `| Alt: ${shippingForm.phone2}`}</span>
+                        <span className="text-sm text-gray-400 font-bold uppercase">Phone: {shippingForm.phone1} {shippingForm.phone2 && `| Alt: ${shippingForm.phone2}`}</span>
                       </p>
                     </div>
                   </div>
@@ -806,7 +901,13 @@ const Checkout = () => {
                     <CreditCard size={16} className="text-primary flex-shrink-0 mt-0.5" />
                     <div>
                       <p className="text-[9px] font-black text-gray-400 uppercase ">Payment Pipeline</p>
-                      <p className="text-gray-800 mt-0.5">{paymentMethod === 'card' ? 'Secure Credit Card' : 'Cash on Delivery (COD)'}</p>
+                      <p className="text-gray-800 mt-0.5">
+                        {paymentMethod === 'wallet' 
+                          ? 'Wallet Payment (Paid)' 
+                          : paymentMethod === 'card' 
+                            ? 'Secure Credit Card' 
+                            : 'Cash on Delivery (COD)'}
+                      </p>
                     </div>
                   </div>
                   {orderNotes && (
@@ -821,7 +922,7 @@ const Checkout = () => {
                 </div>
 
                 <div className="flex gap-3 pt-2">
-                  <button onClick={() => setStep(2)} className="px-6 py-4 border-2 border-gray-100 hover:bg-gray-50 rounded-xl font-black uppercase text-[10px]  transition-all cursor-pointer text-gray-500">Back</button>
+                  <button onClick={() => setStep(2)} className="px-6 py-4 border-2 border-gray-100 hover:bg-gray-50 rounded-xl font-black uppercase text-sm  transition-all cursor-pointer text-gray-500">Back</button>
                   <button 
                     disabled={isConfirmingOrder}
                     onClick={handlePlaceOrder}
@@ -868,8 +969,8 @@ const Checkout = () => {
                               {color && `Color: ${color}`} {size && `• Size: ${size}`}
                             </p>
                           )}
-                          <p className="text-[10px] font-bold text-gray-400 mt-1 uppercase">
-                            Qty: {item.quantity} • <span className="text-gray-700 font-extrabold">₹{(item.unitPrice || 0).toLocaleString()}</span>
+                          <p className="text-sm font-bold text-gray-400 mt-1 uppercase">
+                            Qty: {item.quantity} • <span className="text-gray-700 font-extrabold">₹{Number(item.unitPrice || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                           </p>
                         </div>
                       </div>
@@ -883,7 +984,7 @@ const Checkout = () => {
                       </div>
                       <div className="flex-grow min-w-0">
                         <h4 className="text-xs font-extrabold text-gray-800 uppercase truncate leading-tight">{item.name}</h4>
-                        <p className="text-[10px] font-bold text-gray-400 mt-1 uppercase">Qty: {item.qty} • <span className="text-gray-700 font-extrabold">₹{(item.price || 0).toLocaleString()}</span></p>
+                        <p className="text-sm font-bold text-gray-400 mt-1 uppercase">Qty: {item.qty} • <span className="text-gray-700 font-extrabold">₹{Number(item.price || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></p>
                       </div>
                     </div>
                   ))
@@ -892,7 +993,7 @@ const Checkout = () => {
 
               {/* Coupons & Offers Section */}
               <div className="bg-gray-50/50 p-4.5 rounded-2xl border border-gray-100 space-y-3.5 mt-4">
-                <h4 className="text-[10px] font-black uppercase text-gray-400 tracking-wider flex items-center gap-1.5">
+                <h4 className="text-sm font-black uppercase text-gray-400 tracking-wider flex items-center gap-1.5">
                   <Ticket size={12} className="text-primary" /> Apply Coupon & Save Extra
                 </h4>
                 
@@ -902,7 +1003,7 @@ const Checkout = () => {
                     <div className="flex items-center gap-2">
                       <Check size={12} className="text-green-600 stroke-[3]" />
                       <div>
-                        <p className="text-[10px] font-black uppercase text-green-700">{appliedCoupon.code} Applied!</p>
+                        <p className="text-sm font-black uppercase text-green-700">{appliedCoupon.code} Applied!</p>
                         <p className="text-[8px] font-bold text-green-500 uppercase">
                           You save ₹{appliedCoupon.discount?.toLocaleString()} on this order
                         </p>
@@ -933,7 +1034,7 @@ const Checkout = () => {
                         setPromoInput(''); 
                         toast.success('Coupon removed.'); 
                       }}
-                      className="bg-red-500 hover:bg-red-600 text-white text-[10px] font-black uppercase px-4 py-2.5 rounded-xl transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 shadow-md shadow-red-500/10"
+                      className="bg-red-500 hover:bg-red-600 text-white text-sm font-black uppercase px-4 py-2.5 rounded-xl transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 shadow-md shadow-red-500/10"
                     >
                       Remove
                     </button>
@@ -970,7 +1071,7 @@ const Checkout = () => {
                           setIsValidatingCoupon(false);
                         }
                       }}
-                      className="bg-gray-900 hover:bg-black disabled:opacity-50 text-white text-[10px] font-black uppercase px-4 py-2.5 rounded-xl transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5"
+                      className="bg-gray-900 hover:bg-black disabled:opacity-50 text-white text-sm font-black uppercase px-4 py-2.5 rounded-xl transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5"
                     >
                       {isValidatingCoupon ? <Loader2 size={12} className="animate-spin" /> : null}
                       Apply
@@ -1034,12 +1135,12 @@ const Checkout = () => {
                 )}
                 <div className="flex justify-between">
                   <span>Subtotal</span>
-                  <span className="text-gray-800">₹{(detailedCart?.cartSummary?.subTotal || cart.reduce((acc, item) => acc + (item.price * item.qty), 0)).toLocaleString()}</span>
+                  <span className="text-gray-800">₹{Number(detailedCart?.cartSummary?.subTotal || cart.reduce((acc, item) => acc + (item.price * item.qty), 0)).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                 </div>
                 {(detailedCart?.cartSummary?.discount !== undefined || appliedCoupon) && (
                   <div className="flex justify-between text-green-600">
                     <span>Discount</span>
-                    <span>-₹{((detailedCart?.cartSummary?.discount || 0) + (appliedCoupon?.discount || 0)).toLocaleString()}</span>
+                    <span>-₹{Number((detailedCart?.cartSummary?.discount || 0) + (appliedCoupon?.discount || 0)).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                   </div>
                 )}
                 {appliedCoupon && (
@@ -1047,25 +1148,25 @@ const Checkout = () => {
                     <span className="flex items-center gap-1">
                       <Ticket size={10} className="text-green-500" /> Coupon ({appliedCoupon.code})
                     </span>
-                    <span className="font-extrabold">-₹{appliedCoupon.discount?.toLocaleString()}</span>
+                    <span className="font-extrabold">-₹{Number(appliedCoupon.discount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                   </div>
                 )}
                 {detailedCart?.cartSummary?.shippingCharge !== undefined && (
                   <div className="flex justify-between">
                     <span>Shipping Charge</span>
-                    <span className="text-gray-800 font-extrabold">₹{detailedCart.cartSummary.shippingCharge.toLocaleString()}</span>
+                    <span className="text-gray-800 font-extrabold">₹{Number(detailedCart.cartSummary.shippingCharge).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                   </div>
                 )}
-                {detailedCart?.cartSummary?.codCharge !== undefined && (
+                {paymentMethod === 'cod' && detailedCart?.cartSummary?.codCharge !== undefined && (
                   <div className="flex justify-between transition-all duration-300">
                     <span>COD Charge</span>
                     <span className="text-gray-800 font-extrabold">
-                      ₹{detailedCart.cartSummary.codCharge.toLocaleString()}
+                      ₹{Number(detailedCart.cartSummary.codCharge).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </span>
                   </div>
                 )}
                 {detailedCart?.cartSummary?.estimatedDeliveryDate && (
-                  <div className="flex justify-between text-[10px] text-primary lowercase tracking-wider border-t border-gray-50 pt-2 font-black">
+                  <div className="flex justify-between text-sm text-primary lowercase tracking-wider border-t border-gray-50 pt-2 font-black">
                     <span>Est. Delivery</span>
                     <span>
                       {detailedCart.cartSummary.estimatedDeliveryDate} 
@@ -1080,11 +1181,7 @@ const Checkout = () => {
               <div className="flex justify-between items-baseline">
                 <span className="text-xs font-black uppercase text-gray-400">Final Total</span>
                 <span className="text-2xl font-black text-gray-900">
-                  ₹{(
-                    (detailedCart?.cartSummary?.finalTotal || cart.reduce((acc, item) => acc + (item.price * item.qty), 0)) +
-                    (paymentMethod === 'cod' ? (detailedCart?.cartSummary?.codCharge || 0) : 0) -
-                    (appliedCoupon?.discount || 0)
-                  ).toLocaleString()}
+                  ₹{Number(getFinalTotal()).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </span>
               </div>
             </div>
@@ -1092,12 +1189,12 @@ const Checkout = () => {
             {/* Dynamic Shipping Summary Courier Cards */}
             {detailedCart?.shippingSummary?.length > 0 && (
               <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-xl shadow-gray-100/40 text-left space-y-3">
-                <h4 className="text-[10px] font-black uppercase text-gray-400 tracking-wider">Logistics & Delivery Pipeline</h4>
+                <h4 className="text-sm font-black uppercase text-gray-400 tracking-wider">Logistics & Delivery Pipeline</h4>
                 {detailedCart.shippingSummary.map((ship, idx) => (
                   <div key={idx} className="flex flex-col gap-1.5 p-3.5 bg-gray-50 rounded-2xl border border-gray-100/50 text-xs">
                     <div className="flex justify-between font-extrabold text-gray-800 uppercase">
                       <span>{ship.courierName || 'Delhivery Surface'}</span>
-                      <span className="text-primary">₹{ship.shippingCharge?.toLocaleString()}</span>
+                      <span className="text-primary">₹{Number(ship.shippingCharge || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                     </div>
                     <p className="text-[9px] font-bold text-gray-400 uppercase mt-0.5">Estimated delivery: {ship.estimatedDate || 'Within 5 Days'} ({ship.estimatedDays} Days)</p>
                     <p className="text-[9px] font-bold text-gray-400 uppercase">Vendor: {ship.vendorName}</p>
@@ -1110,7 +1207,7 @@ const Checkout = () => {
             <div className="flex items-center gap-4 p-5 bg-primary/[0.02] rounded-2xl border border-primary/10 text-left">
               <ShieldCheck className="text-primary flex-shrink-0" size={28} />
               <div className="flex flex-col">
-                <span className="text-[10px] font-black text-primary uppercase  leading-tight">Razorpay Secure Checkout</span>
+                <span className="text-sm font-black text-primary uppercase  leading-tight">Razorpay Secure Checkout</span>
                 <span className="text-[8px] font-bold text-primary/60 uppercase  mt-0.5">PCI-DSS Compliant Secure Token Infrastructure</span>
               </div>
             </div>

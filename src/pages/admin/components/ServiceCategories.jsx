@@ -109,7 +109,7 @@ const ServiceCategories = ({ isDarkMode }) => {
           <div className="flex flex-col">
             <span className={`text-sm font-bold ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>{cat.label || cat.name}</span>
             {cat.name !== cat.label && (
-              <span className="text-[10px] font-bold uppercase text-gray-400">/{cat.name}</span>
+              <span className="text-sm font-bold uppercase text-gray-400">/{cat.name}</span>
             )}
           </div>
         </div>
@@ -128,7 +128,7 @@ const ServiceCategories = ({ isDarkMode }) => {
       render: (cat) => (
         <div className="flex items-center gap-2">
           <div className={`w-1.5 h-1.5 rounded-full ${cat.isActive ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]' : 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]'}`}></div>
-          <span className="text-[10px] font-semibold uppercase text-gray-400">{cat.isActive ? 'Active' : 'Inactive'}</span>
+          <span className="text-sm font-semibold uppercase text-gray-400">{cat.isActive ? 'Active' : 'Inactive'}</span>
         </div>
       )
     },
@@ -279,7 +279,7 @@ const ServiceCategories = ({ isDarkMode }) => {
           <button
             key={f.key}
             onClick={() => setFilter(f.key)}
-            className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-wide transition-all duration-200 ${
+            className={`px-4 py-2 rounded-xl text-sm font-black uppercase tracking-wide transition-all duration-200 ${
               filter === f.key
                 ? 'bg-primary text-white shadow-lg shadow-primary/25'
                 : isDarkMode

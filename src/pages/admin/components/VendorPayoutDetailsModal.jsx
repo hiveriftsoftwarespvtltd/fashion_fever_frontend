@@ -270,7 +270,7 @@ export const VendorPayoutDetailsModal = ({ vendorId, onClose, initialMonth, init
               <h3 className="text-lg font-black uppercase tracking-wide">
                 {details?.vendor?.businessName || 'Vendor'} Payout Details
               </h3>
-              <p className="text-[10px] font-bold text-gray-400 uppercase">
+              <p className="text-sm font-bold text-gray-400 uppercase">
                 Vendor Brand Account ID: {vendorId}
               </p>
             </div>
@@ -296,7 +296,7 @@ export const VendorPayoutDetailsModal = ({ vendorId, onClose, initialMonth, init
           <div className={`p-4 rounded-2xl border text-left space-y-3 ${
             isDarkMode ? 'bg-gray-900/30 border-white/5' : 'bg-gray-50/50 border-gray-100'
           }`}>
-            <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
+            <span className="text-sm font-black text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
               <SlidersHorizontal size={12} className="text-primary" /> Filter vendor payments and orders list
             </span>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -373,7 +373,7 @@ export const VendorPayoutDetailsModal = ({ vendorId, onClose, initialMonth, init
 
               {/* Contributed Orders List */}
               <div className="space-y-3">
-                <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider flex items-center gap-1.5 text-left">
+                <span className="text-sm font-black text-gray-400 uppercase tracking-wider flex items-center gap-1.5 text-left">
                   <ShoppingBag size={12} className="text-primary" /> Vendor Orders List
                 </span>
                 {details.orders && details.orders.length > 0 ? (
@@ -393,7 +393,7 @@ export const VendorPayoutDetailsModal = ({ vendorId, onClose, initialMonth, init
                       <tbody className="divide-y divide-gray-100 dark:divide-white/5 text-xs font-medium">
                         {details.orders.map((ord, idx) => (
                           <tr key={idx} className={isDarkMode ? 'hover:bg-white/[0.01]' : 'hover:bg-gray-50/50'}>
-                            <td className="py-3 px-4 font-mono text-[10px] text-gray-400">{ord.orderId || 'N/A'}</td>
+                            <td className="py-3 px-4 font-mono text-sm text-gray-400">{ord.orderId || 'N/A'}</td>
                             <td className="py-3 px-4 text-right">₹{(ord.salesAmount || 0).toLocaleString()}</td>
                             <td className="py-3 px-4 text-right text-primary font-bold">₹{(ord.platformCommission || 0).toLocaleString()}</td>
                             <td className="py-3 px-4 text-right text-emerald-500 font-bold">₹{(ord.netPayout || 0).toLocaleString()}</td>
@@ -411,7 +411,7 @@ export const VendorPayoutDetailsModal = ({ vendorId, onClose, initialMonth, init
                   <div className={`py-6 rounded-2xl border text-center ${
                     isDarkMode ? 'border-white/5' : 'border-gray-100 bg-gray-50/20'
                   }`}>
-                    <p className="text-[10px] font-bold text-gray-400 uppercase">No customer orders for this vendor in this period</p>
+                    <p className="text-sm font-bold text-gray-400 uppercase">No customer orders for this vendor in this period</p>
                   </div>
                 )}
               </div>

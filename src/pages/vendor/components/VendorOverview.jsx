@@ -30,7 +30,9 @@ const VendorOverview = ({
   getImageUrl,
   formatCurrency,
   customerDemographics = [],
-  customerDemographicsLoading
+  customerDemographicsLoading,
+  vendorWallet,
+  walletLoading
 }) => {
   const getCurvePath = (points) => {
     if (!points || points.length === 0) return '';
@@ -116,9 +118,9 @@ const VendorOverview = ({
     { 
       id: 'pendingPayout',
       label: 'Pending Payout', 
-      value: formatCurrency(overviewData?.pendingPayout || 0), 
+      value: formatCurrency(vendorWallet?.pendingBalance !== undefined ? vendorWallet.pendingBalance : (overviewData?.pendingPayout || 0)), 
       icon: <Clock size={20} />, 
-      change: 'In Pipeline',
+      change: 'In Wallet Pipeline',
       color: 'text-amber-500 bg-amber-500/10 border-amber-500/20 dark:border-amber-500/10',
       glow: 'hover:shadow-amber-500/10 hover:border-amber-500/30',
       badge: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20'
@@ -167,10 +169,58 @@ const VendorOverview = ({
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
+      {/* Merchant Wallet Card Block */}
+      <div className={`p-6 lg:p-8 rounded-[32px] border transition-all duration-500 relative overflow-hidden backdrop-blur-xl ${
+        isDarkMode 
+          ? 'bg-gray-800/40 border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.2)]' 
+          : 'bg-white/60 border-gray-100/80 shadow-[0_8px_30px_rgba(0,0,0,0.02)]'
+      }`}>
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <span className="text-[9px] font-bold text-primary uppercase block mb-1">Financial Account</span>
+            <h3 className="text-base font-extrabold uppercase text-gray-800 dark:text-white">Merchant Wallet Balance</h3>
+          </div>
+          <span className="px-3 py-1 bg-emerald-500/10 text-emerald-500 rounded-full text-sm font-bold uppercase">
+            Active Wallet Account
+          </span>
+        </div>
+        
+        {walletLoading ? (
+          <div className="py-6 flex flex-col items-center justify-center gap-2">
+            <div className="w-6 h-6 border-2 border-primary/20 border-t-primary rounded-full animate-spin"></div>
+            <p className="text-[8px] font-bold text-gray-400 uppercase tracking-widest">Updating wallet balance...</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Usable Balance */}
+            <div className={`p-5 rounded-2xl border flex flex-col justify-between ${isDarkMode ? 'bg-gray-900/60 border-white/5' : 'bg-gray-50 border-gray-100'}`}>
+              <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Usable Wallet Balance</span>
+              <span className="text-2xl font-black text-emerald-500">
+                {formatCurrency(vendorWallet?.balance || 0)}
+              </span>
+            </div>
+            {/* Pending Balance */}
+            <div className={`p-5 rounded-2xl border flex flex-col justify-between ${isDarkMode ? 'bg-gray-900/60 border-white/5' : 'bg-gray-50 border-gray-100'}`}>
+              <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Pending Wallet Balance</span>
+              <span className="text-2xl font-black text-amber-500">
+                {formatCurrency(vendorWallet?.pendingBalance || 0)}
+              </span>
+            </div>
+            {/* Total Earnings */}
+            <div className={`p-5 rounded-2xl border flex flex-col justify-between ${isDarkMode ? 'bg-gray-900/60 border-white/5' : 'bg-gray-50 border-gray-100'}`}>
+              <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Lifetime Wallet Earnings</span>
+              <span className="text-2xl font-black text-primary">
+                {formatCurrency(vendorWallet?.totalEarnings || 0)}
+              </span>
+            </div>
+          </div>
+        )}
+      </div>
+
       {overviewLoading ? (
         <div className="h-[40vh] flex flex-col items-center justify-center gap-4 bg-white/60 dark:bg-gray-800/40 backdrop-blur-xl rounded-[32px] border border-gray-100 dark:border-white/5 shadow-xl shadow-gray-100/30">
           <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
-          <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Hydrating Merchant Analytics...</p>
+          <p className="text-sm font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Hydrating Merchant Analytics...</p>
         </div>
       ) : (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 text-left">
@@ -207,7 +257,7 @@ const VendorOverview = ({
                   {stat.change}
                 </span>
               </div>
-              <h3 className="text-[10px] font-bold uppercase tracking-wider mb-1 relative z-10 text-gray-500 dark:text-gray-400">
+              <h3 className="text-sm font-bold uppercase tracking-wider mb-1 relative z-10 text-gray-500 dark:text-gray-400">
                 {stat.label}
               </h3>
               <p className="text-base lg:text-xl font-extrabold tracking-tight relative z-10 transition-colors duration-300 text-gray-800 dark:text-white">
@@ -236,7 +286,7 @@ const VendorOverview = ({
             </div>
             {/* Timeframe selector dropdown */}
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-bold text-gray-400 uppercase">Range:</span>
+              <span className="text-sm font-bold text-gray-400 uppercase">Range:</span>
               <select 
                 value={graphDays} 
                 onChange={(e) => setGraphDays(Number(e.target.value))}
@@ -258,7 +308,7 @@ const VendorOverview = ({
             {orderGraphLoading ? (
               <div className="h-[180px] flex flex-col items-center justify-center gap-3">
                 <div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Hydrating trend metrics...</p>
+                <p className="text-sm font-bold text-gray-400 uppercase tracking-wider">Hydrating trend metrics...</p>
               </div>
             ) : orderGraphData.length === 0 ? (
               <div className="h-[180px] flex flex-col items-center justify-center text-xs font-bold text-gray-400 uppercase tracking-widest">
@@ -353,7 +403,7 @@ const VendorOverview = ({
             {topProductsLoading ? (
               <div className="py-12 flex flex-col items-center justify-center gap-3">
                 <div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Loading product statistics...</p>
+                <p className="text-sm font-bold text-gray-400 uppercase tracking-wider">Loading product statistics...</p>
               </div>
             ) : topProducts.length === 0 ? (
               <div className="text-center py-10 text-xs font-bold text-gray-400 uppercase tracking-widest">
@@ -442,7 +492,7 @@ const VendorOverview = ({
           {topCategoriesLoading ? (
             <div className="py-12 flex flex-col items-center justify-center gap-3">
               <div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Loading category analytics...</p>
+              <p className="text-sm font-bold text-gray-400 uppercase tracking-wider">Loading category analytics...</p>
             </div>
           ) : topCategories.length === 0 ? (
             <div className="text-center py-10 text-xs font-bold text-gray-400 uppercase tracking-widest">
@@ -502,7 +552,7 @@ const VendorOverview = ({
                 {/* Right: Proportion stack and share chips */}
                 <div className="lg:col-span-1 border-t lg:border-t-0 lg:border-l border-gray-100 dark:border-white/5 pt-6 lg:pt-0 lg:pl-8 space-y-6">
                   <div className="space-y-2">
-                    <p className="text-[10px] font-black text-gray-400 uppercase">Sales Proportion Stack</p>
+                    <p className="text-sm font-black text-gray-400 uppercase">Sales Proportion Stack</p>
                     <div className="w-full h-6 rounded-xl overflow-hidden flex shadow-inner border border-gray-100/10">
                       {topCategories.map((item, idx) => {
                         const sales = item.totalSales || item.sales || item.revenue || 0;
@@ -523,7 +573,7 @@ const VendorOverview = ({
                   </div>
 
                   <div className="flex flex-col gap-3 pt-2">
-                    <p className="text-[10px] font-black text-gray-400 uppercase">Proportional Share</p>
+                    <p className="text-sm font-black text-gray-400 uppercase">Proportional Share</p>
                     {topCategories.map((item, idx) => {
                       const sales = item.totalSales || item.sales || item.revenue || 0;
                       const pct = Math.round((sales / totalSales) * 100);
@@ -576,7 +626,7 @@ const VendorOverview = ({
             {orderComparisonLoading ? (
               <div className="py-16 flex flex-col items-center justify-center gap-3">
                 <div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Hydrating comparison...</p>
+                <p className="text-sm font-bold text-gray-400 uppercase tracking-wider">Hydrating comparison...</p>
               </div>
             ) : !orderComparison ? (
               <div className="text-center py-16 text-xs font-bold text-gray-400 uppercase tracking-widest">
@@ -611,8 +661,8 @@ const VendorOverview = ({
                   {/* Revenue Comparison section */}
                   <div className="space-y-3 p-4 rounded-2xl border border-gray-100/50 dark:border-white/5 bg-gray-50/20 dark:bg-gray-900/10">
                     <div className="flex justify-between items-center">
-                      <span className="text-[10px] font-bold text-gray-400 uppercase">Monthly Revenue</span>
-                      <div className={`flex items-center gap-1 text-[10px] font-black uppercase px-2 py-0.5 rounded-full ${
+                      <span className="text-sm font-bold text-gray-400 uppercase">Monthly Revenue</span>
+                      <div className={`flex items-center gap-1 text-sm font-black uppercase px-2 py-0.5 rounded-full ${
                         isRevPositive ? 'bg-emerald-500/10 text-emerald-500' : 'bg-rose-500/10 text-rose-500'
                       }`}>
                         {isRevPositive ? <TrendingUp size={10} /> : <TrendingDown size={10} />}
@@ -623,7 +673,7 @@ const VendorOverview = ({
                     <div className="space-y-2">
                       {/* Current Month */}
                       <div className="space-y-1">
-                        <div className="flex justify-between text-[10px] font-bold text-gray-600 dark:text-gray-300">
+                        <div className="flex justify-between text-sm font-bold text-gray-600 dark:text-gray-300">
                           <span>Current Month</span>
                           <span className="font-extrabold text-primary">{formatCurrency(currentRev)}</span>
                         </div>
@@ -637,7 +687,7 @@ const VendorOverview = ({
 
                       {/* Previous Month */}
                       <div className="space-y-1">
-                        <div className="flex justify-between text-[10px] font-bold text-gray-400">
+                        <div className="flex justify-between text-sm font-bold text-gray-400">
                           <span>Previous Month</span>
                           <span className="font-extrabold">{formatCurrency(prevRev)}</span>
                         </div>
@@ -654,8 +704,8 @@ const VendorOverview = ({
                   {/* Orders Comparison section */}
                   <div className="space-y-3 p-4 rounded-2xl border border-gray-100/50 dark:border-white/5 bg-gray-50/20 dark:bg-gray-900/10">
                     <div className="flex justify-between items-center">
-                      <span className="text-[10px] font-bold text-gray-400 uppercase">Monthly Orders</span>
-                      <div className={`flex items-center gap-1 text-[10px] font-black uppercase px-2 py-0.5 rounded-full ${
+                      <span className="text-sm font-bold text-gray-400 uppercase">Monthly Orders</span>
+                      <div className={`flex items-center gap-1 text-sm font-black uppercase px-2 py-0.5 rounded-full ${
                         isOrderPositive ? 'bg-emerald-500/10 text-emerald-500' : 'bg-rose-500/10 text-rose-500'
                       }`}>
                         {isOrderPositive ? <TrendingUp size={10} /> : <TrendingDown size={10} />}
@@ -666,7 +716,7 @@ const VendorOverview = ({
                     <div className="space-y-2">
                       {/* Current Month */}
                       <div className="space-y-1">
-                        <div className="flex justify-between text-[10px] font-bold text-gray-600 dark:text-gray-300">
+                        <div className="flex justify-between text-sm font-bold text-gray-600 dark:text-gray-300">
                           <span>Current Month</span>
                           <span className="font-extrabold text-blue-500">{currentOrders} {currentOrders === 1 ? 'order' : 'orders'}</span>
                         </div>
@@ -680,7 +730,7 @@ const VendorOverview = ({
 
                       {/* Previous Month */}
                       <div className="space-y-1">
-                        <div className="flex justify-between text-[10px] font-bold text-gray-400">
+                        <div className="flex justify-between text-sm font-bold text-gray-400">
                           <span>Previous Month</span>
                           <span className="font-extrabold">{prevOrders} {prevOrders === 1 ? 'order' : 'orders'}</span>
                         </div>
@@ -696,7 +746,7 @@ const VendorOverview = ({
 
                   {/* Quick Summary Insights */}
                   <div className="p-3 bg-primary/5 rounded-2xl border border-primary/10 text-center">
-                    <p className="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                    <p className="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
                       {isRevPositive 
                         ? `Revenue expanded by ₹${Math.abs(revDiff).toLocaleString()} MoM!` 
                         : `Revenue retracted by ₹${Math.abs(revDiff).toLocaleString()} MoM.`
@@ -734,7 +784,7 @@ const VendorOverview = ({
           {customerDemographicsLoading ? (
             <div className="py-12 flex flex-col items-center justify-center gap-3">
               <div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Hydrating customer demographics...</p>
+              <p className="text-sm font-bold text-gray-400 uppercase tracking-wider">Hydrating customer demographics...</p>
             </div>
           ) : !customerDemographics || customerDemographics.length === 0 ? (
             /* Premium Empty State Card */
@@ -756,7 +806,7 @@ const VendorOverview = ({
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className={`text-[10px] font-bold uppercase tracking-wider border-b ${
+                      <tr className={`text-sm font-bold uppercase tracking-wider border-b ${
                         isDarkMode ? 'border-white/5 text-gray-400' : 'border-gray-100 text-gray-500'
                       }`}>
                         <th className="pb-3 font-black">Region</th>
@@ -797,7 +847,7 @@ const VendorOverview = ({
                             </td>
                             <td className="py-4 text-center font-black">{count.toLocaleString()}</td>
                             <td className="py-4 text-center">
-                              <span className="px-2 py-0.5 bg-blue-500/10 text-blue-550 dark:text-blue-400 rounded-lg text-[10px] font-black">
+                              <span className="px-2 py-0.5 bg-blue-500/10 text-blue-550 dark:text-blue-400 rounded-lg text-sm font-black">
                                 {percentage}%
                               </span>
                             </td>
@@ -849,7 +899,7 @@ const VendorOverview = ({
 
                       return (
                         <div key={idx} className="space-y-1">
-                          <div className="flex justify-between text-[10px] font-extrabold uppercase">
+                          <div className="flex justify-between text-sm font-extrabold uppercase">
                             <span className="text-gray-650 dark:text-gray-300">{region}</span>
                             <span className={design.text}>{percentage}%</span>
                           </div>
@@ -868,7 +918,7 @@ const VendorOverview = ({
                 <div className={`mt-6 p-4 rounded-2xl border text-center ${
                   isDarkMode ? 'bg-gray-950 border-white/5' : 'bg-white border-gray-100'
                 }`}>
-                  <p className="text-[10px] font-bold text-gray-400 uppercase">Top Region</p>
+                  <p className="text-sm font-bold text-gray-400 uppercase">Top Region</p>
                   <p className="text-sm font-black text-primary uppercase mt-1">
                     {(() => {
                       const top = [...customerDemographics].sort((a, b) => {

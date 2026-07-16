@@ -169,7 +169,7 @@ const ServiceProviderProfile = ({ isDarkMode, profileData, setProfileData }) => 
               }`}>
                 Verification Status: {profileData.verificationStatus}
               </p>
-              <p className={`text-[10px] font-bold ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+              <p className={`text-sm font-bold ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                 {profileData.verificationStatus === 'APPROVED'
                   ? 'Your profile is approved and active in searches.'
                   : 'Your profile registration is pending review by Wakeup Makeup admin.'}

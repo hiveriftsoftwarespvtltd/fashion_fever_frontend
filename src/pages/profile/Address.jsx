@@ -189,7 +189,7 @@ const Address = () => {
                   <form onSubmit={handleSave} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {/* Line 1 */}
                     <div className="sm:col-span-2">
-                      <label className="text-[10px] font-bold text-gray-400 uppercase  mb-1 block">Address Line 1 *</label>
+                      <label className="text-sm font-bold text-gray-400 uppercase  mb-1 block">Address Line 1 *</label>
                       <input
                         value={form.line1}
                         onChange={e => setForm(f => ({ ...f, line1: e.target.value }))}
@@ -200,7 +200,7 @@ const Address = () => {
 
                     {/* Line 2 */}
                     <div className="sm:col-span-2">
-                      <label className="text-[10px] font-bold text-gray-400 uppercase  mb-1 block">Address Line 2</label>
+                      <label className="text-sm font-bold text-gray-400 uppercase  mb-1 block">Address Line 2</label>
                       <input
                         value={form.line2}
                         onChange={e => setForm(f => ({ ...f, line2: e.target.value }))}
@@ -211,7 +211,7 @@ const Address = () => {
 
                     {/* Landmark */}
                     <div className="sm:col-span-2">
-                      <label className="text-[10px] font-bold text-gray-400 uppercase  mb-1 block">Landmark</label>
+                      <label className="text-sm font-bold text-gray-400 uppercase  mb-1 block">Landmark</label>
                       <input
                         value={form.landmark}
                         onChange={e => setForm(f => ({ ...f, landmark: e.target.value }))}
@@ -222,7 +222,7 @@ const Address = () => {
 
                     {/* City */}
                     <div>
-                      <label className="text-[10px] font-bold text-gray-400 uppercase  mb-1 block">City *</label>
+                      <label className="text-sm font-bold text-gray-400 uppercase  mb-1 block">City *</label>
                       <input
                         value={form.city}
                         onChange={e => setForm(f => ({ ...f, city: e.target.value }))}
@@ -233,7 +233,7 @@ const Address = () => {
 
                     {/* State */}
                     <div>
-                      <label className="text-[10px] font-bold text-gray-400 uppercase  mb-1 block">State</label>
+                      <label className="text-sm font-bold text-gray-400 uppercase  mb-1 block">State</label>
                       <input
                         value={form.state}
                         onChange={e => setForm(f => ({ ...f, state: e.target.value }))}
@@ -244,7 +244,7 @@ const Address = () => {
 
                     {/* Pincode */}
                     <div>
-                      <label className="text-[10px] font-bold text-gray-400 uppercase  mb-1 block">Pincode *</label>
+                      <label className="text-sm font-bold text-gray-400 uppercase  mb-1 block">Pincode *</label>
                       <input
                         value={form.pincode}
                         onChange={e => setForm(f => ({ ...f, pincode: e.target.value }))}
@@ -255,7 +255,7 @@ const Address = () => {
 
                     {/* Phone 1 */}
                     <div>
-                      <label className="text-[10px] font-bold text-gray-400 uppercase  mb-1 block">Phone 1 *</label>
+                      <label className="text-sm font-bold text-gray-400 uppercase  mb-1 block">Phone 1 *</label>
                       <input
                         value={form.phone1}
                         onChange={e => setForm(f => ({ ...f, phone1: e.target.value }))}
@@ -266,7 +266,7 @@ const Address = () => {
 
                     {/* Phone 2 */}
                     <div>
-                      <label className="text-[10px] font-bold text-gray-400 uppercase  mb-1 block">Phone 2 (Optional)</label>
+                      <label className="text-sm font-bold text-gray-400 uppercase  mb-1 block">Phone 2 (Optional)</label>
                       <input
                         value={form.phone2}
                         onChange={e => setForm(f => ({ ...f, phone2: e.target.value }))}
@@ -344,12 +344,12 @@ const Address = () => {
                             {/* Phones */}
                             <div className="flex flex-wrap gap-3 mt-2.5">
                               {addr.phone1 && (
-                                <span className="flex items-center gap-1 text-[10px] font-bold text-gray-500 uppercase">
+                                <span className="flex items-center gap-1 text-sm font-bold text-gray-500 uppercase">
                                   <Phone size={10} /> {addr.phone1}
                                 </span>
                               )}
                               {addr.phone2 && (
-                                <span className="flex items-center gap-1 text-[10px] font-bold text-gray-400 uppercase">
+                                <span className="flex items-center gap-1 text-sm font-bold text-gray-400 uppercase">
                                   <Phone size={10} /> {addr.phone2}
                                 </span>
                               )}
@@ -361,13 +361,13 @@ const Address = () => {
                         <div className="flex items-center gap-2 mt-4 pt-4 border-t border-gray-50">
                           <button
                             onClick={() => openEdit(addr)}
-                            className="flex-1 flex items-center justify-center gap-1.5 text-[10px] font-bold uppercase text-primary border border-primary/20 bg-primary/5 hover:bg-primary/10 py-2 rounded-lg transition-all cursor-pointer"
+                            className="flex-1 flex items-center justify-center gap-1.5 text-sm font-bold uppercase text-primary border border-primary/20 bg-primary/5 hover:bg-primary/10 py-2 rounded-lg transition-all cursor-pointer"
                           >
                             <Pencil size={11} /> Edit
                           </button>
                           <button
                             onClick={() => handleDelete(addr._id)}
-                            className="flex-1 flex items-center justify-center gap-1.5 text-[10px] font-bold uppercase text-red-500 border border-red-100 bg-red-50 hover:bg-red-100 py-2 rounded-lg transition-all cursor-pointer"
+                            className="flex-1 flex items-center justify-center gap-1.5 text-sm font-bold uppercase text-red-500 border border-red-100 bg-red-50 hover:bg-red-100 py-2 rounded-lg transition-all cursor-pointer"
                           >
                             <Trash2 size={11} /> Delete
                           </button>
@@ -383,7 +383,7 @@ const Address = () => {
                       <div className="w-10 h-10 rounded-xl bg-gray-50 group-hover:bg-primary/5 border border-gray-100 group-hover:border-primary/20 flex items-center justify-center transition-all">
                         <Plus size={20} />
                       </div>
-                      <span className="text-[10px] font-bold uppercase ">Add Another Address</span>
+                      <span className="text-sm font-bold uppercase ">Add Another Address</span>
                     </button>
                   </div>
                 )}

@@ -14,6 +14,9 @@ import ServiceProviderProfile from './components/ServiceProviderProfile';
 import ServiceProviderServices from './components/ServiceProviderServices';
 import ServiceProviderStaff from './components/ServiceProviderStaff';
 import ServiceProviderAvailability from './components/ServiceProviderAvailability';
+import ServiceProviderWallet from './components/ServiceProviderWallet';
+import ServiceProviderLeads from './components/ServiceProviderLeads';
+import PayoutBankDetails from '../../components/shared/PayoutBankDetails';
 
 const ServiceProviderPanel = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -351,7 +354,7 @@ const ServiceProviderPanel = () => {
           }`}>
             <div className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-ping"></div>
             <div>
-              <p className={`text-[10px] font-bold uppercase ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>Current Status</p>
+              <p className={`text-sm font-bold uppercase ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>Current Status</p>
               <p className="text-sm font-extrabold text-amber-600 dark:text-amber-400 uppercase">{profileData.verificationStatus || 'PENDING'}</p>
             </div>
           </div>
@@ -477,14 +480,34 @@ const ServiceProviderPanel = () => {
             />
           )}
 
-          {activeTab === 'profile' && (
-            <ServiceProviderProfile 
-              isDarkMode={isDarkMode} 
-              profileData={profileData} 
-              setProfileData={handleSetProfileData} 
-            />
-          )}
-          </div>
+           {activeTab === 'wallet' && (
+             <ServiceProviderWallet 
+               isDarkMode={isDarkMode} 
+             />
+           )}
+
+            {activeTab === 'leads' && (
+              <ServiceProviderLeads 
+                isDarkMode={isDarkMode} 
+              />
+            )}
+
+            {activeTab === 'payout' && (
+              <PayoutBankDetails 
+                isDarkMode={isDarkMode} 
+                role="service_provider"
+                ownerId={profileData?._id}
+              />
+            )}
+
+           {activeTab === 'profile' && (
+             <ServiceProviderProfile 
+               isDarkMode={isDarkMode} 
+               profileData={profileData} 
+               setProfileData={handleSetProfileData} 
+             />
+           )}
+           </div>
         </main>
 
       </div>
