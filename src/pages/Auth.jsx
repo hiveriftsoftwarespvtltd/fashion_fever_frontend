@@ -37,8 +37,8 @@ const Auth = () => {
     { id: 'user', name: 'User' },
     { id: 'vendor', name: 'Vendor' },
     { id: 'service_provider', name: 'Service Provider' },
-   
     { id: 'educator', name: 'Educator' },
+    { id: 'delivery_person', name: 'Delivery Rider 🛵' },
   ];
 
   const handleRoleCheckboxChange = (roleId) => {
@@ -83,15 +83,20 @@ const Auth = () => {
             if (role === 'super_admin') role = 'admin';
             if (role === 'admin') navigate('/admin?tab=dashboard');
             else if (role === 'vendor') {
-              if (user.vendorId) navigate('/vendor/dashboard');
+              if (user.vendorId || user.vendor) navigate('/vendor/dashboard');
               else navigate('/vendor/register');
             }
-            else if (role === 'influencer') navigate('/influencer/dashboard');
+            else if (role === 'service_provider') navigate('/service-provider/panel');
+            else if (role === 'educator') navigate('/educator/onboard');
+            else if (role === 'influencer') {
+              if (user.influencerId || user.influencer) navigate('/influencer/dashboard');
+              else navigate('/influencer/register');
+            }
+            else if (role === 'delivery_person' || role === 'rider' || role === 'driver') {
+              navigate('/quick-commerce/rider');
+            }
             else if (role === 'distributor') navigate('/distributor/dashboard');
-            else if (role === 'service_provider') navigate('/service-provider/dashboard');
-            else if (role === 'educator') {
-              navigate('/educator/dashboard');
-            } else navigate('/');
+            else navigate('/');
           }, 1500);
         } else {
           setMessage({
@@ -182,15 +187,20 @@ const Auth = () => {
             if (role === 'super_admin') role = 'admin';
             if (role === 'admin') navigate('/admin?tab=dashboard');
             else if (role === 'vendor') {
-              if (user.vendorId) navigate('/vendor/dashboard');
+              if (user.vendorId || user.vendor) navigate('/vendor/dashboard');
               else navigate('/vendor/register');
             }
-            else if (role === 'influencer') navigate('/influencer/dashboard');
+            else if (role === 'service_provider') navigate('/service-provider/panel');
+            else if (role === 'educator') navigate('/educator/onboard');
+            else if (role === 'influencer') {
+              if (user.influencerId || user.influencer) navigate('/influencer/dashboard');
+              else navigate('/influencer/register');
+            }
+            else if (role === 'delivery_person' || role === 'rider' || role === 'driver') {
+              navigate('/quick-commerce/rider');
+            }
             else if (role === 'distributor') navigate('/distributor/dashboard');
-            else if (role === 'service_provider') navigate('/service-provider/dashboard');
-            else if (role === 'educator') {
-              navigate('/educator/dashboard');
-            } else navigate('/');
+            else navigate('/');
           }, 1500);
         } else {
           setTimeout(() => {
@@ -671,7 +681,7 @@ const Auth = () => {
           )}
 
           {!showOTP && !isForgotPassword && (
-            <div className="mt-6">
+            <div className="mt-6 space-y-3">
               <button
                 onClick={() => {
                   setIsLogin(!isLogin);
@@ -680,6 +690,14 @@ const Auth = () => {
                 className="w-full flex justify-center py-3.5 px-4 border-2 border-gray-100 rounded-xl text-sm font-bold uppercase text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-200 transition-all duration-300"
               >
                 {isLogin ? 'Create Account' : 'Sign In Now'}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => navigate('/rider/login')}
+                className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs font-black uppercase tracking-wider text-primary bg-rose-50 border border-rose-100 hover:bg-rose-100 transition-all cursor-pointer shadow-xs"
+              >
+                🛵 Express Delivery Rider Login
               </button>
             </div>
           )}
