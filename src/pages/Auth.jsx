@@ -79,7 +79,14 @@ const Auth = () => {
 
           setTimeout(() => {
             const user = result.data.safeUser;
-            let role = user.role || (Array.isArray(user.roles) ? (user.roles.find(r => r !== 'user') || 'user') : 'user');
+            let role = 'user';
+            if (Array.isArray(user?.roles) && user.roles.length > 0) {
+              const nonUserRole = user.roles.find(r => r && r !== 'user');
+              if (nonUserRole) role = nonUserRole;
+              else if (user.role && user.role !== 'user') role = user.role;
+            } else if (user?.role) {
+              role = user.role;
+            }
             if (role === 'super_admin') role = 'admin';
             if (role === 'admin') navigate('/admin?tab=dashboard');
             else if (role === 'vendor') {
@@ -183,7 +190,14 @@ const Auth = () => {
 
           setTimeout(() => {
             const user = result.data.safeUser;
-            let role = user.role || (Array.isArray(user.roles) ? (user.roles.find(r => r !== 'user') || 'user') : 'user');
+            let role = 'user';
+            if (Array.isArray(user?.roles) && user.roles.length > 0) {
+              const nonUserRole = user.roles.find(r => r && r !== 'user');
+              if (nonUserRole) role = nonUserRole;
+              else if (user.role && user.role !== 'user') role = user.role;
+            } else if (user?.role) {
+              role = user.role;
+            }
             if (role === 'super_admin') role = 'admin';
             if (role === 'admin') navigate('/admin?tab=dashboard');
             else if (role === 'vendor') {

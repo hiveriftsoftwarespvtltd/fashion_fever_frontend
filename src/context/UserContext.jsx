@@ -5,8 +5,16 @@ const UserContext = createContext(null);
 
 const resolveRole = (user) => {
   if (!user) return 'user';
-  const role = user.role || (Array.isArray(user.roles) ? (user.roles.find(r => r !== 'user') || 'user') : 'user');
-  return role === 'super_admin' ? 'admin' : role;
+  let role = 'user';
+  if (Array.isArray(user.roles) && user.roles.length > 0) {
+    const nonUserRole = user.roles.find(r => r && r !== 'user');
+    if (nonUserRole) role = nonUserRole;
+    else if (user.role && user.role !== 'user') role = user.role;
+  } else if (user.role) {
+    role = user.role;
+  }
+  const normalized = typeof role === 'string' ? role.toLowerCase() : 'user';
+  return normalized === 'super_admin' ? 'admin' : normalized;
 };
 
 export const UserProvider = ({ children }) => {
@@ -39,6 +47,17 @@ export const UserProvider = ({ children }) => {
       }
     };
     bootstrapAuth();
+
+    const handleSessionExpired = () => {
+      setUser(null);
+      setToken(null);
+      delete apiClient.defaults.headers.common['Authorization'];
+    };
+
+    window.addEventListener('auth:session_expired', handleSessionExpired);
+    return () => {
+      window.removeEventListener('auth:session_expired', handleSessionExpired);
+    };
   }, []);
 
   const login = (sessionData) => {
