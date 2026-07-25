@@ -223,9 +223,9 @@ const TopBrands = () => {
 const Card = ({ item, onClick }) => (
   <div
     onClick={onClick}
-    className="group cursor-pointer flex flex-col items-center rounded-3xl bg-white border border-gray-100/60 shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:shadow-[0_12px_30px_rgba(255,45,85,0.06)] hover:border-primary/20 hover:-translate-y-1 transition-all duration-500 w-full overflow-hidden"
+    className="group cursor-pointer flex flex-col items-center rounded-3xl bg-white border border-gray-200/80 shadow-md hover:shadow-xl hover:shadow-rose-500/15 hover:border-primary/40 hover:-translate-y-1.5 transition-all duration-500 w-full overflow-hidden h-full"
   >
-    <div className="w-full aspect-[16/9] bg-gray-50 flex items-center justify-center transition-all duration-500">
+    <div className="w-full h-36 sm:h-44 bg-gray-50 flex items-center justify-center transition-all duration-500 overflow-hidden shrink-0">
       <img
         src={item.img}
         alt={item.name}
@@ -233,7 +233,7 @@ const Card = ({ item, onClick }) => (
         onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=300&h=200&fit=crop'; }}
       />
     </div>
-    <div className="text-center w-full px-3 pb-4 pt-3">
+    <div className="text-center w-full px-3 pb-4 pt-3 mt-auto">
       <span className="text-xs font-extrabold uppercase tracking-wider text-gray-800 group-hover:text-primary transition-colors duration-300 block truncate">
         {item.name}
       </span>

@@ -1011,7 +1011,7 @@ export const settleVendorPayout = async (data) => {
  */
 export const getAllServiceCategories = async () => {
   try {
-    const response = await apiClient.get('/service/get-all-service-categories');
+    const response = await apiClient.get('/service/get-all-service-categories', { skipAuth: true });
     return response.data;
   } catch (error) {
     console.error('Fetch service categories error:', error);

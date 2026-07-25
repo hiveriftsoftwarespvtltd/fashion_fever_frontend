@@ -50,7 +50,7 @@ const ProductCard = ({ product, isWishlisted, onWishlistToggle }) => {
   const isShippingApply = product.isShippingApply === true;
   
   // Image URL resolution
-  const imageUrl = firstVariant.thumbnail?.url || (product.images?.[0]?.url || product.images?.[0]) || 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=600&h=800&fit=crop';
+  const imageUrl = firstVariant.thumbnail?.url || (typeof firstVariant.thumbnail === 'string' ? firstVariant.thumbnail : null) || (product.images?.[0]?.url || (typeof product.images?.[0] === 'string' ? product.images[0] : null)) || product.image || '';
   
   // Rating and reviews resolution
   const averageRating = product.averageRating || product.rating || 0;
@@ -59,8 +59,8 @@ const ProductCard = ({ product, isWishlisted, onWishlistToggle }) => {
   // Calculate discount percentage
   const discountPercent = salesPrice > offeredPrice ? Math.round(((salesPrice - offeredPrice) / salesPrice) * 100) : 0;
 
-  // Check if item is already in the cart
-  const cartItem = cart?.find(item => item.id === variantId);
+  // Check if item is already in the standard cart (excluding Quick Delivery cart items)
+  const cartItem = cart?.find(item => (item.id === variantId || item.variantId === variantId) && !item.isQuickDelivery);
   const isInCart = !!cartItem;
 
   const handleCardClick = () => {
@@ -103,19 +103,25 @@ const ProductCard = ({ product, isWishlisted, onWishlistToggle }) => {
   return (
     <div
       onClick={handleCardClick}
-      className="group relative flex flex-col bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-[0_4px_20px_rgb(0,0,0,0.01)] hover:shadow-[0_12px_30px_rgba(0,0,0,0.05)] hover:-translate-y-1 transition-all duration-300 w-full cursor-pointer h-full font-outfit"
+      className="group relative flex flex-col bg-white rounded-2xl overflow-hidden border border-gray-200/80 shadow-md hover:shadow-xl hover:shadow-gray-300/40 hover:-translate-y-1.5 transition-all duration-300 w-full cursor-pointer h-full font-outfit"
     >
       {/* Product Image Section */}
       <div className="relative w-full h-[150px] sm:h-[200px] overflow-hidden bg-gray-50 flex items-center justify-center">
         {/* Hover Zoom Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-gray-900/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"></div>
         
-        <img
-          src={imageUrl}
-          alt={name}
-          className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-          onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=600&h=800&fit=crop'; }}
-        />
+        {imageUrl ? (
+          <img
+            src={imageUrl}
+            alt={name}
+            className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+            onError={(e) => { e.target.style.opacity = '0.3'; }}
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-300 font-bold uppercase text-[10px]">
+            No Image
+          </div>
+        )}
 
         {/* Discount Badge on Top Left */}
         {discountPercent > 0 && (
