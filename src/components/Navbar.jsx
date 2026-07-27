@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Search, ShoppingBag, Menu, ChevronDown, Wallet, User, LogOut, Settings, UserCircle, X, Heart, LayoutDashboard, Bookmark, Bell, Loader2 } from 'lucide-react';
 import { useUser } from '../context/UserContext';
 import { useSearch } from '../context/SearchContext';
@@ -26,7 +26,7 @@ const NotificationBell = () => {
         // Extract notifications list depending on API response format
         const list = res.data?.data ?? res.data ?? [];
         setNotifications(list);
-        
+
         // Count unread
         const unread = list.filter(n => !n.isRead).length;
         setUnreadCount(unread);
@@ -70,7 +70,7 @@ const NotificationBell = () => {
   const handleMarkAllRead = async () => {
     const unreadNotifications = notifications.filter(n => !n.isRead);
     if (unreadNotifications.length === 0) return;
-    
+
     try {
       await Promise.all(unreadNotifications.map(n => markNotificationRead(n._id)));
       setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
@@ -133,9 +133,8 @@ const NotificationBell = () => {
                 <div
                   key={n._id}
                   onClick={() => handleMarkAsRead(n._id)}
-                  className={`p-4 text-left transition-colors cursor-pointer flex gap-3 ${
-                    n.isRead ? 'hover:bg-gray-50/60' : 'bg-primary/5 hover:bg-primary/10'
-                  }`}
+                  className={`p-4 text-left transition-colors cursor-pointer flex gap-3 ${n.isRead ? 'hover:bg-gray-50/60' : 'bg-primary/5 hover:bg-primary/10'
+                    }`}
                 >
                   <div className="flex-grow space-y-1 min-w-0">
                     <div className="flex items-start justify-between gap-2">
@@ -169,11 +168,48 @@ const NotificationBell = () => {
   );
 };
 
+const getDashboardLink = (user) => {
+  if (!user) return null;
+  const roles = Array.isArray(user.roles) ? user.roles : (user.role ? [user.role] : []);
+  const activeRole = roles.find(r => r && String(r).toLowerCase() !== 'user') || user.role || 'user';
+  const role = String(activeRole).toLowerCase();
+
+  if (role === 'admin' || role === 'super_admin') {
+    return { path: '/admin?tab=dashboard', label: 'Admin Panel' };
+  }
+  if (role === 'vendor') {
+    return { path: user.vendorId || user.vendor ? '/vendor/dashboard' : '/vendor/register', label: 'Vendor Dashboard' };
+  }
+  if (role === 'service_provider') {
+    return { path: '/service-provider/panel', label: 'Service Provider Panel' };
+  }
+  if (role === 'educator' || role === 'tutor') {
+    return { path: '/educator/onboard', label: 'Educator Portal' };
+  }
+  if (role === 'influencer') {
+    return { path: user.influencerId || user.influencer ? '/influencer/dashboard' : '/influencer/register', label: 'Influencer Portal' };
+  }
+  if (role === 'delivery_person' || role === 'rider' || role === 'driver') {
+    return { path: '/quick-commerce/rider', label: 'Rider Portal' };
+  }
+  if (role === 'distributor') {
+    return { path: '/distributor/dashboard', label: 'Distributor Portal' };
+  }
+  return null;
+};
+
 const Navbar = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, logout } = useUser();
   const { searchQuery, setSearchQuery } = useSearch();
-  const { cartCount } = useCart();
+  const { cart } = useCart();
+
+  const isQuickCommPage = location.pathname.startsWith('/quick-commerce');
+  const activeCartCount = isQuickCommPage
+    ? cart.filter(item => item.isQuickDelivery).reduce((acc, item) => acc + item.qty, 0)
+    : cart.filter(item => !item.isQuickDelivery).reduce((acc, item) => acc + item.qty, 0);
+
   const { wishlistCount } = useWishlist();
   const { balanceData } = useWallet();
   const [isScrolled, setIsScrolled] = useState(false);
@@ -212,6 +248,7 @@ const Navbar = () => {
     { name: 'Academy', path: '/academy' },
     { name: 'Luxe', path: '/luxe' },
     { name: 'Beauty Advice', path: '/advice' },
+    { name: 'Quick Delivery ⚡', path: '/quick-commerce' },
   ];
 
 
@@ -226,7 +263,7 @@ const Navbar = () => {
             {/* Logo & Links Group */}
             <div className="flex items-center gap-4 lg:gap-10">
               <Link to="/" className="flex-shrink-0">
-                <img src={logo} alt="WakeUp MakeUp" className="h-[60px] lg:h-[80px] w-auto object-contain" />
+                <img src={logo} alt="Fashion Fever" className="h-[60px] lg:h-[80px] w-auto object-contain" />
               </Link>
 
               {/* Nav Links (Desktop) */}
@@ -275,16 +312,16 @@ const Navbar = () => {
                   className="text-[#3f414d] hover:text-primary transition-colors p-1 relative"
                 >
                   <ShoppingBag size={22} strokeWidth={2} />
-                  {cartCount > 0 && (
+                  {activeCartCount > 0 && (
                     <span className="absolute -top-1 -right-1 bg-primary text-white text-[8px] font-bold w-4 h-4 flex items-center justify-center rounded-full shadow-sm transition-all duration-300 scale-100">
-                      {cartCount}
+                      {activeCartCount}
                     </span>
                   )}
                 </button>
 
                 <div className="w-[1px] h-6 bg-gray-100 hidden sm:block"></div>
 
-                 <div className="hidden sm:flex items-center gap-3">
+                <div className="hidden sm:flex items-center gap-3">
                   {user ? (
                     <div className="flex items-center gap-3">
                       {/* Wallet Balance Badge */}
@@ -343,7 +380,11 @@ const Navbar = () => {
                                     </div>
                                   )}
                                   <p className="text-sm font-bold text-primary uppercase mt-0.5">
-                                    {user.role}
+                                    {(() => {
+                                      const roles = Array.isArray(user.roles) ? user.roles : (user.role ? [user.role] : []);
+                                      const activeRole = roles.find(r => r && String(r).toLowerCase() !== 'user') || user.role || 'user';
+                                      return String(activeRole).toUpperCase();
+                                    })()}
                                   </p>
                                 </div>
                               </div>
@@ -351,26 +392,14 @@ const Navbar = () => {
                             </div>
 
                             <div className="p-1.5 flex flex-col gap-0.5">
-                              {user.role === 'admin' && (
-                                <Link to="/admin" className="flex items-center gap-3 px-3.5 py-2.5 hover:bg-gray-50 rounded-xl text-[12px] font-bold text-gray-600 hover:text-primary transition-all">
-                                  <LayoutDashboard size={16} /> Admin Panel
-                                </Link>
-                              )}
-                              {user.role === 'vendor' && (
-                                <Link to="/vendor/dashboard" className="flex items-center gap-3 px-3.5 py-2.5 hover:bg-gray-50 rounded-xl text-[12px] font-bold text-gray-600 hover:text-primary transition-all">
-                                  <LayoutDashboard size={16} /> Vendor Dashboard
-                                </Link>
-                              )}
-                              {user.role === 'influencer' && (
-                                <Link to="/influencer/dashboard" className="flex items-center gap-3 px-3.5 py-2.5 hover:bg-gray-50 rounded-xl text-[12px] font-bold text-gray-600 hover:text-primary transition-all">
-                                  <LayoutDashboard size={16} /> Influencer Portal
-                                </Link>
-                              )}
-                              {user.role === 'distributor' && (
-                                <Link to="/distributor/dashboard" className="flex items-center gap-3 px-3.5 py-2.5 hover:bg-gray-50 rounded-xl text-[12px] font-bold text-gray-600 hover:text-primary transition-all">
-                                  <LayoutDashboard size={16} /> Distributor Portal
-                                </Link>
-                              )}
+                              {(() => {
+                                const dashInfo = getDashboardLink(user);
+                                return dashInfo ? (
+                                  <Link to={dashInfo.path} className="flex items-center gap-3 px-3.5 py-2.5 bg-primary/5 hover:bg-primary/10 rounded-xl text-[12px] font-bold text-primary transition-all">
+                                    <LayoutDashboard size={16} /> {dashInfo.label}
+                                  </Link>
+                                ) : null;
+                              })()}
                               <Link to="/profile" className="flex items-center gap-3 px-3.5 py-2.5 hover:bg-gray-50 rounded-xl text-[12px] font-bold text-gray-600 hover:text-primary transition-all">
                                 <User size={16} /> My Profile
                               </Link>
@@ -463,42 +492,18 @@ const Navbar = () => {
                   <div className="pt-4 border-t border-gray-100 space-y-4">
                     <span className="text-sm font-black text-gray-400 uppercase tracking-widest">My Account</span>
                     <div className="space-y-3.5">
-                      {user.role === 'admin' && (
-                        <Link
-                          to="/admin"
-                          onClick={() => setIsMenuOpen(false)}
-                          className="flex items-center gap-2.5 text-[14px] font-bold text-gray-600 hover:text-primary uppercase tracking-wide"
-                        >
-                          <LayoutDashboard size={14} className="text-primary" /> Admin Panel
-                        </Link>
-                      )}
-                      {user.role === 'vendor' && (
-                        <Link
-                          to="/vendor/dashboard"
-                          onClick={() => setIsMenuOpen(false)}
-                          className="flex items-center gap-2.5 text-[14px] font-bold text-gray-600 hover:text-primary uppercase tracking-wide"
-                        >
-                          <LayoutDashboard size={14} className="text-primary" /> Vendor Dashboard
-                        </Link>
-                      )}
-                      {user.role === 'influencer' && (
-                        <Link
-                          to="/influencer/dashboard"
-                          onClick={() => setIsMenuOpen(false)}
-                          className="flex items-center gap-2.5 text-[14px] font-bold text-gray-600 hover:text-primary uppercase tracking-wide"
-                        >
-                          <LayoutDashboard size={14} className="text-primary" /> Influencer Portal
-                        </Link>
-                      )}
-                      {user.role === 'distributor' && (
-                        <Link
-                          to="/distributor/dashboard"
-                          onClick={() => setIsMenuOpen(false)}
-                          className="flex items-center gap-2.5 text-[14px] font-bold text-gray-600 hover:text-primary uppercase tracking-wide"
-                        >
-                          <LayoutDashboard size={14} className="text-primary" /> Distributor Portal
-                        </Link>
-                      )}
+                      {(() => {
+                        const dashInfo = getDashboardLink(user);
+                        return dashInfo ? (
+                          <Link
+                            to={dashInfo.path}
+                            onClick={() => setIsMenuOpen(false)}
+                            className="flex items-center gap-2.5 text-[14px] font-bold text-primary hover:text-primary-hover uppercase tracking-wide mb-1"
+                          >
+                            <LayoutDashboard size={14} className="text-primary" /> {dashInfo.label}
+                          </Link>
+                        ) : null;
+                      })()}
 
                       <Link
                         to="/profile"
