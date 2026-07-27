@@ -1025,7 +1025,7 @@ export const getAllServiceCategories = async () => {
 
 export const getAllServiceSubscriptionPlans = async () => {
   try {
-    const response = await apiClient.get('/service/get-all-service-subscription-plans');
+    const response = await apiClient.get('/service/get-all-service-subscription-plans', { skipAuth: true });
     return response.data;
   } catch (error) {
     console.error('Fetch subscription plans error:', error);
