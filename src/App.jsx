@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import TopStrip from './components/TopStrip';
 import AnnouncementBar from './components/AnnouncementBar';
@@ -36,9 +36,12 @@ import Coupons from './pages/profile/Coupons';
 import Payments from './pages/profile/Payments';
 import Orders from './pages/profile/Orders';
 import UserServiceLeads from './pages/profile/UserServiceLeads';
+import QuickCommerceHub from './pages/quick_commerce/QuickCommerceHub';
+import RiderFlow from './pages/quick_commerce/RiderFlow';
+import RiderLogin from './pages/quick_commerce/RiderLogin';
 import { CartProvider } from './context/CartContext';
 import { ThemeProvider } from './context/ThemeContext';
-import { UserProvider } from './context/UserContext';
+import { UserProvider, useUser } from './context/UserContext';
 import { SearchProvider } from './context/SearchContext';
 import { WishlistProvider } from './context/WishlistContext';
 import { WalletProvider } from './context/WalletContext';
@@ -61,7 +64,9 @@ const App = () => {
     location.pathname.startsWith('/influencer') ||
     location.pathname.startsWith('/distributor') ||
     location.pathname.startsWith('/service-provider') ||
-    location.pathname.startsWith('/educator');
+    location.pathname.startsWith('/educator') ||
+    location.pathname.startsWith('/rider') ||
+    location.pathname.startsWith('/quick-commerce/rider');
 
   return (
     <UserProvider>
@@ -126,6 +131,12 @@ const App = () => {
                 </RoleGuard>
               } />
 
+              <Route path="/service-provider/panel" element={
+                <RoleGuard allowedRoles={['user', 'service_provider', 'admin']}>
+                  <ServiceProviderPanel />
+                </RoleGuard>
+              } />
+
               <Route path="/educator/dashboard" element={
                 <RoleGuard allowedRoles={['educator', 'admin']}>
                   <EducatorDashboard />
@@ -144,7 +155,19 @@ const App = () => {
                 </RoleGuard>
               } />
 
-              {/* Customer Routes */}
+              {/* Customer & Rider Routes */}
+              <Route path="/quick-commerce" element={<QuickCommerceHub />} />
+              <Route path="/rider/login" element={<RiderLogin />} />
+              <Route path="/rider/dashboard" element={
+                <RoleGuard allowedRoles={['delivery_person', 'rider', 'admin']}>
+                  <RiderFlow />
+                </RoleGuard>
+              } />
+              <Route path="/quick-commerce/rider" element={
+                <RoleGuard allowedRoles={['delivery_person', 'rider', 'admin']}>
+                  <RiderFlow />
+                </RoleGuard>
+              } />
               <Route path="/booking" element={<Booking />} />
               <Route path="/cart" element={<Cart />} />
               <Route path="/checkout" element={<Checkout />} />
