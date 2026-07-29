@@ -5,7 +5,8 @@ import { searchServices, getAvailableSlots, createBooking, createServiceLead } f
 import { getAllServiceCategories } from '../api/adminService';
 import { useUser } from '../context/UserContext';
 import { useNavigate } from 'react-router-dom';
-import { X, Loader2 } from 'lucide-react';
+import { X, Loader2, MapPin, Navigation } from 'lucide-react';
+import bookingHeroImg from '../assets/bookinghero.png';
 
 // Booking Sub-components
 import BookingSearchForm from '../components/booking/BookingSearchForm';
@@ -21,6 +22,7 @@ const Booking = () => {
   const [loading, setLoading] = useState(false);
   const [searchingLocation, setSearchingLocation] = useState(false);
   const [bookingConfirmLoading, setBookingConfirmLoading] = useState(false);
+  const [showLocationModal, setShowLocationModal] = useState(true);
   
   // Geolocation & Search params
   const [city, setCity] = useState('');
@@ -230,12 +232,39 @@ const Booking = () => {
     const serviceProviderId = selectedResult.provider?._id;
     const serviceAddress = [selectedResult.provider?.address, selectedResult.provider?.city].filter(Boolean).join(', ') || 'Delhi';
 
+    // Safely format ISO date strings for backend validator
+    let validSlotStartTime = selectedSlot.startTime;
+    try {
+      if (validSlotStartTime && !validSlotStartTime.includes('T')) {
+        const d = new Date(`${selectedDate} ${validSlotStartTime}`);
+        if (!isNaN(d.getTime())) {
+          validSlotStartTime = d.toISOString();
+        } else {
+          validSlotStartTime = new Date(`${selectedDate}T10:00:00.000Z`).toISOString();
+        }
+      } else if (validSlotStartTime) {
+        validSlotStartTime = new Date(validSlotStartTime).toISOString();
+      } else {
+        validSlotStartTime = new Date(`${selectedDate}T10:00:00.000Z`).toISOString();
+      }
+    } catch (e) {
+      validSlotStartTime = new Date(`${selectedDate}T10:00:00.000Z`).toISOString();
+    }
+
+    let validBookingDate = selectedDate;
+    try {
+      const bd = new Date(selectedDate);
+      if (!isNaN(bd.getTime())) {
+        validBookingDate = bd.toISOString();
+      }
+    } catch (e) {}
+
     const payload = {
       items,
       staffId,
       serviceProviderId,
-      bookingDate: selectedDate,
-      slotStartTime: selectedSlot.startTime,
+      bookingDate: validBookingDate,
+      slotStartTime: validSlotStartTime,
       serviceAddress
     };
 
@@ -425,22 +454,36 @@ const Booking = () => {
   return (
     <div className="bg-gray-50 min-h-screen font-outfit text-gray-800 pb-24 lg:pb-12 text-left">
       
-      {/* Premium Header Banner */}
-      <div className="bg-gradient-to-r from-pink-500 via-rose-500 to-purple-600 py-16 px-4 shadow-md text-white text-center">
-        <div className="max-w-[1600px] mx-auto space-y-4">
-          <span className="text-sm font-black tracking-widest bg-white/20 px-3 py-1 rounded-full uppercase">
-            Instantly Confirmed Appointments
-          </span>
-          <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tight">
-            Book Beauty Services
-          </h1>
-          <p className="text-xs md:text-sm text-white/80 font-bold uppercase tracking-wider">
-            Discover nearby salons, select premium stylists & pay after service.
-          </p>
+      {/* Premium Header Banner - Full Width bookinghero.png */}
+      <div className="relative w-full overflow-hidden bg-[#fff0f4] border-b border-pink-100 shadow-xs">
+        <div className="relative w-full h-[140px] sm:h-[200px] md:h-[240px] flex items-center px-6 sm:px-12 md:px-20">
+
+          {/* Background Image */}
+          <img
+            src={bookingHeroImg}
+            alt="Salon & Bridal Booking Hero"
+            className="absolute inset-0 w-full h-full object-cover object-right sm:object-center"
+          />
+
+          {/* Text Overlay Content */}
+          <div className="relative z-10 max-w-xl text-left py-2">
+            <span className="text-[#ff4d6d] font-bold uppercase tracking-wider text-[9px] sm:text-[11px] mb-1 block">
+              Instantly Confirmed Appointments
+            </span>
+
+            <h1 className="text-xl sm:text-3xl md:text-4xl font-serif text-gray-900 leading-[1.15] mb-1 sm:mb-2 tracking-tight">
+              Book Beauty Services
+            </h1>
+
+            <p className="text-gray-600 font-medium text-[11px] sm:text-xs md:text-sm max-w-md leading-snug hidden sm:block">
+              Discover nearby salons, select premium stylists & pay after service.
+            </p>
+          </div>
+
         </div>
       </div>
 
-      {/* Geolocation Search Form block */}
+      {/* Geolocation Search Form & Custom Requirements Row */}
       <BookingSearchForm
         city={city}
         setCity={setCity}
@@ -450,36 +493,15 @@ const Booking = () => {
         detectLocation={detectLocation}
         handleSearchClick={handleSearchClick}
         loading={loading}
+        onOpenLeadModal={handleOpenLeadModal}
       />
 
-      {/* Main Content Layout Grid (1600px Max Width Container) */}
-      <div className="max-w-[1600px] mx-auto px-4 py-12">
-        
-        {/* Custom Lead Request Banner */}
-        <div className="bg-white p-6 rounded-3xl border border-gray-150 shadow-md mb-8 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="space-y-1 text-left">
-            <span className="text-[10px] font-black tracking-widest text-primary bg-primary/10 px-2.5 py-1 rounded-full uppercase">
-              Custom Requirements
-            </span>
-            <h2 className="text-lg font-bold text-gray-900">Can't find a matching Lounge or Service nearby?</h2>
-            <p className="text-xs text-gray-500 font-medium leading-relaxed">
-              Post your requirement details, budget, and location. Let verified service providers send you customized quotes!
-            </p>
-          </div>
-          <button
-            onClick={handleOpenLeadModal}
-            className="bg-primary hover:bg-primary/95 text-white font-black uppercase text-xs tracking-wider px-6 py-3.5 rounded-2xl shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all cursor-pointer whitespace-nowrap"
-          >
-            Request Custom Service
-          </button>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 xl:gap-12 items-start">
+      {/* Main Content Layout Grid (1600px Max Width 4-Step Columns Container) */}
+      <div className="max-w-[1600px] mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 items-start">
           
-          {/* LEFT COLUMN: Open, comprehensive listings */}
-          <div className="lg:col-span-2 space-y-12">
-            
-            {/* Section 1: Lounge selection */}
+          {/* Col 1: Lounge selection */}
+          <div className="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm min-h-[480px]">
             <LoungeSelection
               loading={loading}
               searchResults={searchResults}
@@ -491,25 +513,20 @@ const Booking = () => {
               setSlots={setSlots}
               servicesRef={servicesRef}
             />
+          </div>
 
-            {/* Section 2: Services Catalogue & Stylist Preferences */}
-            <div className="space-y-6">
-              <ServicesCatalog
-                selectedResult={selectedResult}
-                selectedServices={selectedServices}
-                handleToggleService={handleToggleService}
-                servicesRef={servicesRef}
-              />
-              
-              <StylistSelector
-                slotsLoading={slotsLoading}
-                slots={slots}
-                selectedStaff={selectedStaff}
-                setSelectedStaff={setSelectedStaff}
-              />
-            </div>
+          {/* Col 2: Services Catalogue */}
+          <div className="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm min-h-[480px]">
+            <ServicesCatalog
+              selectedResult={selectedResult}
+              selectedServices={selectedServices}
+              handleToggleService={handleToggleService}
+              servicesRef={servicesRef}
+            />
+          </div>
 
-            {/* Section 3: Schedule Date & Slots */}
+          {/* Col 3: Schedule Date & Slots */}
+          <div className="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm min-h-[480px]">
             <DateTimeSlotSelector
               selectedResult={selectedResult}
               selectedServices={selectedServices}
@@ -523,11 +540,10 @@ const Booking = () => {
               slotsLoading={slotsLoading}
               scheduleRef={scheduleRef}
             />
-
           </div>
 
-          {/* RIGHT COLUMN: Sticky Checkout Card (Displays selection and final checkout action) */}
-          <div className="space-y-6">
+          {/* Col 4: Booking Summary */}
+          <div className="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm min-h-[480px]">
             <BookingSummary
               selectedResult={selectedResult}
               selectedServices={selectedServices}
@@ -784,6 +800,46 @@ const Booking = () => {
               </div>
 
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* GPS Location Permission Modal */}
+      {showLocationModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-[9999] animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl w-full max-w-md p-6 sm:p-8 shadow-2xl border border-gray-100 text-center animate-in scale-in-95 duration-200">
+            <div className="w-16 h-16 rounded-full bg-pink-100 border border-pink-200 flex items-center justify-center mx-auto mb-4 animate-bounce">
+              <Navigation size={28} className="text-[#ff4d6d]" />
+            </div>
+            
+            <h3 className="text-xl font-extrabold text-gray-900 mb-2">
+              Enable Location Access
+            </h3>
+            
+            <p className="text-xs text-gray-600 font-medium leading-relaxed mb-6">
+              Allow location access so we can automatically detect your GPS location and find verified beauty lounges and salons near you.
+            </p>
+
+            <div className="space-y-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowLocationModal(false);
+                  detectLocation(false);
+                }}
+                className="w-full bg-[#ff4d6d] hover:bg-[#e63956] text-white py-3.5 px-6 rounded-2xl font-extrabold text-sm transition-all shadow-md shadow-pink-500/20 cursor-pointer flex items-center justify-center gap-2"
+              >
+                <Navigation size={16} /> Allow GPS Location
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setShowLocationModal(false)}
+                className="w-full bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 py-3 px-6 rounded-2xl font-bold text-xs transition-all cursor-pointer"
+              >
+                Enter City Manually
+              </button>
+            </div>
           </div>
         </div>
       )}

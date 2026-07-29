@@ -65,9 +65,9 @@ const ServiceProviderSidebar = ({
               <span className="text-white text-xs font-black tracking-tight">SP</span>
             </div>
             <div>
-              <p className="text-xs font-black uppercase text-primary tracking-widest leading-none">Wakeup</p>
-              <p className={`text-sm font-bold uppercase tracking-wider leading-tight mt-0.5 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
-                Provider Panel
+              <p className="text-[10px] font-black uppercase text-primary tracking-widest leading-none">FashionFever</p>
+              <p className={`text-xs font-extrabold uppercase tracking-wider leading-tight mt-0.5 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                Service Provider Dashboard
               </p>
             </div>
           </div>

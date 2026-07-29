@@ -215,7 +215,7 @@ const Wishlist = () => {
                       <Heart size={32} className="text-gray-200" />
                     </div>
                     <h2 className="text-sm font-bold text-gray-400 uppercase">Your wishlist is empty</h2>
-                    <Link to="/" className="mt-8 bg-primary text-white px-10 py-4 rounded-xl font-bold uppercase text-xs shadow-xl shadow-primary/20">
+                    <Link to="/" className="mt-8 bg-primary !text-white px-10 py-4 rounded-xl font-bold uppercase text-xs shadow-xl shadow-primary/20">
                       Go Shopping
                     </Link>
                   </div>
@@ -223,7 +223,7 @@ const Wishlist = () => {
 
                 {/* Footer text */}
                 <div className="mt-20 border-t border-gray-50 pt-10 text-center">
-                   <p className="text-xs font-bold text-gray-300 uppercase">No More Products to Show</p>
+                   <p className="text-xs font-bold text-gray-500 uppercase">No More Products to Show</p>
                 </div>
               </div>
             </div>

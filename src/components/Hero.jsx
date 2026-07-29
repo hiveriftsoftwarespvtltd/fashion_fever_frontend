@@ -7,6 +7,7 @@ import hero1 from '../assets/hero1.png';
 import hero2 from '../assets/hero2.png';
 import { getHomeContentsPublic } from '../api/adminService';
 import config from '../config/config';
+import { getImageUrl } from '../utils/imageUrl';
 
 const Hero = () => {
   const navigate = useNavigate();
@@ -17,40 +18,25 @@ const Hero = () => {
   const fallbackSlides = [
     {
       _id: 'fallback-1',
-      title: 'Wakeup Makeup',
+      title: 'FashionFever Makeup',
       computerImage: hero1,
-      mobileImage: hero2,
-      backgroundColor: '#dd8e7f',
+      mobileImage: hero1,
+      backgroundColor: '#3f0f37',
       redirectType: 'NONE',
       isFallback: true
     },
     {
       _id: 'fallback-2',
-      title: 'Premium Beauty',
+      title: 'Premium Lipsticks',
       computerImage: hero2,
-      mobileImage: hero1,
-      backgroundColor: '#3d0d43',
+      mobileImage: hero2,
+      backgroundColor: '#f7d8d5',
       redirectType: 'NONE',
       isFallback: true
     }
   ];
 
-  const resolveImageUrl = (img) => {
-    if (!img) return '';
-    if (typeof img === 'string') {
-      if (img.startsWith('http://') || img.startsWith('https://') || img.startsWith('data:') || img.startsWith('blob:')) {
-        return img;
-      }
-      if (/^[0-9a-fA-F]{24}$/.test(img)) {
-        return `${config.API_URL}/file/get-file/${img}`;
-      }
-      return img;
-    }
-    if (typeof img === 'object' && img?.url) {
-      return img.url;
-    }
-    return '';
-  };
+  const resolveImageUrl = (img) => getImageUrl(img);
 
   useEffect(() => {
     const fetchBanners = async () => {
@@ -133,10 +119,10 @@ const Hero = () => {
   if (loading) {
     return (
       <div className="w-full">
-        <CategoryStrip />
+        {/* <CategoryStrip /> */}
         <AnnouncementBar />
-        <div className="max-w-[1800px] mx-auto md:px-6">
-          <div className="w-full h-[220px] sm:h-[320px] md:h-[420px] lg:h-[600px] xl:h-[680px] rounded-2xl flex items-center justify-center bg-gray-100 dark:bg-gray-900 animate-pulse relative overflow-hidden">
+        <div className="w-full">
+          <div className="w-full h-[200px] sm:h-[300px] md:h-[380px] lg:h-[450px] flex items-center justify-center bg-gray-100 dark:bg-gray-900 animate-pulse relative overflow-hidden">
             <div className="flex flex-col items-center gap-3">
               <div className="w-10 h-10 rounded-full border-2 border-primary/20 border-t-primary animate-spin" />
               <span className="text-sm font-bold tracking-widest text-gray-400 uppercase">Curating offers...</span>
@@ -150,14 +136,14 @@ const Hero = () => {
   return (
     <div className="w-full">
       {/* These move here to become part of Hero */}
-      <CategoryStrip />
+      {/* <CategoryStrip /> */}
       <AnnouncementBar />
 
-      <div className="max-w-[1800px]   mx-auto   md:px-6">
-        {/* Interactive Banner Carousel */}
-        <div className="relative w-full overflow-hidden  shadow-md group">
+      <div className="w-full">
+        {/* Interactive Banner Carousel - Edge to Edge Full Width */}
+        <div className="relative w-full overflow-hidden shadow-sm group">
 
-          {/* Slides Strip — fixed height, object-contain, bg matched to image edge color */}
+          {/* Slides Strip — fixed height, object-cover, bg matched to image edge color */}
           <div
             className="flex transition-transform duration-[800ms] ease-in-out"
             style={{ transform: `translateX(-${currentSlide * 100}%)` }}
@@ -171,15 +157,15 @@ const Hero = () => {
                 <div
                   key={slide._id || index}
                   onClick={() => handleSlideClick(slide)}
-                  className="min-w-full h-[220px] sm:h-[320px] md:h-[420px] lg:h-[600px] xl:h-[680px] cursor-pointer flex items-center justify-center relative select-none"
+                  className="min-w-full h-[200px] sm:h-[300px] md:h-[380px] lg:h-[450px] cursor-pointer flex items-center justify-center relative select-none"
                   style={{ backgroundColor: bgCol }}
                 >
                   <picture className="w-full h-full">
                     {mobImg && <source media="(max-width: 640px)" srcSet={mobImg} />}
                     <img
                       src={compImg}
-                      alt={slide.title || `Wakeup Makeup Banner ${index + 1}`}
-                      className="w-full h-full object-contain sm:object-cover object-center"
+                      alt={slide.title || `FashionFever Banner ${index + 1}`}
+                      className="w-full h-full object-cover object-center"
                     />
                   </picture>
                 </div>

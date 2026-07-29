@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ShoppingBag, Heart, Star, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ShoppingBag, Heart, Star, Loader2, ChevronLeft, ChevronRight, Sparkles, ArrowRight, Crown } from 'lucide-react';
 import { getProducts } from '../api/productService';
 import { addToCart } from '../api/cartService';
 import { addToWishlist, getWishlist, removeFromWishlist } from '../api/wishlistService';
@@ -185,64 +185,83 @@ const ProductSection = () => {
   }
 
   return (
-    <section className="bg-white py-16 font-outfit">
+    <section className="bg-white py-6 sm:py-10">
       <style>{`.ps-track::-webkit-scrollbar{display:none}`}</style>
-      <div className="container mx-auto px-4 md:px-8 max-w-[1600px]">
-        <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-12 gap-4">
-          <div className="text-left">
-            <span className="text-xs font-bold text-primary uppercase mb-2 block tracking-normal">Our Curated Collection</span>
-            <h2 className="text-2xl md:text-4xl font-extrabold text-gray-900 uppercase italic">Best Sellers For You</h2>
+      <div className="max-w-[1600px] mx-auto px-2 sm:px-4 md:px-8">
+        
+        {/* Outer Card Wrapper matching Reference Image */}
+        <div className="bg-white border border-gray-200 rounded-2xl sm:rounded-3xl p-3 sm:p-5 md:p-8 shadow-2xs overflow-hidden">
+          
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-6 sm:mb-8 pb-4 border-b border-slate-100">
+            <div>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 text-[#ff4d6d] text-[10px] sm:text-xs font-black uppercase tracking-widest border border-rose-100/80 mb-2 shadow-2xs">
+                <Crown size={13} className="text-[#ff4d6d]" /> OUR CURATED COLLECTION
+              </span>
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-slate-900 leading-tight tracking-tight font-serif">
+                Best Sellers For You
+              </h2>
+            </div>
+            <Link
+              to="/shop"
+              className="group inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-50 hover:bg-[#ff4d6d] text-slate-700 hover:text-white font-extrabold text-xs uppercase tracking-wider transition-all duration-300 border border-slate-200 hover:border-[#ff4d6d] shadow-2xs cursor-pointer self-start sm:self-auto"
+            >
+              <span>View All</span>
+              <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+            </Link>
           </div>
-          <Link to="/shop" className="text-xs font-bold text-gray-400 hover:text-primary transition-all uppercase border-b-2 border-gray-100 hover:border-primary pb-1 tracking-normal">
-            View All Products
-          </Link>
-        </div>
 
-        {/* ── Carousel strip ─────────────────────────────── */}
-        <div className="relative">
+          {/* ── Carousel Track ─────────────────────────────── */}
+          <div className="relative">
 
-          {/* ← Prev */}
-          <button
-            onClick={() => scrollBy(-1)}
-            className="absolute left-0 top-1/2 -translate-y-6 z-20 w-10 h-10 rounded-full bg-white border border-gray-100 shadow-md flex items-center justify-center text-gray-600 hover:text-primary hover:border-primary transition-all duration-200 hover:scale-105 cursor-pointer"
-            aria-label="Previous"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
+            {/* ← Prev Arrow (Shown on MD+ to prevent mobile overflow) */}
+            <button
+              onClick={() => scrollBy(-1)}
+              onMouseEnter={() => { isPausedRef.current = true; }}
+              onMouseLeave={() => { isPausedRef.current = false; }}
+              className="hidden md:flex absolute -left-5 md:-left-6 top-1/2 -translate-y-1/2 z-20 w-8 h-8 md:w-10 md:h-10 rounded-full bg-white border border-gray-200 shadow-lg items-center justify-center text-gray-700 hover:text-[#ff4d6d] hover:border-[#ff4d6d] transition-all cursor-pointer"
+              aria-label="Previous"
+            >
+              <ChevronLeft className="w-4 h-4 md:w-5 md:h-5" />
+            </button>
 
-          {/* → Next */}
-          <button
-            onClick={() => scrollBy(1)}
-            className="absolute right-0 top-1/2 -translate-y-6 z-20 w-10 h-10 rounded-full bg-white border border-gray-100 shadow-md flex items-center justify-center text-gray-600 hover:text-primary hover:border-primary transition-all duration-200 hover:scale-105 cursor-pointer"
-            aria-label="Next"
-          >
-            <ChevronRight className="w-5 h-5" />
-          </button>
+            {/* → Next Arrow */}
+            <button
+              onClick={() => scrollBy(1)}
+              onMouseEnter={() => { isPausedRef.current = true; }}
+              onMouseLeave={() => { isPausedRef.current = false; }}
+              className="hidden md:flex absolute -right-5 md:-right-6 top-1/2 -translate-y-1/2 z-20 w-8 h-8 md:w-10 md:h-10 rounded-full bg-white border border-gray-200 shadow-lg items-center justify-center text-gray-700 hover:text-[#ff4d6d] hover:border-[#ff4d6d] transition-all cursor-pointer"
+              aria-label="Next"
+            >
+              <ChevronRight className="w-4 h-4 md:w-5 md:h-5" />
+            </button>
 
-          {/* Scrollable track */}
-          <div
-            ref={scrollRef}
-            className="ps-track flex gap-4 overflow-x-auto px-10 py-2"
-            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-            onMouseEnter={() => { isPausedRef.current = true; }}
-            onMouseLeave={() => { isPausedRef.current = false; }}
-          >
-            {products.map((product) => {
-              const firstVariant = product.variants?.[0];
-              return (
-                <div
-                  key={product._id}
-                  className="flex-shrink-0 w-[calc((100%-1rem)/2)] sm:w-[calc((100%-1.5rem)/2)] md:w-[calc((100%-2rem)/3)] lg:w-[calc((100%-3rem)/4)] xl:w-[calc((100%-4rem)/5)]"
-                >
-                  <ProductCard
-                    product={product}
-                    isWishlisted={wishlistIds.includes(firstVariant?._id)}
-                    onWishlistToggle={() => handleAddToWishlist(product._id, firstVariant?._id)}
-                  />
-                </div>
-              );
-            })}
+            {/* Scrollable track */}
+            <div
+              ref={scrollRef}
+              className="ps-track flex gap-3 sm:gap-4 overflow-x-auto py-1"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+              onMouseEnter={() => { isPausedRef.current = true; }}
+              onMouseLeave={() => { isPausedRef.current = false; }}
+            >
+              {products.map((product) => {
+                const firstVariant = product.variants?.[0];
+                return (
+                  <div
+                    key={product._id}
+                    className="flex-shrink-0 w-[165px] sm:w-[200px] md:w-[calc((100%-2rem)/3)] lg:w-[calc((100%-3rem)/4)] xl:w-[calc((100%-4rem)/5)]"
+                  >
+                    <ProductCard
+                      product={product}
+                      isWishlisted={wishlistIds.includes(firstVariant?._id)}
+                      onWishlistToggle={() => handleAddToWishlist(product._id, firstVariant?._id)}
+                    />
+                  </div>
+                );
+              })}
+            </div>
           </div>
+
         </div>
       </div>
     </section>

@@ -59,7 +59,9 @@ const Checkout = () => {
   const getMergedDetailedCartItems = () => {
     if (!detailedCart?.cartItems) return [];
     const merged = {};
-    detailedCart.cartItems.forEach(item => {
+    const standardOnly = detailedCart.cartItems.filter(item => !item.isQuickDelivery);
+    const list = standardOnly.length > 0 ? standardOnly : detailedCart.cartItems;
+    list.forEach(item => {
       const name = item.productName || '';
       const color = ((item.attributes?.Color || item.attributes?.color) ?? '').trim().toLowerCase();
       const size = ((item.attributes?.Size || item.attributes?.size) ?? '').trim().toLowerCase();
@@ -77,7 +79,9 @@ const Checkout = () => {
   const getMergedLocalCartItems = () => {
     if (!cart) return [];
     const merged = {};
-    cart.forEach(item => {
+    const standardOnly = cart.filter(item => !item.isQuickDelivery);
+    const list = standardOnly.length > 0 ? standardOnly : cart;
+    list.forEach(item => {
       const name = item.name || '';
       const color = ((item.attributes?.Color || item.attributes?.color) ?? '').trim().toLowerCase();
       const size = ((item.attributes?.Size || item.attributes?.size) ?? '').trim().toLowerCase();
@@ -92,8 +96,17 @@ const Checkout = () => {
     return Object.values(merged);
   };
 
+  const getSubtotalAmount = () => {
+    const items = getMergedLocalCartItems();
+    if (detailedCart?.cartItems?.length > 0) {
+      const detailedItems = getMergedDetailedCartItems();
+      return detailedItems.reduce((acc, item) => acc + (Number(item.price || item.finalPrice || 0) * Number(item.quantity || 1)), 0);
+    }
+    return items.reduce((acc, item) => acc + (Number(item.price || 0) * Number(item.qty || 1)), 0);
+  };
+
   const getFinalTotal = () => {
-    const baseTotal = detailedCart?.cartSummary?.finalTotal || cart?.reduce((acc, item) => acc + (item.price * item.qty), 0) || 0;
+    const baseTotal = getSubtotalAmount();
     const codCharge = paymentMethod === 'cod' ? (detailedCart?.cartSummary?.codCharge || 0) : 0;
     const discount = appliedCoupon?.discount || 0;
     return Math.max(0, baseTotal + codCharge - discount);
@@ -270,7 +283,10 @@ const Checkout = () => {
     try {
       // Group/merge cart items to prevent duplicate variants in the API payload!
       const mergedPayloadItems = {};
-      cart.forEach(item => {
+      const standardOnlyCart = cart.filter(item => !item.isQuickDelivery);
+      const cartToOrder = standardOnlyCart.length > 0 ? standardOnlyCart : cart;
+      
+      cartToOrder.forEach(item => {
         const pId = item.productId || item.id;
         const vId = item.variantId || item.id;
         const qty = item.qty || 1;
@@ -313,8 +329,8 @@ const Checkout = () => {
             <div class="space-y-4 text-left font-outfit mt-2">
               <p class="text-xs text-gray-600 font-medium leading-relaxed">
                 ${paymentMethod === 'wallet' 
-                  ? 'Thank you for shopping with WakeUp Makeup. Your payment has been processed successfully using your Wallet balance.' 
-                  : 'Thank you for shopping with WakeUp Makeup. Your order is secured under Cash on Delivery (COD).'}
+                  ? 'Thank you for shopping with FashionFever. Your payment has been processed successfully using your Wallet balance.' 
+                  : 'Thank you for shopping with FashionFever. Your order is secured under Cash on Delivery (COD).'}
               </p>
               <div class="bg-gray-50/80 p-5 rounded-2xl border border-gray-100/60 text-xs font-bold text-gray-500 uppercase space-y-2">
                 <div class="flex justify-between border-b border-gray-200/40 pb-2">
@@ -1135,7 +1151,7 @@ const Checkout = () => {
                 )}
                 <div className="flex justify-between">
                   <span>Subtotal</span>
-                  <span className="text-gray-800">₹{Number(detailedCart?.cartSummary?.subTotal || cart.reduce((acc, item) => acc + (item.price * item.qty), 0)).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                  <span className="text-gray-800">₹{Number(getSubtotalAmount()).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                 </div>
                 {(detailedCart?.cartSummary?.discount !== undefined || appliedCoupon) && (
                   <div className="flex justify-between text-green-600">

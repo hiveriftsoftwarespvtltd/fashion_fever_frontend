@@ -376,6 +376,7 @@ const Orders = () => {
                 {[
                   { id: 'all', label: 'All Purchases' },
                   { id: 'pending', label: 'Processing' },
+                  { id: 'shipped', label: 'Shipped' },
                   { id: 'delivered', label: 'Delivered' },
                   { id: 'cancelled', label: 'Cancelled' }
                 ].map(tab => (
@@ -412,7 +413,7 @@ const Orders = () => {
                   <h3 className="text-base font-extrabold uppercase text-gray-800">No Orders Found</h3>
                   <p className="text-xs text-gray-400 font-bold uppercase leading-relaxed">
                     {activeTab === 'all' 
-                      ? "You haven't placed any orders yet on WakeUp Makeup." 
+                      ? "You haven't placed any orders yet on FashionFever." 
                       : `You have no ${activeTab} orders at this moment.`}
                   </p>
                 </div>
@@ -432,24 +433,47 @@ const Orders = () => {
                   >
                     
                     {/* Order Metadata Header Card */}
-                    <div className="bg-gray-50/50 border-b border-gray-100 px-6 py-5 md:px-8 grid grid-cols-2 md:grid-cols-4 gap-4 items-center">
+                    <div className="bg-gray-50/70 border-b border-gray-100 px-6 py-5 md:px-8 grid grid-cols-2 md:grid-cols-4 gap-4 items-center">
                       <div className="space-y-1">
-                        <span className="text-[9px] font-black text-gray-400 uppercase block">Order Number</span>
-                        <code className="text-xs font-black text-gray-900 uppercase tracking-tight">{order.orderNumber}</code>
+                        <span className="text-[9px] font-black text-gray-400 uppercase tracking-wider block">Order Number</span>
+                        <div className="flex flex-col gap-1 items-start">
+                          <code className="text-xs font-black text-gray-900 uppercase tracking-tight bg-white px-2 py-0.5 rounded border border-gray-200 shadow-2xs">
+                            {order.orderNumber}
+                          </code>
+                          {(order.isQuickDelivery || order.orderType === 'QUICK' || order.isQuickCommerce) ? (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase bg-amber-500/15 text-amber-600 border border-amber-500/30 animate-pulse">
+                              ⚡ 10-MIN EXPRESS
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase bg-gray-100 text-gray-500 border border-gray-200">
+                              📦 STANDARD SHIPPING
+                            </span>
+                          )}
+                        </div>
                       </div>
+
+                      {/* PLACED DATE & TIME */}
                       <div className="space-y-1">
-                        <span className="text-[9px] font-black text-gray-400 uppercase block">Placed On</span>
-                        <span className="text-xs font-extrabold text-gray-700 flex items-center gap-1.5">
-                          <Calendar size={12} className="text-gray-400" />
-                          {order.createdAt ? new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'N/A'}
-                        </span>
+                        <span className="text-[9px] font-black text-gray-400 uppercase tracking-wider block">Placed Date & Time</span>
+                        <div className="flex flex-col gap-0.5">
+                          <span className="text-xs font-black text-gray-800 flex items-center gap-1.5">
+                            <Calendar size={13} className="text-primary" />
+                            {order.createdAt ? new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'N/A'}
+                          </span>
+                          <span className="text-[11px] font-bold text-gray-500 flex items-center gap-1.5">
+                            <Clock size={11} className="text-slate-400" />
+                            {order.createdAt ? new Date(order.createdAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true }) : ''}
+                          </span>
+                        </div>
                       </div>
+
                       <div className="space-y-1">
-                        <span className="text-[9px] font-black text-gray-400 uppercase block">Final Total</span>
-                        <span className="text-xs font-black text-primary">₹{(order.grandTotal || 0).toLocaleString()}</span>
+                        <span className="text-[9px] font-black text-gray-400 uppercase tracking-wider block">Final Total</span>
+                        <span className="text-base font-black text-primary font-mono">₹{(order.grandTotal || 0).toLocaleString()}</span>
                       </div>
+
                       <div className="flex flex-col gap-1 items-start md:items-end justify-center">
-                        <span className="text-[9px] font-black text-gray-400 uppercase block md:hidden">Status</span>
+                        <span className="text-[9px] font-black text-gray-400 uppercase tracking-wider block md:hidden">Status</span>
                         {getStatusBadge(order.orderStatus)}
                       </div>
                     </div>
@@ -545,6 +569,24 @@ const Orders = () => {
                             <p className="text-gray-800 font-extrabold">{order.shippingAddress?.city}, {order.shippingAddress?.state} - {order.shippingAddress?.pincode}</p>
                             <p className="text-gray-400">{order.shippingAddress?.country || 'India'}</p>
                           </div>
+
+                          {/* Courier Tracking ID Badge if present */}
+                          {(order.trackingId || order.vendorOrders?.some(vo => vo.trackingId)) && (
+                            <div className="mt-3 pt-3 border-t border-gray-200/60 bg-blue-50/80 p-3.5 rounded-xl border border-blue-100 flex items-center justify-between text-left">
+                              <div className="flex items-center gap-2.5">
+                                <Truck size={18} className="text-blue-600 flex-shrink-0" />
+                                <div>
+                                  <span className="text-[9px] font-black uppercase text-blue-400 block tracking-wider">Courier Tracking ID</span>
+                                  <span className="text-xs font-black font-mono text-blue-900 select-all">
+                                    {order.trackingId || order.vendorOrders?.find(vo => vo.trackingId)?.trackingId}
+                                  </span>
+                                </div>
+                              </div>
+                              <span className="text-[9px] font-black uppercase bg-blue-600 text-white px-2.5 py-1 rounded-lg shadow-xs">
+                                Shipped 📦
+                              </span>
+                            </div>
+                          )}
                         </div>
 
                         {/* Order Calculation Side */}

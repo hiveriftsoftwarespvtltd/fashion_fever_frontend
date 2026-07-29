@@ -28,6 +28,12 @@ export const registerVendor = async (formData) => {
 export const getVendorDetails = async () => {
   try {
     const response = await apiClient.get('/vendor/vendor-details');
+    if (response.data && (response.data._id || response.data.businessName)) {
+      return {
+        success: true,
+        data: response.data
+      };
+    }
     return response.data;
   } catch (error) {
     console.error('Fetch vendor details error:', error);

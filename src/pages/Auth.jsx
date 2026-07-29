@@ -69,7 +69,7 @@ const Auth = () => {
             type: 'success',
             text: result.message || 'Login successful!'
           });
-          
+
           const sessionData = {
             user: result.data.safeUser,
             token: result.data.access_token,
@@ -79,31 +79,22 @@ const Auth = () => {
 
           setTimeout(() => {
             const user = result.data.safeUser;
-            let role = 'user';
-            if (Array.isArray(user?.roles) && user.roles.length > 0) {
-              const nonUserRole = user.roles.find(r => r && r !== 'user');
-              if (nonUserRole) role = nonUserRole;
-              else if (user.role && user.role !== 'user') role = user.role;
-            } else if (user?.role) {
-              role = user.role;
-            }
+            let role = user.role || (Array.isArray(user.roles) ? (user.roles.find(r => r !== 'user') || 'user') : 'user');
             if (role === 'super_admin') role = 'admin';
             if (role === 'admin') navigate('/admin?tab=dashboard');
             else if (role === 'vendor') {
-              if (user.vendorId || user.vendor) navigate('/vendor/dashboard');
+              if (user.vendorId) navigate('/vendor/dashboard');
               else navigate('/vendor/register');
             }
-            else if (role === 'service_provider') navigate('/service-provider/panel');
-            else if (role === 'educator') navigate('/educator/onboard');
-            else if (role === 'influencer') {
-              if (user.influencerId || user.influencer) navigate('/influencer/dashboard');
-              else navigate('/influencer/register');
-            }
             else if (role === 'delivery_person' || role === 'rider' || role === 'driver') {
-              navigate('/quick-commerce/rider');
+              navigate('/rider/dashboard');
             }
+            else if (role === 'influencer') navigate('/influencer/dashboard');
             else if (role === 'distributor') navigate('/distributor/dashboard');
-            else navigate('/');
+            else if (role === 'service_provider') navigate('/service-provider/dashboard');
+            else if (role === 'educator') {
+              navigate('/educator/dashboard');
+            } else navigate('/');
           }, 1500);
         } else {
           setMessage({
@@ -190,31 +181,19 @@ const Auth = () => {
 
           setTimeout(() => {
             const user = result.data.safeUser;
-            let role = 'user';
-            if (Array.isArray(user?.roles) && user.roles.length > 0) {
-              const nonUserRole = user.roles.find(r => r && r !== 'user');
-              if (nonUserRole) role = nonUserRole;
-              else if (user.role && user.role !== 'user') role = user.role;
-            } else if (user?.role) {
-              role = user.role;
-            }
+            let role = user.role || (Array.isArray(user.roles) ? (user.roles.find(r => r !== 'user') || 'user') : 'user');
             if (role === 'super_admin') role = 'admin';
             if (role === 'admin') navigate('/admin?tab=dashboard');
             else if (role === 'vendor') {
-              if (user.vendorId || user.vendor) navigate('/vendor/dashboard');
+              if (user.vendorId) navigate('/vendor/dashboard');
               else navigate('/vendor/register');
             }
-            else if (role === 'service_provider') navigate('/service-provider/panel');
-            else if (role === 'educator') navigate('/educator/onboard');
-            else if (role === 'influencer') {
-              if (user.influencerId || user.influencer) navigate('/influencer/dashboard');
-              else navigate('/influencer/register');
-            }
-            else if (role === 'delivery_person' || role === 'rider' || role === 'driver') {
-              navigate('/quick-commerce/rider');
-            }
+            else if (role === 'influencer') navigate('/influencer/dashboard');
             else if (role === 'distributor') navigate('/distributor/dashboard');
-            else navigate('/');
+            else if (role === 'service_provider') navigate('/service-provider/dashboard');
+            else if (role === 'educator') {
+              navigate('/educator/dashboard');
+            } else navigate('/');
           }, 1500);
         } else {
           setTimeout(() => {
@@ -315,7 +294,7 @@ const Auth = () => {
       <div className="max-w-md w-full space-y-8 bg-white p-10 rounded-2xl shadow-xl border border-gray-100 transition-all duration-500">
         <div className="text-center">
           <h2 className="text-[32px] font-bold text-primary uppercase mb-2">
-            WAKEUP
+            FASHIONFEVER
           </h2>
           <h3 className="mt-4 text-2xl font-bold text-gray-900 uppercase">
             {isForgotPassword ? 'Reset Password' : (showOTP ? 'Verification' : (isLogin ? 'Sign In' : 'Join Us'))}
@@ -323,7 +302,7 @@ const Auth = () => {
           <p className="mt-2 text-sm text-gray-500 font-medium">
             {isForgotPassword
               ? (forgotStep === 1 ? 'Enter your email to receive an OTP' : 'Enter the OTP and your new password')
-              : (showOTP ? 'Enter the code sent to your email' : (isLogin ? 'Access your beauty portal' : 'Start your journey with WAKEUP'))}
+              : (showOTP ? 'Enter the code sent to your email' : (isLogin ? 'Access your beauty portal' : 'Start your journey with FASHIONFEVER'))}
           </p>
         </div>
 
@@ -548,21 +527,20 @@ const Auth = () => {
 
                     {isRolesDropdownOpen && (
                       <>
-                        <div 
-                          className="fixed inset-0 z-10" 
+                        <div
+                          className="fixed inset-0 z-10"
                           onClick={() => setIsRolesDropdownOpen(false)}
                         />
                         <div className="absolute z-20 mt-1.5 w-full bg-white border border-gray-200 rounded-xl shadow-lg p-2 max-h-60 overflow-y-auto space-y-1 animate-in fade-in slide-in-from-top-1 duration-200">
                           {roles.map(role => {
                             const isChecked = formData.roles?.includes(role.id);
                             return (
-                              <label 
-                                key={role.id} 
-                                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer select-none transition-colors ${
-                                  isChecked 
-                                    ? 'bg-primary/5 text-primary' 
+                              <label
+                                key={role.id}
+                                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer select-none transition-colors ${isChecked
+                                    ? 'bg-primary/5 text-primary'
                                     : 'hover:bg-gray-50 text-gray-600'
-                                }`}
+                                  }`}
                               >
                                 <input
                                   type="checkbox"
@@ -688,7 +666,7 @@ const Auth = () => {
               </div>
               <div className="relative flex justify-center text-sm">
                 <span className="px-4 bg-white text-gray-400 font-bold uppercase text-sm">
-                  {isLogin ? 'New to Wakeup?' : 'Already have an account?'}
+                  {isLogin ? 'New to FashionFever?' : 'Already have an account?'}
                 </span>
               </div>
             </div>

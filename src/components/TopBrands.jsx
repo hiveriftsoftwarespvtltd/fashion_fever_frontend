@@ -1,19 +1,32 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { getPublicBrands } from '../api/productService';
+import { getImageUrl } from '../utils/imageUrl';
 
-// ── Fallback images if API returns no brands ────────────────────────
-import m1 from '../assets/1makeup.png';
-import m2 from '../assets/2makeup.png';
-import m3 from '../assets/3makeup.png';
-import m4 from '../assets/4makeup.png';
-import s1 from '../assets/1skincare.png';
-import s2 from '../assets/2skincare.png';
-import s3 from '../assets/3skincare.png';
-import s4 from '../assets/4skincare.png';
+const bgColors = [
+  'bg-[#fff4f6]', // Soft blush pink
+  'bg-[#f6f6f6]', // Soft grey
+  'bg-[#fff7f0]', // Soft warm peach
+  'bg-[#f4f7f6]', // Soft mint grey
+  'bg-[#faf5ff]', // Soft lavender tint
+  'bg-[#f0fdf4]', // Soft sage tint
+];
 
-// Speed in pixels per frame (at 60fps ≈ 0.7px/frame = ~42px/s — slow & smooth)
+const defaultBrands = [
+  { name: 'HIRALAL', logoIcon: '🌸', count: 1 },
+  { name: 'WILD STONE', logoIcon: null, count: 1 },
+  { name: 'HIRALAL', logoIcon: '🌸', count: 1 },
+  { name: 'WILD STONE', logoIcon: null, count: 1 },
+  { name: 'HIRALAL', logoIcon: '🌸', count: 1 },
+  { name: 'WILD STONE', logoIcon: null, count: 1 },
+  { name: 'MAYBELLINE', logoIcon: null, count: 24 },
+  { name: 'LAKME', logoIcon: null, count: 18 },
+  { name: 'NYKAA', logoIcon: null, count: 32 },
+  { name: 'PLUM', logoIcon: '🌿', count: 15 }
+];
+
+// Speed in pixels per frame
 const SPEED = 0.7;
 
 const TopBrands = () => {
@@ -30,26 +43,28 @@ const TopBrands = () => {
         const response = await getPublicBrands();
         if (response.success) {
           const payload = response.data ?? response;
-          if (Array.isArray(payload)) {
-            // Deduplicate by brand name and map images correctly (both string and object schemas)
+          if (Array.isArray(payload) && payload.length > 0) {
             const uniqueBrandsMap = {};
             payload.forEach(item => {
               if (item.brand) {
                 const bName = item.brand.trim().toLowerCase();
                 if (!uniqueBrandsMap[bName]) {
-                  const imgUrl = typeof item.image === 'string' 
-                    ? item.image 
-                    : (item.image?.url || 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=600&h=800&fit=crop');
+                  const rawImg = typeof item.image === 'string'
+                    ? item.image
+                    : (item.image?.url || null);
+                  const imgUrl = getImageUrl(rawImg);
                   uniqueBrandsMap[bName] = {
                     name: item.brand,
                     img: imgUrl,
-                    totalProducts: item.totalProducts
+                    totalProducts: item.totalProducts || 1
                   };
                 }
               }
             });
             const uniqueBrands = Object.values(uniqueBrandsMap);
-            setBrands(uniqueBrands);
+            if (uniqueBrands.length > 0) {
+              setBrands(uniqueBrands);
+            }
           }
         }
       } catch (error) {
@@ -61,28 +76,17 @@ const TopBrands = () => {
     fetchBrands();
   }, []);
 
-  const items = brands.length > 0 ? brands : [
-    { img: m1, name: 'Lipstick' },
-    { img: m2, name: 'Foundation' },
-    { img: s1, name: 'Moisturizer' },
-    { img: s2, name: 'Serum' },
-    { img: m3, name: 'Eye Palette' },
-    { img: s3, name: 'Sunscreen' },
-    { img: m4, name: 'Blush' },
-    { img: s4, name: 'Face Wash' }
-  ];
-
+  const items = brands.length > 0 ? brands : defaultBrands;
   const tripled = [...items, ...items, ...items];
 
-  // ── How many cards visible ──────────────────────────────────────
-  const getN   = () => (window.innerWidth >= 640 ? 6 : 2);
+  // Number of cards visible per screen breakpoint
+  const getN = () => (window.innerWidth >= 1024 ? 6 : window.innerWidth >= 640 ? 4 : 2);
   const getSetW = () => {
     const el = containerRef.current;
     if (!el) return 0;
     return (el.clientWidth / getN()) * items.length;
   };
 
-  // ── Init scroll to the middle set ──────────────────────────────
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
@@ -90,9 +94,8 @@ const TopBrands = () => {
       el.scrollLeft = getSetW();
     }, 50);
     return () => clearTimeout(id);
-  }, [brands]); // eslint-disable-line
+  }, [brands]);
 
-  // ── RAF auto-scroll loop ────────────────────────────────────────
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
@@ -112,27 +115,25 @@ const TopBrands = () => {
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
-  }, [brands]); // eslint-disable-line
+  }, [brands]);
 
-  // ── Touch events — pause RAF while user swipes ──────────────────
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
 
     const onTouchStart = () => { isPausedRef.current = true; };
-    const onTouchEnd   = () => {
+    const onTouchEnd = () => {
       setTimeout(() => { isPausedRef.current = false; }, 1000);
     };
 
     el.addEventListener('touchstart', onTouchStart, { passive: true });
-    el.addEventListener('touchend',   onTouchEnd,   { passive: true });
+    el.addEventListener('touchend', onTouchEnd, { passive: true });
     return () => {
       el.removeEventListener('touchstart', onTouchStart);
-      el.removeEventListener('touchend',   onTouchEnd);
+      el.removeEventListener('touchend', onTouchEnd);
     };
   }, []);
 
-  // ── Nav buttons — scroll by one card width, then resume ─────────
   const scrollByCard = (dir) => {
     const el = containerRef.current;
     if (!el) return;
@@ -145,71 +146,72 @@ const TopBrands = () => {
   };
 
   return (
-    <section className="w-full bg-white py-10 border-t border-gray-100">
+    <section className="w-full bg-white py-8 border-t border-gray-100">
 
-      {/* Hide scrollbar, responsive card widths */}
       <style>{`
         .tb-scroll::-webkit-scrollbar { display: none; }
         .tb-scroll { -ms-overflow-style: none; scrollbar-width: none; }
-        .tb-card   { width: 50%; }
-        @media (min-width: 640px) { .tb-card { width: calc(100% / 6); } }
+        .tb-card { width: 50%; }
+        @media (min-width: 640px) { .tb-card { width: 25%; } }
+        @media (min-width: 1024px) { .tb-card { width: calc(100% / 6); } }
       `}</style>
 
-      {/* ── Header ────────────────────────────────────────────── */}
-      <div className="max-w-[1800px] mx-auto px-4 md:px-8 mb-8">
-        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+      {/* ── Header Matching Reference Image ────────────────── */}
+      <div className="max-w-[1600px] mx-auto px-4 md:px-8 mb-6">
+        <div className="flex items-end justify-between">
           <div>
-            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-primary mb-1">
-              Trending Now
+            <p className="text-[12px] font-black uppercase tracking-wider text-[#ff4d6d] mb-0.5">
+              TRENDING NOW
             </p>
-            <h2 className="text-2xl md:text-[28px] font-black text-gray-900 leading-tight">
+            <h2 className="text-xl md:text-2xl font-bold text-gray-900 leading-tight">
               Top Brands
             </h2>
           </div>
 
-          <div className="flex gap-2">
-            <span className="px-4 py-1.5 bg-primary/10 text-primary rounded-full text-sm font-bold uppercase tracking-wider">
-              Luxe Labels
-            </span>
-          </div>
+          <Link
+            to="/shop"
+            className="text-xs font-bold text-[#ff4d6d] hover:underline transition-all cursor-pointer"
+          >
+            View All
+          </Link>
         </div>
       </div>
 
-      {/* ── Ticker strip with overlaid nav arrows ──────────────── */}
-      <div className="relative max-w-[1800px] mx-auto px-10 md:px-14">
+      {/* ── Brand Cards Ticker Slider ──────────────────── */}
+      <div className="relative max-w-[1600px] mx-auto px-4 md:px-8">
 
-        {/* ← Prev */}
+        {/* Left Arrow Button (MD+ screens) */}
         <button
           onClick={() => scrollByCard(-1)}
           onMouseEnter={() => { isPausedRef.current = true; }}
           onMouseLeave={() => { isPausedRef.current = false; }}
-          className="absolute left-0 top-1/2 -translate-y-6 z-20 w-10 h-10 rounded-full bg-white border border-gray-200 shadow-md flex items-center justify-center text-gray-600 hover:text-primary hover:border-primary transition-all duration-200 hover:scale-105"
+          className="hidden md:flex absolute -left-5 md:-left-6 top-1/2 -translate-y-1/2 z-20 w-8 h-8 md:w-10 md:h-10 rounded-full bg-white border border-gray-200 shadow-lg items-center justify-center text-gray-700 hover:text-[#ff4d6d] hover:border-[#ff4d6d] transition-all cursor-pointer"
           aria-label="Previous"
         >
-          <ChevronLeft className="w-5 h-5" />
+          <ChevronLeft className="w-4 h-4 md:w-5 md:h-5" />
         </button>
 
-        {/* → Next */}
+        {/* Right Arrow Button */}
         <button
           onClick={() => scrollByCard(1)}
           onMouseEnter={() => { isPausedRef.current = true; }}
           onMouseLeave={() => { isPausedRef.current = false; }}
-          className="absolute right-0 top-1/2 -translate-y-6 z-20 w-10 h-10 rounded-full bg-white border border-gray-200 shadow-md flex items-center justify-center text-gray-600 hover:text-primary hover:border-primary transition-all duration-200 hover:scale-105"
+          className="hidden md:flex absolute -right-5 md:-right-6 top-1/2 -translate-y-1/2 z-20 w-8 h-8 md:w-10 md:h-10 rounded-full bg-white border border-gray-200 shadow-lg items-center justify-center text-gray-700 hover:text-[#ff4d6d] hover:border-[#ff4d6d] transition-all cursor-pointer"
           aria-label="Next"
         >
-          <ChevronRight className="w-5 h-5" />
+          <ChevronRight className="w-4 h-4 md:w-5 md:h-5" />
         </button>
 
-        {/* Scrollable track */}
+        {/* Scrollable Track */}
         <div
           ref={containerRef}
-          className="tb-scroll flex overflow-x-auto py-2"
+          className="tb-scroll flex overflow-x-auto py-1"
           onMouseEnter={() => { isPausedRef.current = true; }}
           onMouseLeave={() => { isPausedRef.current = false; }}
         >
           {tripled.map((item, i) => (
-            <div key={i} className="tb-card flex-shrink-0 px-2 sm:px-2.5">
-              <Card item={item} onClick={() => navigate('/shop')} />
+            <div key={i} className="tb-card flex-shrink-0 px-2">
+              <Card item={item} onClick={() => navigate(`/shop?brand=${encodeURIComponent(item.name)}`)} />
             </div>
           ))}
         </div>
@@ -219,31 +221,48 @@ const TopBrands = () => {
   );
 };
 
-/* ── Card ──────────────────────────────────────────────────────── */
-const Card = ({ item, onClick }) => (
-  <div
-    onClick={onClick}
-    className="group cursor-pointer flex flex-col items-center rounded-3xl bg-white border border-gray-200/80 shadow-md hover:shadow-xl hover:shadow-rose-500/15 hover:border-primary/40 hover:-translate-y-1.5 transition-all duration-500 w-full overflow-hidden h-full"
-  >
-    <div className="w-full h-36 sm:h-44 bg-gray-50 flex items-center justify-center transition-all duration-500 overflow-hidden shrink-0">
-      <img
-        src={item.img}
-        alt={item.name}
-        className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
-        onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=300&h=200&fit=crop'; }}
-      />
-    </div>
-    <div className="text-center w-full px-3 pb-4 pt-3 mt-auto">
-      <span className="text-xs font-extrabold uppercase tracking-wider text-gray-800 group-hover:text-primary transition-colors duration-300 block truncate">
-        {item.name}
-      </span>
-      {item.totalProducts !== undefined && (
-        <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest block mt-0.5">
-          {item.totalProducts} Products
+/* ── Card Component Matching Reference Image ────────────────── */
+const Card = ({ item, onClick }) => {
+  return (
+    <div
+      onClick={onClick}
+      className="group cursor-pointer flex flex-col items-center rounded-2xl bg-white border border-gray-200 shadow-2xs hover:shadow-md hover:border-gray-300 transition-all duration-300 w-full overflow-hidden h-full"
+    >
+      {/* Top Box with White Background & Brand Image/Logo */}
+      <div className="w-full h-32 sm:h-36 bg-white flex flex-col items-center justify-center p-2 transition-all duration-300 relative overflow-hidden shrink-0">
+        {item.img ? (
+          <img
+            src={item.img}
+            alt={item.name}
+            className="w-full h-full object-contain p-1 transition-transform duration-500 group-hover:scale-105"
+            onError={(e) => {
+              e.target.style.display = 'none';
+            }}
+          />
+        ) : item.logoIcon ? (
+          <div className="flex flex-col items-center justify-center text-center">
+            <span className="text-xl mb-1">{item.logoIcon}</span>
+            <span className="font-serif text-sm sm:text-base font-extrabold tracking-widest text-gray-900 uppercase leading-tight">
+              {item.name}
+            </span>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center text-center p-2">
+            <span className="font-serif text-xs sm:text-sm font-extrabold tracking-widest text-gray-900 uppercase leading-tight">
+              {item.name}
+            </span>
+          </div>
+        )}
+      </div>
+
+      {/* Bottom Box with Product Count */}
+      <div className="w-full bg-white border-t border-gray-150 py-2.5 px-2 text-center mt-auto">
+        <span className="text-[11px] font-medium text-gray-600 block truncate">
+          {item.totalProducts !== undefined ? item.totalProducts : (item.count || 1)} Products
         </span>
-      )}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default TopBrands;

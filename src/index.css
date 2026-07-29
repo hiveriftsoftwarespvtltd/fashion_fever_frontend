@@ -13,7 +13,7 @@
   --text-dark: #3f414d;
   --text-muted: #666666;
   --top-strip-bg: #fc9bc9;
-  --marquee-speed: 20s;
+  --marquee-speed: 60s;
 }
 
 /* Base Styles */
@@ -81,4 +81,16 @@ button {
   /* IE and Edge */
   scrollbar-width: none !important;
   /* Firefox */
+}
+
+/* Marquee / Ticker Animation */
+@keyframes marquee {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  display: inline-flex;
+  animation: marquee var(--marquee-speed, 25s) linear infinite;
+  will-change: transform;
 }

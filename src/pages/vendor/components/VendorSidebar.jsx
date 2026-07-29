@@ -8,7 +8,8 @@ import {
   LogOut,
   X,
   Wallet,
-  Landmark
+  Landmark,
+  Zap
 } from 'lucide-react';
 
 import { useTheme } from '../../../context/ThemeContext';
@@ -19,6 +20,7 @@ const VendorSidebar = ({ activeTab, setActiveTab, isSidebarOpen, setIsSidebarOpe
     { id: 'overview', icon: <LayoutDashboard size={18} />, label: 'Overview' },
     { id: 'products', icon: <Package size={18} />, label: 'Products' },
     { id: 'orders', icon: <ShoppingCart size={18} />, label: 'Orders' },
+    { id: 'quickcommerce', icon: <Zap size={18} />, label: '⚡ Quick Commerce' },
     { id: 'earnings', icon: <IndianRupee size={18} />, label: 'Earnings' },
     { id: 'wallet', icon: <Wallet size={18} />, label: 'Wallet Ledger' },
     { id: 'payout', icon: <Landmark size={18} />, label: 'Bank Details' },
@@ -43,9 +45,14 @@ const VendorSidebar = ({ activeTab, setActiveTab, isSidebarOpen, setIsSidebarOpe
      ${isDarkMode ? 'bg-gray-950 border-white/5' : 'bg-white border-gray-200'}
    `}>
         <div className={`h-24 px-6 border-b flex items-center justify-between ${isDarkMode ? 'border-white/5' : 'border-gray-100'}`}>
-          <span className="text-2xl font-bold text-primary uppercase truncate block">
-            {vendorData?.businessName || 'V-DASH'}
-          </span>
+          <div className="flex flex-col text-left min-w-0">
+            <span className="text-[10px] font-black text-primary uppercase tracking-widest leading-none truncate">
+              {vendorData?.businessName || 'FashionFever'}
+            </span>
+            <span className={`text-xs font-black uppercase tracking-wide block mt-1.5 whitespace-nowrap ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+              Vendor Dashboard
+            </span>
+          </div>
           <button className="lg:hidden text-gray-400" onClick={() => setIsSidebarOpen(false)}>
             <X size={20} />
           </button>

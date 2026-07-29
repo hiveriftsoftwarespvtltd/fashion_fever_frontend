@@ -86,7 +86,7 @@ const MapPinpointer = ({ latitude, longitude, onCoordinatesChange, isDarkMode })
         attribution: '&copy; OpenStreetMap contributors'
       }).addTo(mapInstance);
 
-      // Custom marker icon styled with WAKEUPMAKEUP primary rose-pink color theme
+      // Custom marker icon styled with FASHIONFEVER primary rose-pink color theme
       const customIcon = L.divIcon({
         html: `
           <div class="flex items-center justify-center relative">

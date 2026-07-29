@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X, Play, Pause, Volume2, VolumeX, ChevronLeft, ChevronRight } from 'lucide-react';
 import { getInfluencerStories } from '../api/influencerService';
+import { getImageUrl } from '../utils/imageUrl';
 
 const defaultStories = [
   {
@@ -108,9 +109,9 @@ const InstaStories = () => {
             return {
               id: item._id || idx + 100,
               title: item.influencerName || 'Creator Story',
-              thumbnail: item.thumbnail || selectedDefaultThumb,
+              thumbnail: getImageUrl(item.thumbnail) || selectedDefaultThumb,
               type: isVideo ? 'video' : 'image',
-              mediaUrl: isVideo || isImage ? normalizedUrl : selectedDefaultImage,
+              mediaUrl: getImageUrl(isVideo || isImage ? normalizedUrl : selectedDefaultImage),
               ctaText: `View ${item.influencerName || 'Creator'}'s Link`,
               ctaLink: normalizedUrl || '/shop',
               isExternal: true
@@ -258,7 +259,7 @@ const InstaStories = () => {
                 </div>
                 {/* Caption label */}
                 <span className={`text-xs font-bold uppercase tracking-wider text-center transition-colors ${
-                  hasViewed ? 'text-gray-400 dark:text-gray-600' : 'text-gray-800 dark:text-gray-250'
+                  hasViewed ? 'text-gray-400 dark:text-gray-600' : 'text-white'
                 }`}>
                   {story.title}
                 </span>

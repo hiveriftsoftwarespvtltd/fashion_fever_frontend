@@ -130,7 +130,6 @@ export const getUserAvatar = async () => {
     const response = await apiClient.get('/user/get-user-avatar');
     return response.data;
   } catch (error) {
-    console.error('Get user avatar error:', error);
     return error.response?.data || { success: false, message: 'Failed to fetch avatar', statusCode: 500 };
   }
 };

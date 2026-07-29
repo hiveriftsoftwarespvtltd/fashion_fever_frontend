@@ -1,5 +1,6 @@
 import React from 'react';
 import { Info, Loader2, ShieldCheck } from 'lucide-react';
+import StylistSelector from './StylistSelector';
 
 const DateTimeSlotSelector = ({
   selectedResult,
@@ -34,18 +35,25 @@ const DateTimeSlotSelector = ({
     return dates;
   };
 
-  // Helper to format ISO time string to only time (e.g. 03:30 AM)
-  const formatSlotTime = (isoString) => {
-    if (!isoString) return '';
+  // Helper to format slot time safely without Invalid Date errors
+  const formatSlotTime = (timeVal) => {
+    if (!timeVal) return '';
+    const str = String(timeVal).trim();
+    if (str.toUpperCase().includes('AM') || str.toUpperCase().includes('PM') || str.includes(':')) {
+      return str;
+    }
     try {
-      const date = new Date(isoString);
+      const date = new Date(str);
+      if (isNaN(date.getTime())) {
+        return str;
+      }
       return date.toLocaleTimeString('en-US', {
         hour: '2-digit',
         minute: '2-digit',
         hour12: true
       });
     } catch (e) {
-      return isoString;
+      return str;
     }
   };
 
@@ -59,10 +67,16 @@ const DateTimeSlotSelector = ({
       </div>
 
       {!selectedResult || selectedServices.length === 0 ? (
-        <div className="py-16 bg-white rounded-3xl border border-gray-150 flex flex-col items-center justify-center text-center p-6 shadow-sm">
-          <Info size={32} className="text-gray-300 mb-3" />
-          <p className="text-xs font-black text-gray-400 uppercase">Services Selection Pending</p>
-          <p className="text-[9px] text-gray-455 font-bold uppercase mt-1">Please select a lounge and at least one service above to view slots.</p>
+        <div className="py-20 flex flex-col items-center justify-center text-center p-4">
+          <div className="w-14 h-14 rounded-full bg-pink-100/60 border border-pink-200/50 flex items-center justify-center mb-3">
+            <svg className="w-7 h-7 text-[#ff4d6d]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <h3 className="text-sm font-extrabold text-gray-900 mb-1">Services Selection Pending</h3>
+          <p className="text-xs text-gray-500 font-medium max-w-xs leading-relaxed">
+            Please select a lounge and at least one service above to view slots.
+          </p>
         </div>
       ) : (
         <div className="space-y-6 bg-white p-6 rounded-3xl border border-gray-150 shadow-sm">
@@ -97,6 +111,14 @@ const DateTimeSlotSelector = ({
             </div>
           </div>
 
+          {/* Stylist / Therapist Preference Selector */}
+          <StylistSelector
+            slotsLoading={slotsLoading}
+            slots={slots}
+            selectedStaff={selectedStaff}
+            setSelectedStaff={setSelectedStaff}
+          />
+
           {/* Available Time Slots Grid */}
           <div className="space-y-3 pt-4 border-t border-gray-100">
             <span className="text-sm font-black uppercase text-gray-400 block">Available Slots</span>
@@ -107,7 +129,7 @@ const DateTimeSlotSelector = ({
                 <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest animate-pulse">Scanning available calendar slots...</span>
               </div>
             ) : slots && slots.length > 0 ? (
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="grid grid-cols-2 gap-2.5">
                 {slots.map((slot, idx) => {
                   const stylistRestricted = selectedStaff && 
                     (!slot.availableStaff || !slot.availableStaff.some(st => st?._id === selectedStaff._id));
@@ -121,21 +143,21 @@ const DateTimeSlotSelector = ({
                       type="button"
                       disabled={!isAvail}
                       onClick={() => setSelectedSlot(slot)}
-                      className={`py-4 px-2 rounded-2xl text-sm font-black uppercase border-2 text-center transition-all cursor-pointer flex flex-col justify-center items-center gap-1 ${
+                      className={`py-3 px-2 rounded-xl text-xs font-bold border text-center transition-all cursor-pointer flex flex-col justify-center items-center gap-1 ${
                         isSel 
-                          ? 'bg-primary border-primary text-white shadow-lg shadow-primary/25 scale-[1.02]' 
+                          ? 'bg-[#ff4d6d] border-[#ff4d6d] text-white shadow-md shadow-pink-500/20 scale-[1.02]' 
                           : isAvail
-                          ? 'bg-white border-gray-150 text-gray-700 hover:border-gray-300 hover:scale-[1.01]'
-                          : 'bg-gray-100 border-transparent text-gray-350 cursor-not-allowed opacity-50'
+                          ? 'bg-white border-gray-200 text-gray-800 hover:border-[#ff4d6d] hover:text-[#ff4d6d]'
+                          : 'bg-gray-100 border-transparent text-gray-400 cursor-not-allowed opacity-50'
                       }`}
                     >
-                      <span className="leading-none">{formatSlotTime(slot.startTime)} - {formatSlotTime(slot.endTime)}</span>
-                      <span className={`text-[7px] font-black px-1.5 py-0.5 rounded uppercase leading-none mt-1 ${
+                      <span className="whitespace-nowrap font-bold text-xs">{formatSlotTime(slot.startTime)} - {formatSlotTime(slot.endTime)}</span>
+                      <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full uppercase ${
                         isSel 
                           ? 'bg-white/20 text-white' 
                           : isAvail
-                          ? 'bg-green-50 text-green-500'
-                          : 'bg-gray-200 text-gray-400'
+                          ? 'bg-green-50 text-green-600 border border-green-200/50'
+                          : 'bg-gray-200 text-gray-500'
                       }`}>
                         {isAvail ? 'Available' : 'Booked'}
                       </span>

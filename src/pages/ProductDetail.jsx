@@ -26,7 +26,8 @@ import {
   Loader2,
   Play,
   Trash2,
-  Eye
+  Eye,
+  Zap
 } from 'lucide-react';
 import Swal from 'sweetalert2';
 import apiClient from '../api/apiClient';
@@ -54,6 +55,7 @@ const ProductDetail = () => {
   const [reviewsData, setReviewsData] = useState(null);
   const [isZoomed, setIsZoomed] = useState(false);
   const [zoomOrigin, setZoomOrigin] = useState('center center');
+  const [isExpressDelivery, setIsExpressDelivery] = useState(false);
 
   const fetchProductDetails = async () => {
     setIsLoading(true);
@@ -64,6 +66,9 @@ const ProductDetail = () => {
       if (fetchedProduct) {
         setProduct(fetchedProduct);
         setIsWishlisted(!!fetchedProduct.isWishlisted);
+        if (fetchedProduct.vendorId?.quickCommerce?.enabled) {
+          setIsExpressDelivery(true);
+        }
 
         // Fetch reviews
         try {
@@ -191,9 +196,9 @@ const ProductDetail = () => {
       price: currentVariant.offeredPrice || currentVariant.salesPrice || 0,
       image: currentVariant.thumbnail?.url || variantImages?.[0]?.url || '',
     };
-    addToCart(itemPayload, currentVariant._id, product._id);
+    addToCart(itemPayload, currentVariant._id, product._id, isExpressDelivery);
     if (quantity > 1) {
-      updateQty(currentVariant._id, quantity - 1, product._id);
+      updateQty(currentVariant._id, quantity - 1, product._id, isExpressDelivery);
     }
     toast.success(`In Bag! Added successfully.`);
   };
@@ -213,11 +218,15 @@ const ProductDetail = () => {
       price: currentVariant.offeredPrice || currentVariant.salesPrice || 0,
       image: currentVariant.thumbnail?.url || '',
     };
-    await addToCart(itemPayload, currentVariant._id, product._id);
+    await addToCart(itemPayload, currentVariant._id, product._id, isExpressDelivery);
     if (quantity > 1) {
-      await updateQty(currentVariant._id, quantity - 1, product._id);
+      await updateQty(currentVariant._id, quantity - 1, product._id, isExpressDelivery);
     }
-    navigate("/checkout");
+    if (isExpressDelivery) {
+      navigate("/quick-commerce?tab=cart");
+    } else {
+      navigate("/checkout");
+    }
   };
 
   const toggleWishlist = async () => {
@@ -656,6 +665,44 @@ const ProductDetail = () => {
                         </button>
                       );
                     })}
+                  </div>
+                </div>
+              )}
+
+              {/* Delivery Mode Selector if Quick Commerce is enabled */}
+              {product.vendorId?.quickCommerce?.enabled && (
+                <div className="bg-gradient-to-r from-rose-500/10 via-amber-500/5 to-rose-500/5 border border-rose-500/20 p-4 rounded-2xl flex flex-col gap-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-rose-600 flex items-center gap-1">
+                      <Zap size={12} className="fill-rose-500 text-rose-500 animate-pulse" /> Express Delivery Available
+                    </span>
+                    <span className="text-[10px] font-bold text-slate-500 uppercase">Within 10 Mins!</span>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      onClick={() => setIsExpressDelivery(false)}
+                      className={`p-3 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1 ${
+                        !isExpressDelivery
+                          ? 'border-primary bg-white ring-2 ring-primary/5 shadow-xs font-black text-primary text-xs'
+                          : 'border-slate-100 bg-slate-50/50 hover:border-slate-200 text-slate-500 text-xs font-bold'
+                      }`}
+                    >
+                      <span>Standard Shipping</span>
+                      <span className="text-[9px] opacity-75 font-semibold">2-3 Days Delivery</span>
+                    </button>
+                    
+                    <button
+                      onClick={() => setIsExpressDelivery(true)}
+                      className={`p-3 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1 ${
+                        isExpressDelivery
+                          ? 'border-rose-500 bg-white ring-2 ring-rose-500/5 shadow-xs font-black text-rose-600 text-xs'
+                          : 'border-slate-100 bg-slate-50/50 hover:border-slate-200 text-slate-500 text-xs font-bold'
+                      }`}
+                    >
+                      <span className="flex items-center gap-1">⚡ Express Delivery</span>
+                      <span className="text-[9px] opacity-75 font-semibold">10 Mins Delivery</span>
+                    </button>
                   </div>
                 </div>
               )}

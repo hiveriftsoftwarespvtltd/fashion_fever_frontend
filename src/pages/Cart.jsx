@@ -12,7 +12,7 @@ import { Link } from 'react-router-dom';
 
 const Cart = () => {
  const [cartItems, setCartItems] = useState([
- { id: 1, name: 'Velvet Matte Lipstick', brand: 'Wakeup Luxe', shade: 'Ruby Rush', price: 899, quantity: 1, image: 'https://images.unsplash.com/photo-1586776977607-310e9c725c37?w=100&h=100&fit=crop' },
+ { id: 1, name: 'Velvet Matte Lipstick', brand: 'FashionFever Luxe', shade: 'Ruby Rush', price: 899, quantity: 1, image: 'https://images.unsplash.com/photo-1586776977607-310e9c725c37?w=100&h=100&fit=crop' },
  { id: 2, name: 'Hydrating Face Serum', brand: 'Skin Glow', price: 1250, quantity: 1, image: 'https://images.unsplash.com/photo-1620916566398-39f1143af7be?w=100&h=100&fit=crop' },
  ]);
 

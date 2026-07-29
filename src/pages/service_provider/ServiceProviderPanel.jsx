@@ -154,7 +154,7 @@ const ServiceProviderPanel = () => {
           <span className={`text-xs font-black uppercase tracking-wider ${
             isDarkMode ? 'text-gray-400' : 'text-gray-500'
           }`}>
-            WAKEUP MAKEUP PARTNER CONSOLE
+            FASHIONFEVER PARTNER CONSOLE
           </span>
           <div className="flex items-center gap-4">
             <button 
@@ -276,7 +276,7 @@ const ServiceProviderPanel = () => {
           <span className={`text-xs font-black uppercase tracking-wider ${
             isDarkMode ? 'text-gray-400' : 'text-gray-500'
           }`}>
-            WAKEUP MAKEUP PARTNER CONSOLE
+            FASHIONFEVER PARTNER CONSOLE
           </span>
           <div className="flex items-center gap-4">
             <button 
@@ -421,7 +421,7 @@ const ServiceProviderPanel = () => {
             <span className={`text-xs font-black uppercase tracking-wider hidden sm:inline-block ${
               isDarkMode ? 'text-gray-400' : 'text-gray-500'
             }`}>
-              WAKEUP MAKEUP PARTNER CONSOLE
+              FASHIONFEVER PARTNER CONSOLE
             </span>
           </div>
 

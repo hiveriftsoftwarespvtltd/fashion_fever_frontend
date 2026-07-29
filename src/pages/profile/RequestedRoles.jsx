@@ -127,7 +127,7 @@ const RequestedRoles = () => {
 
     return details[roleKey] || {
       title: roleKey.replace('_', ' ').toUpperCase(),
-      description: 'Manage specialized activities and integrations within WAKEUP.',
+      description: 'Manage specialized activities and integrations within FASHIONFEVER.',
       icon: <ShieldCheck className="text-primary" size={24} />,
       actionLink: null
     };

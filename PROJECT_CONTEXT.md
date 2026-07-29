@@ -1,7 +1,7 @@
 # PROJECT_CONTEXT.md
 
 ## 1. Project Overview & Goal
-**WAKEUPMAKEUP** is a premium, multi-sided beauty marketplace application integrating:
+**FASHIONFEVER** is a premium, multi-sided fashion & beauty marketplace application integrating:
 *   **E-Commerce Platform:** Customers browse beauty products; approved vendors list items and configure variants.
 *   **Booking Platform:** Customers schedule beauty services from approved salon and freelance service providers.
 *   **Affiliate Portal:** Social media influencers register, generate custom referral links, track conversion metrics, and submit content links for commission validations.

@@ -15,7 +15,8 @@ import {
   Menu,
   X,
   Sun,
-  Moon
+  Moon,
+  Landmark
 } from 'lucide-react';
 import { getAllInfluencerCommissionSlabs } from '../api/adminService';
 import { useTheme } from '../context/ThemeContext';
@@ -68,9 +69,14 @@ const InfluencerCommissionSlabs = () => {
         ${isDarkMode ? 'bg-gray-950 border-white/5' : 'bg-white border-gray-200'}
       `}>
         <div className={`h-24 px-6 border-b flex items-center justify-between ${isDarkMode ? 'border-white/5' : 'border-gray-100'}`}>
-          <span className="text-lg font-black text-primary uppercase tracking-wider block">
-            WAKEUP CREATOR
-          </span>
+          <div className="flex flex-col text-left min-w-0">
+            <span className="text-[10px] font-black text-primary uppercase tracking-widest leading-none">
+              FashionFever Creator
+            </span>
+            <span className={`text-xs font-black uppercase tracking-wide block mt-1.5 whitespace-nowrap ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+              Influencer Dashboard
+            </span>
+          </div>
           <button className="lg:hidden text-gray-400 hover:text-white" onClick={() => setIsSidebarOpen(false)}>
             <X size={20} />
           </button>
@@ -114,10 +120,21 @@ const InfluencerCommissionSlabs = () => {
           >
             <Percent size={18} /> Commission Slabs
           </button>
-          <button className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all text-left ${
-            isDarkMode ? 'text-gray-400 hover:bg-white/5 hover:text-white' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'
-          } cursor-pointer`}>
+          <button 
+            onClick={() => { navigate('/influencer/dashboard?tab=wallet'); setIsSidebarOpen(false); }}
+            className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all text-left ${
+              isDarkMode ? 'text-gray-400 hover:bg-white/5 hover:text-white' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'
+            } cursor-pointer`}
+          >
             <Wallet size={18} /> My Wallet
+          </button>
+          <button 
+            onClick={() => { navigate('/influencer/dashboard?tab=payout'); setIsSidebarOpen(false); }}
+            className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all text-left ${
+              isDarkMode ? 'text-gray-400 hover:bg-white/5 hover:text-white' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'
+            } cursor-pointer`}
+          >
+            <Landmark size={18} /> Bank Details
           </button>
           <button className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all text-left ${
             isDarkMode ? 'text-gray-400 hover:bg-white/5 hover:text-white' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'

@@ -39,6 +39,7 @@ import VendorEarnings from './components/VendorEarnings';
 import VendorProfile from './components/VendorProfile';
 import VendorWallet from './components/VendorWallet';
 import PayoutBankDetails from '../../components/shared/PayoutBankDetails';
+import VendorFlow from '../quick_commerce/VendorFlow';
 
 const VendorDashboard = () => {
   const { isDarkMode, toggleTheme } = useTheme();
@@ -108,8 +109,9 @@ const VendorDashboard = () => {
   const fetchVendorData = async () => {
     try {
       const response = await getVendorDetails();
-      if (response.success) {
-        setVendorData(response.data);
+      const vendorInfo = response?.data || response;
+      if (vendorInfo && (vendorInfo._id || vendorInfo.businessName)) {
+        setVendorData(vendorInfo);
       }
     } catch (error) {
       console.error("Failed to fetch vendor details:", error);
@@ -547,6 +549,11 @@ const VendorDashboard = () => {
               }}
               onExportOrders={handleExportOrders}
             />
+          </div>
+
+          {/* ⚡ Quick Commerce Tab */}
+          <div className={activeTab === 'quickcommerce' ? 'block animate-in fade-in duration-300' : 'hidden'}>
+            <VendorFlow />
           </div>
 
           <div className={activeTab === 'earnings' ? 'block animate-in fade-in duration-300' : 'hidden'}>

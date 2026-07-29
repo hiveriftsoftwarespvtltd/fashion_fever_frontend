@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
+import { Routes, Route, useLocation, useNavigate, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import TopStrip from './components/TopStrip';
 import AnnouncementBar from './components/AnnouncementBar';
@@ -39,6 +39,8 @@ import UserServiceLeads from './pages/profile/UserServiceLeads';
 import QuickCommerceHub from './pages/quick_commerce/QuickCommerceHub';
 import RiderFlow from './pages/quick_commerce/RiderFlow';
 import RiderLogin from './pages/quick_commerce/RiderLogin';
+import LegalPrivacy from './pages/LegalPrivacy';
+import TermsConditions from './pages/TermsConditions';
 import { CartProvider } from './context/CartContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { UserProvider, useUser } from './context/UserContext';
@@ -115,7 +117,7 @@ const App = () => {
 
               <Route path="/influencer/commission-slabs" element={
                 <RoleGuard allowedRoles={['influencer', 'admin']}>
-                  <InfluencerCommissionSlabs />
+                  <Navigate to="/influencer/dashboard?tab=commission-slabs" replace />
                 </RoleGuard>
               } />
 
@@ -157,6 +159,7 @@ const App = () => {
 
               {/* Customer & Rider Routes */}
               <Route path="/quick-commerce" element={<QuickCommerceHub />} />
+              <Route path="/quick-delivery" element={<QuickCommerceHub />} />
               <Route path="/rider/login" element={<RiderLogin />} />
               <Route path="/rider/dashboard" element={
                 <RoleGuard allowedRoles={['delivery_person', 'rider', 'admin']}>
@@ -190,6 +193,13 @@ const App = () => {
               <Route path="/services" element={<Booking />} />
               <Route path="/about" element={<Home />} />
               <Route path="/contact" element={<Home />} />
+              <Route path="/get-app" element={<Home />} />
+              <Route path="/stores" element={<Home />} />
+              <Route path="/help" element={<SupportTickets />} />
+              <Route path="/luxe" element={<Shop />} />
+              <Route path="/advice" element={<Home />} />
+              <Route path="/privacy-policy" element={<LegalPrivacy />} />
+              <Route path="/terms" element={<TermsConditions />} />
             </Routes>
           </main>
 

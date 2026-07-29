@@ -108,7 +108,7 @@ const MyLearning = () => {
                 <div className="space-y-1.5 max-w-sm mx-auto">
                   <h3 className="text-base font-extrabold uppercase text-gray-800">No Enrollments Found</h3>
                   <p className="text-xs text-gray-400 font-bold uppercase leading-relaxed">
-                    You haven't enrolled in any courses yet on WakeUp Makeup.
+                    You haven't enrolled in any courses yet on FashionFever.
                   </p>
                 </div>
                 <Link 

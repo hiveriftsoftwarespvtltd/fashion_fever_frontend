@@ -58,6 +58,7 @@ import ServiceCategories from "./components/ServiceCategories";
 import ServiceProviders from "./components/ServiceProviders";
 import HomeContentList from "./components/HomeContentList";
 import CreateHomeContentModal from "./components/CreateHomeContentModal";
+import HomeBookingCardsManager from "./components/HomeBookingCardsManager";
 import HomeContentDetailsModal from "./components/HomeContentDetailsModal";
 import AdminWalletBalances from "./components/AdminWalletBalances";
 import SupportTickets from "./components/SupportTickets";
@@ -299,7 +300,7 @@ const AdminPanel = () => {
         const list = vendorsRes.value.data?.data ?? vendorsRes.value.data ?? [];
         setTopVendorsGraph(Array.isArray(list) ? list : []);
       }
-      
+
       fetchMonthlyData(selectedYear);
     } catch (err) {
       console.error("Failed to load overview data:", err);
@@ -503,6 +504,8 @@ const AdminPanel = () => {
         const name = typeof business === 'object' ? business?.businessName : vendor.name;
         const slug = typeof business === 'object' ? business?.slug : 'unknown-brand';
         const logo = typeof business === 'object' ? business?.logo?.url : null;
+        const email = vendor.email || (typeof business === 'object' ? (business?.email || business?.user?.email || business?.userId?.email) : null) || vendor.userId?.email || vendor.businessEmail || '';
+        const phone = vendor.phone || vendor.mobile || (typeof business === 'object' ? (business?.phone || business?.mobile || business?.user?.phone) : null) || vendor.userId?.phone || '';
         return (
           <div className="flex items-center gap-4">
             <div className={`w-12 h-12 rounded-2xl overflow-hidden flex items-center justify-center font-bold border ${isDarkMode ? 'bg-gray-800 border-white/5' : 'bg-gray-100 border-gray-100 shadow-sm'}`}>
@@ -514,7 +517,9 @@ const AdminPanel = () => {
             </div>
             <div className="flex flex-col">
               <span className={`text-sm font-bold ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>{name || 'Vendor Partner'}</span>
-              <span className="text-sm font-bold uppercase text-gray-400">/{slug}</span>
+              {email && <span className="text-xs font-bold text-primary lowercase tracking-tight">{email}</span>}
+              {phone && <span className="text-[10px] font-extrabold text-gray-400">📞 {phone}</span>}
+              <span className="text-[10px] font-bold uppercase text-gray-400">/{slug}</span>
             </div>
           </div>
         );
@@ -668,7 +673,7 @@ const AdminPanel = () => {
                   toast.error('Something went wrong during deletion.');
                 }
               }
-             });
+            });
           }} className={`p-2.5 rounded-xl transition-all cursor-pointer ${isDarkMode ? 'bg-white/5 text-gray-400 hover:text-red-500' : 'bg-gray-50 text-gray-400 hover:text-red-500'}`}><Trash2 size={18} /></button>
         </div>
       )
@@ -1119,8 +1124,8 @@ const AdminPanel = () => {
       header: 'Actions',
       render: (product) => (
         <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
-          <button 
-            title="View Product Details" 
+          <button
+            title="View Product Details"
             onClick={() => {
               Swal.fire({
                 title: product.name,
@@ -1147,13 +1152,13 @@ const AdminPanel = () => {
                   confirmButton: 'w-full py-3 bg-primary hover:bg-primary-hover text-white rounded-xl font-bold text-xs uppercase shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all cursor-pointer'
                 }
               });
-            }} 
+            }}
             className={`p-2.5 rounded-xl transition-all cursor-pointer ${isDarkMode ? 'bg-white/5 text-gray-400 hover:text-primary' : 'bg-gray-50 text-gray-400 hover:text-primary'}`}
           >
             <Eye size={18} />
           </button>
-          <button 
-            title="Delete Product" 
+          <button
+            title="Delete Product"
             onClick={() => {
               Swal.fire({
                 title: 'Delete Product?',
@@ -1190,7 +1195,7 @@ const AdminPanel = () => {
                   }
                 }
               });
-            }} 
+            }}
             className={`p-2.5 rounded-xl transition-all cursor-pointer ${isDarkMode ? 'bg-white/5 text-gray-400 hover:text-red-500' : 'bg-gray-50 text-gray-400 hover:text-red-500'}`}
           >
             <Trash2 size={18} />
@@ -1278,12 +1283,12 @@ const AdminPanel = () => {
       render: (item) => {
         const isApproved = item.isApproved;
         const educatorId = item._id;
-        
+
         return (
           <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
             {!isApproved && (
-              <button 
-                title="Approve Educator" 
+              <button
+                title="Approve Educator"
                 onClick={async () => {
                   const loadingToast = toast.loading('Approving educator...');
                   try {
@@ -1299,15 +1304,15 @@ const AdminPanel = () => {
                     toast.dismiss(loadingToast);
                     toast.error('Something went wrong during approval.');
                   }
-                }} 
+                }}
                 className="p-2 bg-green-500 text-white rounded-xl shadow-lg shadow-green-500/20 hover:scale-110 transition-all cursor-pointer"
               >
                 <CircleCheckBig size={15} />
               </button>
             )}
             {isApproved && (
-              <button 
-                title="Revoke / Disapprove Educator" 
+              <button
+                title="Revoke / Disapprove Educator"
                 onClick={async () => {
                   const loadingToast = toast.loading('Rejecting educator...');
                   try {
@@ -1323,14 +1328,14 @@ const AdminPanel = () => {
                     toast.dismiss(loadingToast);
                     toast.error('Something went wrong.');
                   }
-                }} 
+                }}
                 className="p-2 bg-red-500 text-white rounded-xl shadow-lg shadow-red-500/20 hover:scale-110 transition-all cursor-pointer"
               >
                 <CircleX size={15} />
               </button>
             )}
-            <button 
-              title={item.isActive ? "Deactivate Educator" : "Activate Educator"} 
+            <button
+              title={item.isActive ? "Deactivate Educator" : "Activate Educator"}
               onClick={async () => {
                 const loadingToast = toast.loading(item.isActive ? 'Deactivating educator...' : 'Activating educator...');
                 try {
@@ -1346,12 +1351,11 @@ const AdminPanel = () => {
                   toast.dismiss(loadingToast);
                   toast.error('Something went wrong.');
                 }
-              }} 
-              className={`p-2 rounded-xl transition-all cursor-pointer ${
-                item.isActive 
-                  ? (isDarkMode ? 'bg-white/5 text-green-500 hover:text-red-500' : 'bg-gray-50 text-green-600 hover:text-red-500') 
+              }}
+              className={`p-2 rounded-xl transition-all cursor-pointer ${item.isActive
+                  ? (isDarkMode ? 'bg-white/5 text-green-500 hover:text-red-500' : 'bg-gray-50 text-green-600 hover:text-red-500')
                   : (isDarkMode ? 'bg-white/5 text-gray-400 hover:text-green-500' : 'bg-gray-50 text-gray-400 hover:text-green-600')
-              }`}
+                }`}
             >
               <Power size={15} />
             </button>
@@ -1375,18 +1379,18 @@ const AdminPanel = () => {
       <CourseCategoryDetailsModal courseCategoryId={selectedCourseCategoryId} onClose={() => setSelectedCourseCategoryId(null)} />
       <DeleteConfirmModal isOpen={!!itemToDelete} itemName={itemToDelete?.name || itemToDelete?.businessName} onConfirm={handleDeleteConfirm} onCancel={() => setItemToDelete(null)} />
       <OnboardInfluencerModal isOpen={isOnboardingOpen} onClose={() => { setIsOnboardingOpen(false); setEditingInfluencer(null); }} initialData={editingInfluencer} onSuccess={fetchData} />
-      <CreateCategoryModal 
-        isOpen={isCreateCategoryOpen || !!editingCategory} 
-        onClose={() => { 
-          setIsCreateCategoryOpen(false); 
-          setEditingCategory(null); 
-        }} 
-        onSuccess={fetchData} 
+      <CreateCategoryModal
+        isOpen={isCreateCategoryOpen || !!editingCategory}
+        onClose={() => {
+          setIsCreateCategoryOpen(false);
+          setEditingCategory(null);
+        }}
+        onSuccess={fetchData}
         initialData={editingCategory}
       />
-      <CategoryDetailsModal 
-        categoryId={selectedCategoryId} 
-        onClose={() => setSelectedCategoryId(null)} 
+      <CategoryDetailsModal
+        categoryId={selectedCategoryId}
+        onClose={() => setSelectedCategoryId(null)}
       />
       <CreateCommissionSlabModal
         isOpen={isCreateSlabOpen || !!editingSlab}
@@ -1446,7 +1450,7 @@ const AdminPanel = () => {
       />
 
       {/* Main Content */}
-      <div 
+      <div
         ref={containerRef}
         className="flex-1 flex flex-col min-h-screen min-w-0 h-screen overflow-y-scroll"
       >
@@ -1594,24 +1598,24 @@ const AdminPanel = () => {
                   activeTab === 'users'
                     ? userColumns
                     : activeTab === 'influencers'
-                    ? influencerColumns
-                    : activeTab === 'commission-slabs'
-                    ? commissionSlabColumns
-                    : activeTab === 'cashback-slabs'
-                    ? cashbackSlabColumns
-                    : activeTab === 'coupons'
-                    ? couponColumns
-                    : activeTab === 'categories'
-                    ? categoryColumns
-                  : activeTab === 'course-categories'
-                    ? courseCategoryColumns
-                    : activeTab === 'orders'
-                    ? orderColumns
-                    : activeTab === 'products'
-                    ? productColumns
-                    : activeTab === 'educators' || activeTab === 'all-educators'
-                    ? educatorColumns
-                    : vendorColumns
+                      ? influencerColumns
+                      : activeTab === 'commission-slabs'
+                        ? commissionSlabColumns
+                        : activeTab === 'cashback-slabs'
+                          ? cashbackSlabColumns
+                          : activeTab === 'coupons'
+                            ? couponColumns
+                            : activeTab === 'categories'
+                              ? categoryColumns
+                              : activeTab === 'course-categories'
+                                ? courseCategoryColumns
+                                : activeTab === 'orders'
+                                  ? orderColumns
+                                  : activeTab === 'products'
+                                    ? productColumns
+                                    : activeTab === 'educators' || activeTab === 'all-educators'
+                                      ? educatorColumns
+                                      : vendorColumns
                 }
                 data={dataList}
                 loading={loading}
@@ -1663,6 +1667,11 @@ const AdminPanel = () => {
           {/* Service Categories */}
           <div className={activeTab === 'service-categories' ? 'block animate-in fade-in duration-300' : 'hidden'}>
             <ServiceCategories isDarkMode={isDarkMode} />
+          </div>
+
+          {/* Dedicated Home Booking Cards Manager (Super Admin Tab) */}
+          <div className={activeTab === 'home-booking-cards' ? 'block animate-in fade-in duration-300' : 'hidden'}>
+            <HomeBookingCardsManager isDarkMode={isDarkMode} />
           </div>
 
           {/* Service Providers */}

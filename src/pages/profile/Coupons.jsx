@@ -32,7 +32,7 @@ const Coupons = () => {
     },
     {
       id: 2,
-      code: 'WAKEUPNEW',
+      code: 'FASHIONFEVERNEW',
       discount: '₹200 OFF',
       title: 'First Order Special Gift',
       desc: 'Flat discount on your very first order of cosmetics or salon slots.',
@@ -68,7 +68,7 @@ const Coupons = () => {
       code: 'WELCOME10',
       discount: '10% OFF',
       title: 'Newsletter Signup Reward',
-      desc: 'Already redeemed discount for joining the WakeUp makeup squad.',
+      desc: 'Already redeemed discount for joining the FashionFever squad.',
       minOrder: '₹499',
       expiry: '15 Apr 2026',
       status: 'redeemed',

@@ -8,20 +8,55 @@ const VendorOrders = ({
   onViewOrder,
   onExportOrders
 }) => {
+  const [orderTypeFilter, setOrderTypeFilter] = React.useState('all');
+
+  const filteredOrders = orders.filter((order) => {
+    const isQuick = order.isQuickDelivery || order.orderType === 'QUICK' || order.isQuickCommerce;
+    if (orderTypeFilter === 'quick') return isQuick;
+    if (orderTypeFilter === 'standard') return !isQuick;
+    return true;
+  });
+
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center gap-3">
           <h2 className="text-lg font-bold">Customer Orders</h2>
-          <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-bold uppercase">
-            {orders.length} Total Orders
-          </span>
+          <div className="flex items-center gap-1.5 bg-gray-100 dark:bg-gray-800 p-1 rounded-xl">
+            <button
+              onClick={() => setOrderTypeFilter('all')}
+              className={`px-3 py-1 rounded-lg text-xs font-bold uppercase transition-all cursor-pointer ${orderTypeFilter === 'all'
+                  ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm'
+                  : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'
+                }`}
+            >
+              All ({orders.length})
+            </button>
+            <button
+              onClick={() => setOrderTypeFilter('quick')}
+              className={`px-3 py-1 rounded-lg text-xs font-bold uppercase transition-all cursor-pointer flex items-center gap-1 ${orderTypeFilter === 'quick'
+                  ? 'bg-amber-500 text-white shadow-sm'
+                  : 'text-amber-600 dark:text-amber-400 hover:text-amber-700'
+                }`}
+            >
+              ⚡ Quick Commerce ({orders.filter(o => o.isQuickDelivery || o.orderType === 'QUICK' || o.isQuickCommerce).length})
+            </button>
+            <button
+              onClick={() => setOrderTypeFilter('standard')}
+              className={`px-3 py-1 rounded-lg text-xs font-bold uppercase transition-all cursor-pointer ${orderTypeFilter === 'standard'
+                  ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm'
+                  : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'
+                }`}
+            >
+              📦 Standard ({orders.filter(o => !o.isQuickDelivery && o.orderType !== 'QUICK' && !o.isQuickCommerce).length})
+            </button>
+          </div>
         </div>
-        
+
         {orders.length > 0 && (
           <button
             onClick={onExportOrders}
-            className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/95 text-white rounded-xl text-xs font-bold uppercase transition-all shadow-md shadow-primary/10 cursor-pointer"
+            className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/95 text-white rounded-xl text-xs font-bold uppercase transition-all shadow-md shadow-primary/10 cursor-pointer self-start sm:self-auto"
           >
             <Download size={14} />
             Export CSV
@@ -47,19 +82,32 @@ const VendorOrders = ({
             <tbody className={`divide-y ${isDarkMode ? 'divide-white/5' : 'divide-gray-50'}`}>
               {ordersLoading ? (
                 <tr><td colSpan="8" className="p-10 text-center font-bold text-gray-400">Loading orders...</td></tr>
-              ) : orders.map((order) => {
+              ) : filteredOrders.length === 0 ? (
+                <tr><td colSpan="8" className="p-10 text-center font-bold text-gray-400">No orders found matching the selected filter.</td></tr>
+              ) : filteredOrders.map((order) => {
                 const itemsCount = order.items?.reduce((sum, item) => sum + (item.quantity || 0), 0) || 0;
                 const orderDate = order.createdAt ? new Date(order.createdAt) : null;
                 const isDateValid = orderDate && !isNaN(orderDate.getTime());
-                
+
                 let statusColor = isDarkMode ? 'bg-amber-500/10 text-amber-400' : 'bg-amber-50 text-amber-655';
                 if (order.orderStatus === 'delivered') statusColor = isDarkMode ? 'bg-green-500/10 text-green-400' : 'bg-green-50 text-green-600';
                 else if (order.orderStatus === 'cancelled') statusColor = isDarkMode ? 'bg-red-500/10 text-red-400' : 'bg-red-50 text-red-655';
-                
+
                 return (
                   <tr key={order._id} className={`${isDarkMode ? 'hover:bg-white/5' : 'hover:bg-gray-50/50'} transition-colors`}>
                     <td className="px-6 py-4">
-                      <span className={`font-bold text-sm ${isDarkMode ? 'text-gray-250' : 'text-gray-800'}`}>{order.orderNumber}</span>
+                      <div className="flex flex-col gap-1">
+                        <span className={`font-bold text-sm ${isDarkMode ? 'text-gray-250' : 'text-gray-800'}`}>{order.orderNumber}</span>
+                        {(order.isQuickDelivery || order.orderType === 'QUICK' || order.isQuickCommerce) ? (
+                          <span className="inline-flex items-center gap-1 w-max px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-amber-500/20 text-amber-500 border border-amber-500/30 animate-pulse">
+                            ⚡ 10-MIN EXPRESS
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 w-max px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-gray-500/10 text-gray-500 border border-gray-200/50">
+                            📦 STANDARD
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex flex-col">
@@ -109,3 +157,4 @@ const VendorOrders = ({
 };
 
 export default VendorOrders;
+

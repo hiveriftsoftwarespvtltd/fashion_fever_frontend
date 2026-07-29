@@ -193,7 +193,7 @@ const InfluencerRegistration = () => {
               Join as Influencer
             </h1>
             <p className="text-sm text-gray-500 font-medium mt-3 max-w-md mx-auto leading-relaxed">
-              Complete your profile to start earning commissions and growing with WAKEUP MAKEUP.
+              Complete your profile to start earning commissions and growing with FashionFever.
             </p>
           </div>
 
@@ -359,7 +359,7 @@ const InfluencerRegistration = () => {
           </div>
 
           <p className="text-center text-sm font-bold text-gray-400 uppercase mt-8 pb-8">
-            By registering, you agree to WAKEUP's{' '}
+            By registering, you agree to FashionFever's{' '}
             <span className="text-primary cursor-pointer hover:underline">Influencer Terms & Conditions</span>
           </p>
         </div>

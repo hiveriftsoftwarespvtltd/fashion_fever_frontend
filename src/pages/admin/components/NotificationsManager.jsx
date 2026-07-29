@@ -826,7 +826,7 @@ const NotificationsManager = ({ isDarkMode }) => {
                       type="text"
                       value={actionUrl}
                       onChange={e => setActionUrl(e.target.value)}
-                      placeholder="E.g., wakeupmakeup://offers"
+                      placeholder="E.g., fashionfever://offers"
                       className={`w-full px-4 py-2.5 rounded-xl border text-xs font-bold outline-none transition-all ${
                         isDarkMode 
                           ? 'bg-gray-900 border-white/5 text-white focus:border-primary/50' 

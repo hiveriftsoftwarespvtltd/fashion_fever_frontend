@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { X, Calendar, MapPin, FileText, ShoppingBag, CreditCard, Tag, Landmark, ShieldCheck } from 'lucide-react';
+import { X, Calendar, MapPin, ShoppingBag, Tag, Landmark, ShieldCheck, Truck, UserCheck, Phone, Bike, AlertTriangle, Loader2, CheckCircle2 } from 'lucide-react';
 import { updateVendorOrder } from '../../../api/vendorService';
+import { getVendorDeliveryPersons, assignDeliveryPerson, assignRiderToStandardOrder, getAvailableRiders } from '../../../api/quickECommerceService';
 import { toast } from '../../../utils/toast';
 import { useTheme } from '../../../context/ThemeContext';
 
@@ -18,6 +19,11 @@ const VendorOrderDetailsModal = ({ isOpen, onClose, order, onUpdate }) => {
   const [cancellationReason, setCancellationReason] = useState('');
   const [updating, setUpdating] = useState(false);
 
+  // Rider Assignment State
+  const [riders, setRiders] = useState([]);
+  const [selectedRiderId, setSelectedRiderId] = useState('');
+  const [assigningRider, setAssigningRider] = useState(false);
+
   useEffect(() => {
     setCurrentOrder(order);
     if (order) {
@@ -25,8 +31,60 @@ const VendorOrderDetailsModal = ({ isOpen, onClose, order, onUpdate }) => {
       setPaymentStatus(order.paymentStatus || 'pending');
       setTrackingId(order.trackingId || '');
       setCancellationReason(order.cancellationReason || '');
+      // Pre-select already assigned rider
+      const existingRider = order.deliveryPersonId;
+      setSelectedRiderId(
+        existingRider && typeof existingRider === 'object' ? existingRider._id : (existingRider || '')
+      );
     }
   }, [order]);
+
+  // Fetch all active riders when modal opens
+  useEffect(() => {
+    if (!isOpen) return;
+    getAvailableRiders()
+      .then((res) => {
+        // getAvailableRiders returns plain array directly
+        let list = [];
+        if (Array.isArray(res)) {
+          list = res;
+        } else if (Array.isArray(res?.data)) {
+          list = res.data;
+        } else if (Array.isArray(res?.data?.deliveryPersons)) {
+          list = res.data.deliveryPersons;
+        }
+        console.log('[Rider Modal] fetched riders:', list.length, list);
+        setRiders(list);
+      })
+      .catch((err) => { console.error('[Rider Modal] fetch error:', err); setRiders([]); });
+  }, [isOpen]);
+
+  const handleAssignRider = async () => {
+    if (!selectedRiderId) { toast.error('Please select a rider first.'); return; }
+    setAssigningRider(true);
+    const tid = toast.loading('Dispatching rider...');
+    try {
+      const isQuick = currentOrder.isQuickDelivery || currentOrder.orderType === 'QUICK' || currentOrder.isQuickCommerce;
+      const res = isQuick
+        ? await assignDeliveryPerson(currentOrder._id, selectedRiderId)
+        : await assignRiderToStandardOrder(currentOrder._id, selectedRiderId);
+      toast.dismiss(tid);
+      if (res?.success || res?.message) {
+        toast.success('Rider dispatched successfully!');
+        const updated = res.order || res.data;
+        setCurrentOrder(updated || { ...currentOrder, deliveryPersonId: selectedRiderId, orderStatus: 'shipped' });
+        setOrderStatus('shipped');
+        if (onUpdate) onUpdate();
+      } else {
+        toast.error(res?.message || 'Failed to assign rider.');
+      }
+    } catch (err) {
+      toast.dismiss(tid);
+      toast.error('Error assigning rider. Try again.');
+    } finally {
+      setAssigningRider(false);
+    }
+  };
 
   if (!isOpen || !currentOrder) return null;
 
@@ -71,7 +129,7 @@ const VendorOrderDetailsModal = ({ isOpen, onClose, order, onUpdate }) => {
       toast.dismiss(loadingToast);
       if (res.success) {
         toast.success(res.message || 'Order updated successfully!');
-        
+
         // Extract updated object matching backend double-nested payload structure
         const updatedObj = res.data?.data || res.data || res.order;
         if (updatedObj) {
@@ -85,7 +143,7 @@ const VendorOrderDetailsModal = ({ isOpen, onClose, order, onUpdate }) => {
             cancellationReason
           }));
         }
-        
+
         if (onUpdate) onUpdate();
       } else {
         toast.error(res.message || 'Failed to update order status.');
@@ -101,17 +159,15 @@ const VendorOrderDetailsModal = ({ isOpen, onClose, order, onUpdate }) => {
 
   return (
     <div className="fixed inset-0 z-[4000] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto font-outfit text-left">
-      <div className={`w-full max-w-2xl my-auto rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 border transition-all duration-300 ${
-        isDarkMode ? 'bg-gray-900 border-white/5 text-white' : 'bg-white border-gray-100 text-gray-800'
-      }`}>
-        
+      <div className={`w-full max-w-2xl my-auto rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 border transition-all duration-300 ${isDarkMode ? 'bg-gray-900 border-white/5 text-white' : 'bg-white border-gray-100 text-gray-800'
+        }`}>
+
         <div className="p-6 md:p-8 max-h-[85vh] overflow-y-auto space-y-6">
           {/* Modal Header */}
           <div className={`flex justify-between items-start border-b pb-4 ${isDarkMode ? 'border-white/5' : 'border-gray-100'}`}>
             <div className="flex items-center gap-4">
-              <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border shadow-inner ${
-                isDarkMode ? 'bg-primary/20 border-primary/30' : 'bg-primary/10 border-primary/20'
-              }`}>
+              <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border shadow-inner ${isDarkMode ? 'bg-primary/20 border-primary/30' : 'bg-primary/10 border-primary/20'
+                }`}>
                 <ShoppingBag className="text-primary" size={20} />
               </div>
               <div>
@@ -121,18 +177,16 @@ const VendorOrderDetailsModal = ({ isOpen, onClose, order, onUpdate }) => {
                 </p>
               </div>
             </div>
-            <button onClick={onClose} className={`p-2 rounded-xl transition-all hover:scale-105 cursor-pointer ${
-              isDarkMode ? 'hover:bg-white/5 text-gray-500 hover:text-gray-300' : 'hover:bg-gray-50 text-gray-400 hover:text-gray-800'
-            }`}>
+            <button onClick={onClose} className={`p-2 rounded-xl transition-all hover:scale-105 cursor-pointer ${isDarkMode ? 'hover:bg-white/5 text-gray-500 hover:text-gray-300' : 'hover:bg-gray-50 text-gray-400 hover:text-gray-800'
+              }`}>
               <X size={20} />
             </button>
           </div>
 
           {/* Quick Payout Status Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className={`p-4 rounded-2xl border ${
-              isDarkMode ? 'border-green-500/20 bg-green-500/5' : 'border-green-100 bg-green-50/20'
-            }`}>
+            <div className={`p-4 rounded-2xl border ${isDarkMode ? 'border-green-500/20 bg-green-500/5' : 'border-green-100 bg-green-50/20'
+              }`}>
               <p className="text-sm font-bold text-green-500 uppercase mb-1 flex items-center gap-1">
                 <Landmark size={10} /> Vendor Payout
               </p>
@@ -140,9 +194,8 @@ const VendorOrderDetailsModal = ({ isOpen, onClose, order, onUpdate }) => {
                 {formatCurrency(currentOrder.payoutAmount || 0)}
               </span>
             </div>
-            <div className={`p-4 rounded-2xl border ${
-              isDarkMode ? 'border-purple-500/20 bg-purple-500/5' : 'border-purple-100 bg-purple-50/20'
-            }`}>
+            <div className={`p-4 rounded-2xl border ${isDarkMode ? 'border-purple-500/20 bg-purple-500/5' : 'border-purple-100 bg-purple-50/20'
+              }`}>
               <p className="text-sm font-bold text-purple-500 uppercase mb-1 flex items-center gap-1">
                 <Tag size={10} /> Commission Rate
               </p>
@@ -153,9 +206,8 @@ const VendorOrderDetailsModal = ({ isOpen, onClose, order, onUpdate }) => {
                 Fee: {formatCurrency(currentOrder.commissionAmount || 0)}
               </p>
             </div>
-            <div className={`p-4 rounded-2xl border ${
-              isDarkMode ? 'border-white/5 bg-gray-950/40' : 'border-gray-100 bg-gray-50/50'
-            }`}>
+            <div className={`p-4 rounded-2xl border ${isDarkMode ? 'border-white/5 bg-gray-950/40' : 'border-gray-100 bg-gray-50/50'
+              }`}>
               <p className="text-sm font-bold text-gray-400 uppercase mb-1">Order Status</p>
               <span className={`px-2.5 py-1 rounded-full text-xs font-bold uppercase border ${getOrderStatusColor(currentOrder.orderStatus)}`}>
                 {currentOrder.orderStatus || 'Pending'}
@@ -166,9 +218,8 @@ const VendorOrderDetailsModal = ({ isOpen, onClose, order, onUpdate }) => {
           {/* Customer & Shipping Section */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Shipping Address */}
-            <div className={`p-5 rounded-3xl border ${
-              isDarkMode ? 'border-white/5 bg-gray-950/20' : 'border-gray-100 bg-gray-50/30'
-            }`}>
+            <div className={`p-5 rounded-3xl border ${isDarkMode ? 'border-white/5 bg-gray-950/20' : 'border-gray-100 bg-gray-50/30'
+              }`}>
               <p className="text-sm font-bold text-gray-400 uppercase mb-3 flex items-center gap-1">
                 <MapPin size={12} /> Shipping Address
               </p>
@@ -186,9 +237,8 @@ const VendorOrderDetailsModal = ({ isOpen, onClose, order, onUpdate }) => {
             </div>
 
             {/* Customer Details */}
-            <div className={`p-5 rounded-3xl border flex flex-col justify-between ${
-              isDarkMode ? 'border-white/5 bg-gray-950/20' : 'border-gray-100 bg-gray-50/30'
-            }`}>
+            <div className={`p-5 rounded-3xl border flex flex-col justify-between ${isDarkMode ? 'border-white/5 bg-gray-950/20' : 'border-gray-100 bg-gray-50/30'
+              }`}>
               <div>
                 <p className="text-sm font-bold text-gray-400 uppercase mb-3 flex items-center gap-1">
                   <ShieldCheck size={12} /> Customer Identity
@@ -202,9 +252,8 @@ const VendorOrderDetailsModal = ({ isOpen, onClose, order, onUpdate }) => {
                       {typeof currentOrder.userId === 'object' ? currentOrder.userId.email : currentOrder.userId}
                     </p>
                     {typeof currentOrder.userId === 'object' && currentOrder.userId.role && (
-                      <p className={`text-[9px] uppercase font-bold px-2 py-0.5 rounded inline-block mt-2 ${
-                        isDarkMode ? 'bg-blue-500/10 text-blue-400' : 'bg-blue-50 text-blue-500'
-                      }`}>
+                      <p className={`text-[9px] uppercase font-bold px-2 py-0.5 rounded inline-block mt-2 ${isDarkMode ? 'bg-blue-500/10 text-blue-400' : 'bg-blue-50 text-blue-500'
+                        }`}>
                         Role: {currentOrder.userId.role}
                       </p>
                     )}
@@ -215,11 +264,10 @@ const VendorOrderDetailsModal = ({ isOpen, onClose, order, onUpdate }) => {
               </div>
               <div className={`mt-4 pt-4 border-t flex justify-between items-center text-xs ${isDarkMode ? 'border-white/5' : 'border-gray-100'}`}>
                 <span className="font-bold text-gray-400 uppercase text-[9px]">Payment Status</span>
-                <span className={`px-2 py-0.5 rounded text-sm font-bold uppercase ${
-                  currentOrder.paymentStatus === 'paid' 
-                    ? (isDarkMode ? 'bg-green-500/10 text-green-400' : 'bg-green-50 text-green-500') 
+                <span className={`px-2 py-0.5 rounded text-sm font-bold uppercase ${currentOrder.paymentStatus === 'paid'
+                    ? (isDarkMode ? 'bg-green-500/10 text-green-400' : 'bg-green-50 text-green-500')
                     : (isDarkMode ? 'bg-amber-500/10 text-amber-400' : 'bg-amber-50 text-amber-500')
-                }`}>
+                  }`}>
                   {currentOrder.paymentStatus || 'Pending'}
                 </span>
               </div>
@@ -229,14 +277,12 @@ const VendorOrderDetailsModal = ({ isOpen, onClose, order, onUpdate }) => {
           {/* Order Items Table */}
           <div>
             <p className="text-sm font-bold text-gray-400 uppercase mb-3">Order Items</p>
-            <div className={`border rounded-2xl overflow-hidden shadow-sm ${
-              isDarkMode ? 'border-white/5 bg-gray-950' : 'border-gray-100 bg-white'
-            }`}>
+            <div className={`border rounded-2xl overflow-hidden shadow-sm ${isDarkMode ? 'border-white/5 bg-gray-950' : 'border-gray-100 bg-white'
+              }`}>
               <table className="w-full text-xs text-left border-collapse">
                 <thead>
-                  <tr className={`border-b text-[9px] font-bold uppercase text-gray-400 ${
-                    isDarkMode ? 'bg-gray-950/50 border-white/5' : 'bg-gray-50'
-                  }`}>
+                  <tr className={`border-b text-[9px] font-bold uppercase text-gray-400 ${isDarkMode ? 'bg-gray-950/50 border-white/5' : 'bg-gray-50'
+                    }`}>
                     <th className="p-3">Product Name</th>
                     <th className="p-3 text-center">Qty</th>
                     <th className="p-3 text-right">Price</th>
@@ -252,9 +298,8 @@ const VendorOrderDetailsModal = ({ isOpen, onClose, order, onUpdate }) => {
                         {item.attributes && (
                           <div className="flex gap-2 mt-1">
                             {Object.entries(item.attributes).map(([key, val]) => (
-                              <span key={key} className={`px-1.5 py-0.5 rounded text-[9px] uppercase font-semibold ${
-                                isDarkMode ? 'bg-white/5 text-gray-400' : 'bg-gray-100 text-gray-500'
-                              }`}>
+                              <span key={key} className={`px-1.5 py-0.5 rounded text-[9px] uppercase font-semibold ${isDarkMode ? 'bg-white/5 text-gray-400' : 'bg-gray-100 text-gray-500'
+                                }`}>
                                 {key}: {val}
                               </span>
                             ))}
@@ -273,9 +318,8 @@ const VendorOrderDetailsModal = ({ isOpen, onClose, order, onUpdate }) => {
 
           {/* Applied Coupon Info */}
           {currentOrder.orderId?.appliedCoupon && currentOrder.orderId.appliedCoupon.code && (
-            <div className={`p-4 rounded-2xl border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 ${
-              isDarkMode ? 'border-purple-500/20 bg-purple-500/5' : 'border-purple-100 bg-purple-50/30'
-            }`}>
+            <div className={`p-4 rounded-2xl border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 ${isDarkMode ? 'border-purple-500/20 bg-purple-500/5' : 'border-purple-100 bg-purple-50/30'
+              }`}>
               <div className="flex items-center gap-3">
                 <div className="p-2.5 rounded-xl bg-purple-500/10 text-purple-500">
                   <Tag size={16} />
@@ -293,9 +337,8 @@ const VendorOrderDetailsModal = ({ isOpen, onClose, order, onUpdate }) => {
           )}
 
           {/* Price Breakdown */}
-          <div className={`p-5 rounded-3xl border space-y-3 ${
-            isDarkMode ? 'border-white/5 bg-gray-950/20' : 'border-gray-100 bg-gray-50/30'
-          }`}>
+          <div className={`p-5 rounded-3xl border space-y-3 ${isDarkMode ? 'border-white/5 bg-gray-950/20' : 'border-gray-100 bg-gray-50/30'
+            }`}>
             <div className={`flex justify-between text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
               <span>Subtotal</span>
               <span className={`font-bold ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>{formatCurrency(currentOrder.subTotal || 0)}</span>
@@ -324,23 +367,98 @@ const VendorOrderDetailsModal = ({ isOpen, onClose, order, onUpdate }) => {
             </div>
           </div>
 
-          {/* Action / Update Panel */}
+          {/* ── Rider Assignment Panel ── */}
           <div className={`p-5 rounded-3xl border space-y-4 ${
-            isDarkMode ? 'border-primary/20 bg-primary/5' : 'border-primary/10 bg-primary/5'
+            isDarkMode ? 'border-amber-500/20 bg-amber-500/5' : 'border-amber-100 bg-amber-50/40'
           }`}>
+            {/* Header */}
+            <div className="flex items-center justify-between">
+              <h3 className="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-widest flex items-center gap-2">
+                <Truck size={14} /> Assign Delivery Rider
+              </h3>
+              {currentOrder.deliveryPersonId && (
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-green-500/15 text-green-600 border border-green-500/30">
+                  <UserCheck size={10} /> Rider Assigned
+                </span>
+              )}
+            </div>
+
+            {/* Currently Assigned Rider Info */}
+            {currentOrder.deliveryPersonId && (
+              <div className={`flex items-center justify-between p-3 rounded-2xl border text-xs ${
+                isDarkMode ? 'bg-gray-950/60 border-white/5' : 'bg-white border-amber-100'
+              }`}>
+                <div className="flex items-center gap-2">
+                  <div className={`w-7 h-7 rounded-full flex items-center justify-center ${isDarkMode ? 'bg-amber-500/15' : 'bg-amber-100'}`}>
+                    <Bike size={14} className="text-amber-600" />
+                  </div>
+                  <div>
+                    <p className={`font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                      {typeof currentOrder.deliveryPersonId === 'object'
+                        ? (currentOrder.deliveryPersonId.name || 'Assigned Rider')
+                        : 'Assigned Rider'}
+                    </p>
+                    {typeof currentOrder.deliveryPersonId === 'object' && currentOrder.deliveryPersonId.phone && (
+                      <p className="text-[10px] font-mono text-gray-500 mt-0.5 flex items-center gap-1">
+                        <Phone size={9} /> {currentOrder.deliveryPersonId.phone}
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-amber-500/15 text-amber-600">
+                  {currentOrder.deliveryStatus || 'ASSIGNED'}
+                </span>
+              </div>
+            )}
+
+            {/* Rider Select + Dispatch Button */}
+            <div className="flex flex-col gap-2.5">
+              <select
+                value={selectedRiderId}
+                onChange={(e) => setSelectedRiderId(e.target.value)}
+                className={`w-full border rounded-xl px-3 py-2.5 text-xs font-bold outline-none focus:ring-2 focus:ring-primary/30 transition-all ${
+                  isDarkMode ? 'bg-gray-950 border-white/10 text-gray-200' : 'bg-white border-gray-200 text-gray-700'
+                }`}
+              >
+                <option value="">
+                {riders.length === 0
+                  ? 'No riders available — add a rider first'
+                  : '-- Select a Rider --'}
+                </option>
+                {riders.map((r) => (
+                  <option key={r._id} value={r._id}>
+                    {r.name} · {r.phone} · {r.vehicleType || 'bike'} · {r.status || 'AVAILABLE'}
+                  </option>
+                ))}
+              </select>
+              <button
+                onClick={handleAssignRider}
+                disabled={assigningRider || !selectedRiderId || riders.length === 0}
+                className="w-full px-5 py-3 bg-primary hover:bg-primary/90 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-black uppercase tracking-widest rounded-xl transition-all shadow-lg shadow-primary/25 cursor-pointer flex items-center justify-center gap-2"
+              >
+                <Truck size={14} />
+                {assigningRider
+                  ? <><Loader2 size={14} className="animate-spin" /> Dispatching...</>
+                  : 'Dispatch Rider'}
+              </button>
+            </div>
+          </div>
+
+          {/* Action / Update Panel */}
+          <div className={`p-5 rounded-3xl border space-y-4 ${isDarkMode ? 'border-primary/20 bg-primary/5' : 'border-primary/10 bg-primary/5'
+            }`}>
             <h3 className="text-xs font-bold text-primary uppercase tracking-wider flex items-center gap-1.5">
               <Landmark size={12} /> Manage Order Actions
             </h3>
-            
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-bold text-gray-400 uppercase block mb-1.5">Order Status</label>
                 <select
                   value={orderStatus}
                   onChange={(e) => setOrderStatus(e.target.value)}
-                  className={`w-full border rounded-xl px-3 py-2 text-xs font-bold focus:ring-2 focus:ring-primary/20 outline-none transition-all ${
-                    isDarkMode ? 'bg-gray-950 border-white/10 text-gray-200' : 'bg-white border-gray-200 text-gray-700'
-                  }`}
+                  className={`w-full border rounded-xl px-3 py-2 text-xs font-bold focus:ring-2 focus:ring-primary/20 outline-none transition-all ${isDarkMode ? 'bg-gray-950 border-white/10 text-gray-200' : 'bg-white border-gray-200 text-gray-700'
+                    }`}
                 >
                   <option value="pending">Pending</option>
                   <option value="shipped">Shipped</option>
@@ -354,9 +472,8 @@ const VendorOrderDetailsModal = ({ isOpen, onClose, order, onUpdate }) => {
                 <select
                   value={paymentStatus}
                   onChange={(e) => setPaymentStatus(e.target.value)}
-                  className={`w-full border rounded-xl px-3 py-2 text-xs font-bold focus:ring-2 focus:ring-primary/20 outline-none transition-all ${
-                    isDarkMode ? 'bg-gray-950 border-white/10 text-gray-200' : 'bg-white border-gray-200 text-gray-700'
-                  }`}
+                  className={`w-full border rounded-xl px-3 py-2 text-xs font-bold focus:ring-2 focus:ring-primary/20 outline-none transition-all ${isDarkMode ? 'bg-gray-950 border-white/10 text-gray-200' : 'bg-white border-gray-200 text-gray-700'
+                    }`}
                 >
                   <option value="pending">Pending</option>
                   <option value="paid">Paid</option>
@@ -373,9 +490,8 @@ const VendorOrderDetailsModal = ({ isOpen, onClose, order, onUpdate }) => {
                   placeholder="Enter courier tracking ID..."
                   value={trackingId}
                   onChange={(e) => setTrackingId(e.target.value)}
-                  className={`w-full border rounded-xl px-3 py-2 text-xs font-medium focus:ring-2 focus:ring-primary/20 outline-none transition-all ${
-                    isDarkMode ? 'bg-gray-950 border-white/10 text-gray-200 placeholder-gray-650' : 'bg-white border-gray-200 text-gray-700 placeholder-gray-400'
-                  }`}
+                  className={`w-full border rounded-xl px-3 py-2 text-xs font-medium focus:ring-2 focus:ring-primary/20 outline-none transition-all ${isDarkMode ? 'bg-gray-950 border-white/10 text-gray-200 placeholder-gray-650' : 'bg-white border-gray-200 text-gray-700 placeholder-gray-400'
+                    }`}
                 />
               </div>
             )}
@@ -389,9 +505,8 @@ const VendorOrderDetailsModal = ({ isOpen, onClose, order, onUpdate }) => {
                   value={cancellationReason}
                   onChange={(e) => setCancellationReason(e.target.value)}
                   rows="2"
-                  className={`w-full border rounded-xl px-3 py-2 text-xs font-medium focus:ring-2 focus:ring-primary/20 outline-none transition-all resize-none ${
-                    isDarkMode ? 'bg-gray-950 border-white/10 text-gray-200 placeholder-gray-650' : 'bg-white border-gray-200 text-gray-700 placeholder-gray-400'
-                  }`}
+                  className={`w-full border rounded-xl px-3 py-2 text-xs font-medium focus:ring-2 focus:ring-primary/20 outline-none transition-all resize-none ${isDarkMode ? 'bg-gray-950 border-white/10 text-gray-200 placeholder-gray-650' : 'bg-white border-gray-200 text-gray-700 placeholder-gray-400'
+                    }`}
                 />
               </div>
             )}
@@ -399,15 +514,16 @@ const VendorOrderDetailsModal = ({ isOpen, onClose, order, onUpdate }) => {
             <button
               onClick={handleUpdateStatus}
               disabled={updating}
-              className="w-full py-2.5 bg-primary hover:bg-primary/95 disabled:bg-gray-300 text-white rounded-xl font-bold text-sm uppercase tracking-wider transition-all shadow-md shadow-primary/10 hover:opacity-95 active:opacity-90 cursor-pointer text-center"
+              className="w-full py-2.5 bg-primary hover:bg-primary/95 disabled:bg-gray-300 text-white rounded-xl font-bold text-sm uppercase tracking-wider transition-all shadow-md shadow-primary/10 hover:opacity-95 active:opacity-90 cursor-pointer text-center flex items-center justify-center gap-2"
             >
-              {updating ? 'Saving Changes...' : 'Save Order & Payout Status'}
+              {updating
+                ? <><Loader2 size={15} className="animate-spin" /> Saving Changes...</>
+                : <><CheckCircle2 size={15} /> Save Order &amp; Payout Status</>}
             </button>
           </div>
 
-          <button onClick={onClose} className={`w-full py-4 rounded-2xl font-bold text-xs uppercase transition-all cursor-pointer text-center ${
-            isDarkMode ? 'bg-white/5 hover:bg-white/10 text-gray-300' : 'bg-gray-100 hover:bg-gray-200 text-gray-800'
-          }`}>
+          <button onClick={onClose} className={`w-full py-4 rounded-2xl font-bold text-xs uppercase transition-all cursor-pointer text-center ${isDarkMode ? 'bg-white/5 hover:bg-white/10 text-gray-300' : 'bg-gray-100 hover:bg-gray-200 text-gray-800'
+            }`}>
             Dismiss Details
           </button>
         </div>

@@ -20,6 +20,25 @@ export const getInfluencerOverview = async () => {
 };
 
 /**
+ * Fetch audience & buyer analytics for logged in influencer
+ * Method: GET
+ * Route: /influencers/audience-analytics
+ */
+export const getInfluencerAudienceAnalytics = async () => {
+  try {
+    const response = await apiClient.get('/influencers/audience-analytics');
+    return response.data;
+  } catch (error) {
+    console.error('Fetch influencer audience analytics error:', error);
+    return error.response?.data || {
+      success: false,
+      message: 'Failed to fetch audience analytics.',
+      statusCode: 500
+    };
+  }
+};
+
+/**
  * Fetch detailed influencer analytics (commissions, orders, coupon usage, recent orders)
  * Method: GET
  * Route: /influencers/analytics

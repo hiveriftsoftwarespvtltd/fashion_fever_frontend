@@ -7,6 +7,7 @@ import { useWishlist } from '../context/WishlistContext';
 import { toast } from '../utils/toast';
 import { getProducts, getPublicCategories, getPublicBrands } from '../api/productService';
 import ProductCard from '../components/shared/ProductCard';
+import shopHeroImg from '../assets/shophero.png';
 
 
 const Shop = () => {
@@ -25,7 +26,7 @@ const Shop = () => {
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
   const [hoveredProduct, setHoveredProduct] = useState(null);
   const [freeShippingOnly, setFreeShippingOnly] = useState(false);
-  const [availableBrands, setAvailableBrands] = useState(['Wakeup Luxe', 'Skin Glow', 'Natural Flow', 'Hair Care+', 'Beauty Base', 'Lakme']);
+  const [availableBrands, setAvailableBrands] = useState(['FashionFever Luxe', 'Skin Glow', 'Natural Flow', 'Hair Care+', 'Beauty Base', 'Lakme']);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -109,7 +110,7 @@ const Shop = () => {
           page: currentPage,
           limit: 10
         };
-        
+
         // 1. Search Query mapping
         if (localSearch) {
           params.search = localSearch;
@@ -146,7 +147,7 @@ const Shop = () => {
           if (response.success) {
             let rawProducts = [];
             const rawData = response.data;
-            
+
             if (Array.isArray(rawData)) {
               rawProducts = rawData;
             } else if (rawData) {
@@ -160,7 +161,7 @@ const Shop = () => {
                 rawProducts = rawData.data.data;
               }
             }
-            
+
             // Set dynamic total pages count returned by API or compute via totalProducts count
             const totalItems = response.data?.totalProducts || response.data?.total || response.data?.count || response.data?.data?.totalProducts || response.data?.data?.total || 0;
             const apiPagesCount = response.data?.totalPages || response.data?.pages || response.data?.data?.totalPages || response.data?.data?.pages;
@@ -169,18 +170,26 @@ const Shop = () => {
 
             // Brands are loaded dynamically from /public-user/brands on mount
 
-            // Map raw backend products to existing component layout schema
-            const mapped = rawProducts.map(p => {
+            // Filter raw products to ONLY include products added by actual Vendors (p.vendor or p.vendorId must exist)
+            const realVendorProducts = rawProducts.filter(p => {
+              const vendorObj = p.vendor || p.vendorId;
+              return Boolean(vendorObj && (typeof vendorObj === 'object' ? (vendorObj._id || vendorObj.businessName) : vendorObj));
+            });
+
+            const mapped = realVendorProducts.map(p => {
               const firstVariant = p.variants?.[0] || {};
+              const vendorObj = p.vendor || p.vendorId;
+              const vendorName = (typeof vendorObj === 'object' ? vendorObj.businessName : null) || p.brand || 'Vendor Merchant';
+              const imgUrl = firstVariant.thumbnail?.url || (typeof firstVariant.thumbnail === 'string' ? firstVariant.thumbnail : null) || p.images?.[0]?.url || (typeof p.images?.[0] === 'string' ? p.images[0] : null) || p.image || '';
               return {
                 id: p._id,
                 name: p.name,
-                brand: p.brand || p.vendorId?.businessName || 'WakeUp Luxe',
+                brand: vendorName,
                 price: firstVariant.offeredPrice || firstVariant.salesPrice || 0,
                 rating: p.rating || 4.7,
                 reviews: 120,
-                image: firstVariant.thumbnail?.url || p.images?.[0]?.url || 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=600&h=800&fit=crop',
-                category: p.categoryId?.name || 'Beauty',
+                image: imgUrl,
+                category: p.categoryId?.name || p.category?.name || 'Beauty',
                 badge: p.tags?.[0] || null,
                 originalProduct: p,
                 firstVariant: firstVariant
@@ -218,14 +227,14 @@ const Shop = () => {
 
   // Toggle Brand Filter
   const handleBrandChange = (brand) => {
-    setSelectedBrands(prev => 
+    setSelectedBrands(prev =>
       prev.includes(brand) ? prev.filter(b => b !== brand) : [...prev, brand]
     );
   };
 
   // Toggle Price Filter
   const handlePriceChange = (label) => {
-    setSelectedPrices(prev => 
+    setSelectedPrices(prev =>
       prev.includes(label) ? prev.filter(p => p !== label) : [...prev, label]
     );
   };
@@ -241,7 +250,7 @@ const Shop = () => {
 
   // Filter & Sort Logic (Local Brand Filter over fetched products)
   const filteredProducts = products.filter(product => {
-    const matchesBrand = selectedBrands.length === 0 || 
+    const matchesBrand = selectedBrands.length === 0 ||
       selectedBrands.some(b => b.toLowerCase() === product.brand?.toLowerCase());
     return matchesBrand;
   });
@@ -250,7 +259,7 @@ const Shop = () => {
     if (sortBy === 'Price: Low to High') return a.price - b.price;
     if (sortBy === 'Price: High to Low') return b.price - a.price;
     if (sortBy === 'Customer Rating') return b.rating - a.rating;
-    return b.reviews - a.reviews; 
+    return b.reviews - a.reviews;
   });
 
   // Filter Sidebar Content Component
@@ -261,7 +270,7 @@ const Shop = () => {
           <SlidersHorizontal size={20} className="text-primary" /> Filters
         </h2>
         {(activeCategory !== 'All' || selectedBrands.length > 0 || selectedPrices.length > 0 || freeShippingOnly) && (
-          <button 
+          <button
             onClick={clearAllFilters}
             className="text-sm font-semibold text-primary hover:text-white hover:bg-primary px-3 py-1.5 rounded-lg uppercase  transition-all"
           >
@@ -273,27 +282,31 @@ const Shop = () => {
       {/* Categories */}
       <div className="space-y-4">
         <h3 className="text-xs font-bold uppercase text-gray-400">Categories</h3>
-        <div className="flex flex-col gap-2">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
-              className={`w-full text-left px-4 py-2.5 rounded-xl text-xs font-bold uppercase transition-all duration-300 flex items-center justify-between ${
-                activeCategory === cat
-                  ? 'bg-gray-900 text-white shadow-md'
-                  : 'bg-transparent text-gray-600 hover:bg-gray-50'
-              }`}
-            >
-              <span className="truncate text-left">{cat.trim()}</span>
-              {activeCategory === cat && <Check size={14} className="text-white flex-shrink-0 ml-2" />}
-            </button>
-          ))}
+        <div className="flex flex-col gap-2.5 max-h-72 overflow-y-auto pr-1 custom-scrollbar">
+          {categories.map((cat) => {
+            const isSelected = activeCategory === cat;
+            return (
+              <label
+                key={cat}
+                onClick={() => setActiveCategory(cat)}
+                className="flex items-center gap-3 cursor-pointer group text-left py-0.5 select-none"
+              >
+                {/* Square Checkbox Box */}
+                <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-all ${isSelected ? 'bg-[#ff4d6d] border-[#ff4d6d] shadow-2xs' : 'border-gray-300 bg-white group-hover:border-[#ff4d6d]'}`}>
+                  {isSelected && <Check size={13} className="text-white stroke-[3.5]" />}
+                </div>
+                <span className={`text-xs font-bold uppercase transition-colors ${isSelected ? 'text-gray-900 font-extrabold' : 'text-gray-600 group-hover:text-gray-900'}`}>
+                  {cat.trim()}
+                </span>
+              </label>
+            );
+          })}
         </div>
       </div>
 
       {/* Brand */}
       <div className="space-y-4 pt-6 border-t border-gray-100">
-        <h3 className="text-xs font-bold uppercase  text-gray-400">Brands</h3>
+        <h3 className="text-xs font-bold uppercase text-gray-400">Brands</h3>
         <div className="relative mb-3 group">
           <div className="absolute inset-0 bg-primary/5 rounded-xl blur transition-opacity opacity-0 group-hover:opacity-100"></div>
           <div className="relative">
@@ -303,7 +316,7 @@ const Shop = () => {
               value={brandSearch}
               onChange={(e) => setBrandSearch(e.target.value)}
               placeholder="Search brands..."
-              className="w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs outline-none focus:border-primary/30 focus:bg-white transition-all font-bold placeholder:font-medium text-gray-700"
+              className="w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs outline-none focus:border-[#ff4d6d] focus:bg-white transition-all font-bold placeholder:font-medium text-gray-700"
             />
           </div>
         </div>
@@ -311,9 +324,9 @@ const Shop = () => {
           {brands
             .filter(b => b.toLowerCase().includes(brandSearch.toLowerCase()))
             .map((brand) => (
-              <label key={brand} className="flex items-center gap-3 cursor-pointer group">
-                <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-all ${selectedBrands.includes(brand) ? 'bg-primary border-primary' : 'border-gray-200 bg-gray-50 group-hover:border-primary/50'}`}>
-                  {selectedBrands.includes(brand) && <Check size={12} className="text-white" />}
+              <label key={brand} className="flex items-center gap-3 cursor-pointer group py-0.5 select-none">
+                <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${selectedBrands.includes(brand) ? 'bg-[#ff4d6d] border-[#ff4d6d] shadow-2xs' : 'border-gray-300 bg-white group-hover:border-[#ff4d6d]'}`}>
+                  {selectedBrands.includes(brand) && <Check size={13} className="text-white stroke-[3.5]" />}
                 </div>
                 <input
                   type="checkbox"
@@ -321,7 +334,7 @@ const Shop = () => {
                   onChange={() => handleBrandChange(brand)}
                   className="hidden"
                 />
-                <span className={`text-xs font-bold uppercase  transition-colors ${selectedBrands.includes(brand) ? 'text-gray-900' : 'text-gray-500 group-hover:text-gray-900'}`}>
+                <span className={`text-xs font-bold uppercase transition-colors ${selectedBrands.includes(brand) ? 'text-gray-900 font-extrabold' : 'text-gray-600 group-hover:text-gray-900'}`}>
                   {brand}
                 </span>
               </label>
@@ -331,12 +344,12 @@ const Shop = () => {
 
       {/* Price */}
       <div className="space-y-4 pt-6 border-t border-gray-100">
-        <h3 className="text-xs font-bold uppercase  text-gray-400">Price Range</h3>
+        <h3 className="text-xs font-bold uppercase text-gray-400">Price Range</h3>
         <div className="space-y-3">
           {priceRanges.map((range) => (
-            <label key={range.label} className="flex items-center gap-3 cursor-pointer group">
-              <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-all ${selectedPrices.includes(range.label) ? 'bg-primary border-primary' : 'border-gray-200 bg-gray-50 group-hover:border-primary/50'}`}>
-                {selectedPrices.includes(range.label) && <Check size={12} className="text-white" />}
+            <label key={range.label} className="flex items-center gap-3 cursor-pointer group py-0.5 select-none">
+              <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${selectedPrices.includes(range.label) ? 'bg-[#ff4d6d] border-[#ff4d6d] shadow-2xs' : 'border-gray-300 bg-white group-hover:border-[#ff4d6d]'}`}>
+                {selectedPrices.includes(range.label) && <Check size={13} className="text-white stroke-[3.5]" />}
               </div>
               <input
                 type="checkbox"
@@ -344,7 +357,7 @@ const Shop = () => {
                 onChange={() => handlePriceChange(range.label)}
                 className="hidden"
               />
-              <span className={`text-xs font-bold uppercase  transition-colors ${selectedPrices.includes(range.label) ? 'text-gray-900' : 'text-gray-500 group-hover:text-gray-900'}`}>
+              <span className={`text-xs font-bold uppercase transition-colors ${selectedPrices.includes(range.label) ? 'text-gray-900 font-extrabold' : 'text-gray-600 group-hover:text-gray-900'}`}>
                 {range.label}
               </span>
             </label>
@@ -355,9 +368,9 @@ const Shop = () => {
       {/* Shipping */}
       <div className="space-y-4 pt-6 border-t border-gray-100">
         <h3 className="text-xs font-bold uppercase text-gray-400">Shipping</h3>
-        <label className="flex items-center gap-3 cursor-pointer group">
-          <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-all ${freeShippingOnly ? 'bg-primary border-primary' : 'border-gray-200 bg-gray-50 group-hover:border-primary/50'}`}>
-            {freeShippingOnly && <Check size={12} className="text-white" />}
+        <label className="flex items-center gap-3 cursor-pointer group py-0.5 select-none">
+          <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${freeShippingOnly ? 'bg-[#ff4d6d] border-[#ff4d6d] shadow-2xs' : 'border-gray-300 bg-white group-hover:border-[#ff4d6d]'}`}>
+            {freeShippingOnly && <Check size={13} className="text-white stroke-[3.5]" />}
           </div>
           <input
             type="checkbox"
@@ -375,38 +388,48 @@ const Shop = () => {
 
   return (
     <div className="bg-[#fcfcfc] min-h-screen font-outfit pb-24">
-      
-      {/* Premium Hero Banner */}
-      <div className="relative bg-gray-900 py-12 md:py-20 overflow-hidden">
-        <div className="absolute inset-0 opacity-40 mix-blend-overlay">
-          <img src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=1600&h=400&fit=crop" alt="Shop Banner" className="w-full h-full object-cover" />
-        </div>
-        <div className="absolute inset-0 bg-gradient-to-r from-gray-900 via-gray-900/80 to-transparent"></div>
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-2xl">
-            <span className="text-primary font-bold uppercase tracking-wide text-xs mb-4 block">New Arrivals 2024</span>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white uppercase leading-tight mb-6">
-              Discover Your <br/><span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-pink-400">Signature Look</span>
+
+      {/* Premium Hero Banner - Full Width */}
+      <div className="relative w-full overflow-hidden bg-[#fff0f4] border-b border-pink-100">
+        <div className="relative w-full h-[140px] sm:h-[200px] md:h-[240px] flex items-center px-6 sm:px-12 md:px-20">
+
+          {/* Background Banner Image */}
+          <img
+            src={shopHeroImg}
+            alt="Shop Hero Banner"
+            className="absolute inset-0 w-full h-full object-cover object-center"
+          />
+
+          {/* Text Overlay Content */}
+          <div className="relative z-10 max-w-lg text-left py-2">
+            <span className="text-[#ff4d6d] font-black uppercase tracking-wider text-[9px] sm:text-[11px] mb-1 block">
+              NEW ARRIVALS 2024
+            </span>
+
+            <h1 className="text-lg sm:text-2xl md:text-3xl font-serif text-gray-900 leading-[1.15] mb-1 sm:mb-2 tracking-tight">
+              Discover Your <span className="font-serif">Signature Look</span>
             </h1>
-            <p className="text-gray-300 font-medium text-sm md:text-base max-w-md leading-relaxed">
+
+            <p className="text-gray-600 font-medium text-[11px] sm:text-xs md:text-sm max-w-md leading-snug hidden sm:block">
               Shop our curated collection of premium beauty essentials designed to enhance your natural radiance.
             </p>
           </div>
+
         </div>
       </div>
 
-      <div className="container mx-auto px-4 max-w-[1400px] mt-8 md:mt-12">
-        <div className="flex flex-col lg:flex-row gap-8">
-          
+      <div className="container mx-auto px-4 max-w-[1600px] mt-8 md:mt-12">
+        <div className="flex flex-col lg:flex-row gap-8 items-start">
+
           {/* Desktop Filters Sidebar */}
-          <aside className="hidden lg:block w-[280px] flex-shrink-0">
-            <div className="bg-white rounded-2xl border border-gray-100 p-8 shadow-sm sticky top-[100px]">
+          <aside className="hidden lg:block w-[280px] flex-shrink-0 sticky top-24 self-start">
+            <div className="bg-white rounded-2xl border border-gray-100 p-6 xl:p-8 shadow-sm max-h-[calc(100vh-120px)] overflow-y-auto custom-scrollbar">
               <FilterContent />
             </div>
           </aside>
 
           {/* Mobile Filter Drawer Overlay */}
-          <div 
+          <div
             className={`fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[200] lg:hidden transition-opacity duration-300 ${isMobileFilterOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
             onClick={() => setIsMobileFilterOpen(false)}
           />
@@ -417,7 +440,7 @@ const Shop = () => {
               <h2 className="text-lg font-bold uppercase  text-gray-900 flex items-center gap-2">
                 <Filter size={20} className="text-primary" /> Filters
               </h2>
-              <button 
+              <button
                 onClick={() => setIsMobileFilterOpen(false)}
                 className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:text-gray-900 hover:bg-gray-200 transition-colors"
               >
@@ -428,7 +451,7 @@ const Shop = () => {
               <FilterContent />
             </div>
             <div className="p-6 border-t border-gray-100 bg-gray-50">
-              <button 
+              <button
                 onClick={() => setIsMobileFilterOpen(false)}
                 className="w-full bg-gray-900 text-white py-4 rounded-xl font-bold uppercase text-xs  shadow-xl shadow-gray-900/20 active:opacity-90 transition-opacity"
               >
@@ -439,13 +462,13 @@ const Shop = () => {
 
           {/* Main Content Area */}
           <main className="flex-grow min-w-0">
-            
+
             {/* Toolbar */}
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8 bg-white p-4 lg:p-5 rounded-2xl border border-gray-100 shadow-sm">
-              
+
               <div className="flex items-center w-full sm:w-auto justify-between sm:justify-start gap-4">
                 {/* Mobile Filter Trigger */}
-                <button 
+                <button
                   onClick={() => setIsMobileFilterOpen(true)}
                   className="lg:hidden flex items-center gap-2 px-4 py-2.5 bg-gray-50 rounded-xl text-xs font-bold uppercase  text-gray-800 hover:bg-gray-100 transition-colors border border-gray-200"
                 >
@@ -529,17 +552,16 @@ const Shop = () => {
                   <button
                     key={p}
                     onClick={() => setCurrentPage(p)}
-                    className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-xs transition-all cursor-pointer ${
-                      p === currentPage
-                        ? 'bg-gray-900 text-white shadow-xl shadow-gray-900/20'
-                        : 'bg-white border border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-gray-900 hover:border-gray-300'
-                    }`}
+                    className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-xs transition-all cursor-pointer ${p === currentPage
+                      ? 'bg-gray-900 text-white shadow-xl shadow-gray-900/20'
+                      : 'bg-white border border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-gray-900 hover:border-gray-300'
+                      }`}
                   >
                     {p}
                   </button>
                 ))}
                 {currentPage < totalPages && (
-                  <button 
+                  <button
                     onClick={() => setCurrentPage(prev => prev + 1)}
                     className="px-4 h-10 rounded-xl bg-white border border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-gray-900 font-bold text-xs uppercase flex items-center transition-all ml-2 cursor-pointer"
                   >

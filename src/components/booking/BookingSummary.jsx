@@ -11,18 +11,25 @@ const BookingSummary = ({
   handleConfirmBooking,
   bookingConfirmLoading
 }) => {
-  // Helper to format ISO time string to only time (e.g. 03:30 AM)
-  const formatSlotTime = (isoString) => {
-    if (!isoString) return '';
+  // Helper to format slot time safely without Invalid Date errors
+  const formatSlotTime = (timeVal) => {
+    if (!timeVal) return '';
+    const str = String(timeVal).trim();
+    if (str.toUpperCase().includes('AM') || str.toUpperCase().includes('PM') || str.includes(':')) {
+      return str;
+    }
     try {
-      const date = new Date(isoString);
+      const date = new Date(str);
+      if (isNaN(date.getTime())) {
+        return str;
+      }
       return date.toLocaleTimeString('en-US', {
         hour: '2-digit',
         minute: '2-digit',
         hour12: true
       });
     } catch (e) {
-      return isoString;
+      return str;
     }
   };
 

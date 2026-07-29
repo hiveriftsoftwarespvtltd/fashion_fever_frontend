@@ -33,7 +33,7 @@ const LoungeSelection = ({
           <p className="text-sm text-gray-400 font-bold uppercase mt-1">Try expanding your search radius or selecting a different city.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-4">
           {searchResults.map((result, index) => {
             const prov = result.provider;
             const hasServices = result.services?.length || 0;
@@ -44,70 +44,75 @@ const LoungeSelection = ({
                 key={prov._id || index}
                 onClick={() => {
                   setSelectedResult(result);
-                  setSelectedServices([]); // Clear prior services
+                  setSelectedServices([]);
                   setSelectedSlot(null);
                   setSelectedStaff(null);
                   setSlots([]);
-                  setTimeout(() => {
-                    servicesRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                  }, 150);
                 }}
-                className={`bg-white rounded-3xl border text-left overflow-hidden transition-all duration-300 group flex flex-col cursor-pointer ${
+                className={`bg-white p-3.5 sm:p-4 rounded-2xl border text-left transition-all duration-200 group flex items-center justify-between gap-3 cursor-pointer ${
                   isSelected 
-                    ? 'border-primary ring-4 ring-primary/5 shadow-xl bg-pink-50/[0.01]'
-                    : 'border-gray-150 shadow-sm hover:shadow-md hover:border-gray-200'
+                    ? 'border-[#ff4d6d] ring-2 ring-[#ff4d6d]/10 bg-pink-50/20 shadow-md'
+                    : 'border-gray-150 shadow-2xs hover:border-gray-300 hover:shadow-sm'
                 }`}
               >
-                {/* Card cover image */}
-                <div className="relative h-44 bg-gray-100 overflow-hidden flex items-center justify-center">
-                  {result.services?.[0]?.images?.[0]?.url ? (
-                    <img 
-                      src={result.services[0].images[0].url} 
-                      alt={prov.businessName}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                    />
-                  ) : (
-                    <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center">
-                      <Scissors size={28} className="text-primary" />
+                {/* Left: Thumbnail & Main Info */}
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-gray-100 overflow-hidden shrink-0 border border-gray-100 flex items-center justify-center">
+                    {result.services?.[0]?.images?.[0]?.url ? (
+                      <img 
+                        src={result.services[0].images[0].url} 
+                        alt={prov.businessName}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                      />
+                    ) : (
+                      <Scissors size={24} className="text-gray-400" />
+                    )}
+                  </div>
+
+                  <div className="min-w-0 space-y-1">
+                    {/* Header Row: Title, Rating, Distance, Heart */}
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h3 className="text-sm font-extrabold text-gray-900 truncate">
+                        {prov.businessName}
+                      </h3>
+                      
+                      <div className="flex items-center gap-1 text-[11px] font-bold text-[#ff4d6d] bg-pink-50 px-1.5 py-0.5 rounded-md">
+                        <Star size={11} className="fill-[#ff4d6d] text-[#ff4d6d]" />
+                        <span>{prov.rating || 5}</span>
+                      </div>
+
+                      <span className="text-[11px] font-medium text-gray-400">
+                        {(prov.distance ? (prov.distance / 1000).toFixed(1) : '10.0')} KM Away
+                      </span>
                     </div>
-                  )}
-                  
-                  {/* Rating badge */}
-                  <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-md px-2.5 py-0.5 rounded-lg flex items-center gap-1 shadow-sm border border-gray-100">
-                    <span className="text-[9px] font-black text-gray-800">{prov.rating || 5.0}</span>
-                    <Star size={9} className="fill-yellow-400 text-yellow-400" />
-                  </div>
 
-                  {/* Distance Tag */}
-                  <span className="absolute top-3 right-3 text-[8px] font-black text-white uppercase bg-black/60 backdrop-blur-md px-2 py-1 rounded-md">
-                    {(prov.distance / 1000).toFixed(1)} KM Away
-                  </span>
-                </div>
-
-                {/* Card Content details */}
-                <div className="p-6 flex-grow flex flex-col justify-between space-y-4">
-                  <div>
-                    <h3 className="text-base font-extrabold text-gray-800 uppercase truncate">
-                      {prov.businessName}
-                    </h3>
-                    <p className="text-gray-400 text-sm font-bold uppercase mt-1 truncate">
-                      {prov.address}, {prov.city}
+                    {/* Address Subtitle */}
+                    <p className="text-xs text-gray-500 font-medium truncate">
+                      {prov.businessName} {prov.address || 'Address'}, {prov.city || 'Delhi'}
                     </p>
-                  </div>
 
-                  <div className="flex items-center justify-between border-t border-gray-100 pt-4 mt-2">
-                    <span className="text-[9px] font-black text-primary uppercase bg-primary/5 border border-primary/10 px-2 py-1 rounded-md inline-block">
-                      {hasServices} Services
-                    </span>
-                    <span className="text-sm font-black text-primary uppercase flex items-center gap-0.5">
-                      {isSelected ? (
-                        <>Selected <Check size={12} /></>
-                      ) : (
-                        <>View Catalog <ChevronRight size={12} /></>
-                      )}
-                    </span>
+                    {/* Services Count Tag */}
+                    <div className="flex items-center gap-1.5 text-[11px] font-bold text-gray-500 pt-0.5">
+                      <Scissors size={12} className="text-gray-400" />
+                      <span>{hasServices} Services</span>
+                    </div>
                   </div>
                 </div>
+
+                {/* Right: View Catalog Button */}
+                <div className="shrink-0 flex items-center gap-2">
+                  <button
+                    type="button"
+                    className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all border ${
+                      isSelected 
+                        ? 'bg-[#ff4d6d] border-[#ff4d6d] text-white shadow-xs' 
+                        : 'border-[#ff4d6d] text-[#ff4d6d] hover:bg-pink-50'
+                    }`}
+                  >
+                    {isSelected ? 'Selected' : 'View Catalog'}
+                  </button>
+                </div>
+
               </div>
             );
           })}

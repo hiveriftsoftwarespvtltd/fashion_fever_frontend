@@ -1025,7 +1025,7 @@ export const getAllServiceCategories = async () => {
 
 export const getAllServiceSubscriptionPlans = async () => {
   try {
-    const response = await apiClient.get('/service/get-all-service-subscription-plans', { skipAuth: true });
+    const response = await apiClient.get('/service/get-all-service-subscription-plans');
     return response.data;
   } catch (error) {
     console.error('Fetch subscription plans error:', error);
@@ -1251,19 +1251,19 @@ export const verifyServiceProvider = async (providerId, status) => {
 export const addHomeContent = async (data) => {
   try {
     const formData = new FormData();
-    
+
     // Core text attributes
     if (data.title !== undefined && data.title !== null) formData.append('title', data.title);
     if (data.subTitle !== undefined && data.subTitle !== null) formData.append('subTitle', data.subTitle);
     if (data.description !== undefined && data.description !== null) formData.append('description', data.description);
-    
+
     // Append tags/labels if present
     if (data.labels && Array.isArray(data.labels)) {
       data.labels.forEach((label, index) => {
         formData.append(`labels[${index}]`, label);
       });
     }
-    
+
     // Multi-platform banner images (File structures)
     if (data.computerImage) {
       formData.append('computerImage', data.computerImage);
@@ -1271,7 +1271,7 @@ export const addHomeContent = async (data) => {
     if (data.mobileImage) {
       formData.append('mobileImage', data.mobileImage);
     }
-    
+
     // Styling & configuration controls
     if (data.contentType !== undefined && data.contentType !== null) formData.append('contentType', data.contentType);
     if (data.redirectType !== undefined && data.redirectType !== null) formData.append('redirectType', data.redirectType);
@@ -1283,7 +1283,7 @@ export const addHomeContent = async (data) => {
     if (data.isActive !== undefined && data.isActive !== null) formData.append('isActive', data.isActive);
     if (data.startDate !== undefined && data.startDate !== null) formData.append('startDate', data.startDate);
     if (data.endDate !== undefined && data.endDate !== null) formData.append('endDate', data.endDate);
-    
+
     if (data.metaData !== undefined && data.metaData !== null) {
       formData.append('metaData', typeof data.metaData === 'object' ? JSON.stringify(data.metaData) : data.metaData);
     }
@@ -1364,19 +1364,19 @@ export const getHomeContentsPublic = async (params = {}) => {
 export const updateHomeContent = async (id, data) => {
   try {
     const formData = new FormData();
-    
+
     // Core text attributes
     if (data.title !== undefined && data.title !== null) formData.append('title', data.title);
     if (data.subTitle !== undefined && data.subTitle !== null) formData.append('subTitle', data.subTitle);
     if (data.description !== undefined && data.description !== null) formData.append('description', data.description);
-    
+
     // Append tags/labels if present
     if (data.labels && Array.isArray(data.labels)) {
       data.labels.forEach((label, index) => {
         formData.append(`labels[${index}]`, label);
       });
     }
-    
+
     // Multi-platform banner images (Only append if they are new File instances)
     if (data.computerImage instanceof File) {
       formData.append('computerImage', data.computerImage);
@@ -1384,7 +1384,7 @@ export const updateHomeContent = async (id, data) => {
     if (data.mobileImage instanceof File) {
       formData.append('mobileImage', data.mobileImage);
     }
-    
+
     // Styling & configuration controls
     if (data.contentType !== undefined && data.contentType !== null) formData.append('contentType', data.contentType);
     if (data.redirectType !== undefined && data.redirectType !== null) formData.append('redirectType', data.redirectType);
@@ -1396,7 +1396,7 @@ export const updateHomeContent = async (id, data) => {
     if (data.isActive !== undefined && data.isActive !== null) formData.append('isActive', data.isActive);
     if (data.startDate !== undefined && data.startDate !== null) formData.append('startDate', data.startDate);
     if (data.endDate !== undefined && data.endDate !== null) formData.append('endDate', data.endDate);
-    
+
     if (data.metaData !== undefined && data.metaData !== null) {
       formData.append('metaData', typeof data.metaData === 'object' ? JSON.stringify(data.metaData) : data.metaData);
     }

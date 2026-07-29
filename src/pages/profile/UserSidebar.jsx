@@ -32,7 +32,7 @@ const sidebarLinks = [
   { icon: <ClipboardList size={18} />, label: 'Custom Requests', path: '/profile/service-leads' },
   { icon: <BookOpen size={18} />,    label: 'My Learning',      path: '/my-learning' },
   { icon: <Heart size={18} />,       label: 'My Wishlist',      path: '/wishlist' },
-  { icon: <CreditCard size={18} />,  label: 'My Saved Payment', path: '/payments' },
+  // { icon: <CreditCard size={18} />,  label: 'My Saved Payment', path: '/payments' },
 ];
 
 const UserSidebar = () => {
@@ -71,6 +71,10 @@ const UserSidebar = () => {
       <div className={`mt-3 lg:mt-0 bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-300 ${
         isOpen ? 'block animate-in fade-in slide-in-from-top-4 duration-300' : 'hidden lg:block'
       }`}>
+        <div className="px-5 py-4 border-b border-gray-100 bg-rose-50/40 text-left">
+          <p className="text-[10px] font-black uppercase text-primary tracking-widest leading-none">FashionFever</p>
+          <p className="text-sm font-extrabold uppercase text-gray-900 tracking-wide mt-1">User Account Dashboard</p>
+        </div>
         <div className="flex flex-col">
           {sidebarLinks.map((link, idx) => {
             const isActive = location.pathname === link.path;

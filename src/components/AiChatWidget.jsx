@@ -9,7 +9,7 @@ const AiChatWidget = () => {
     {
       id: 'welcome',
       sender: 'ai',
-      text: 'Hello! I am your Beauty AI Assistant. Ask me anything about our courses, beauty products, or how to get started on Wakeup Make Up!',
+      text: 'Hello! I am your Beauty AI Assistant. Ask me anything about our courses, beauty products, or how to get started on FashionFever!',
       timestamp: new Date()
     }
   ]);

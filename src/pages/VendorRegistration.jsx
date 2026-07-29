@@ -109,7 +109,7 @@ const VendorRegistration = () => {
           </div>
           <h1 className="text-4xl font-bold text-gray-900 uppercase">Vendor Registration</h1>
           <p className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
-            Scale your beauty business with WAKEUP. Fill in your business details below to get started.
+            Scale your beauty business with FashionFever. Fill in your business details below to get started.
           </p>
         </div>
 
@@ -388,7 +388,7 @@ const VendorRegistration = () => {
         </form>
 
         <p className="mt-12 text-center text-xs font-bold text-gray-400 uppercase pb-12">
-          By registering, you agree to WAKEUP's <span className="text-primary cursor-pointer hover:underline">Vendor Terms & Conditions</span>
+          By registering, you agree to FashionFever's <span className="text-primary cursor-pointer hover:underline">Vendor Terms & Conditions</span>
         </p>
       </div>
     </div>

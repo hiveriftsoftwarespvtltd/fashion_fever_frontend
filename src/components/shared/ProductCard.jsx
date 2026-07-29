@@ -3,63 +3,54 @@ import { ShoppingBag, Heart, Star, Truck, Plus, Minus } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '../../utils/toast';
+import { getImageUrl } from '../../utils/imageUrl';
 
 const ProductCard = ({ product, isWishlisted, onWishlistToggle }) => {
   const navigate = useNavigate();
   const { cart, addToCart, removeFromCart, updateQty } = useCart();
 
-  // Extract keys dynamically to support all formats from listing APIs
   const productId = product._id || product.id;
   const name = product.name || 'Unnamed Product';
-  
-  // Category resolution
+
   const getCategoryName = () => {
     if (product.category && typeof product.category === 'object') {
-      return product.category.name || product.category.label || 'Skincare';
+      return product.category.name || product.category.label || 'SKINCARE';
     }
     if (product.categoryId && typeof product.categoryId === 'object') {
-      return product.categoryId.name || product.categoryId.label || 'Skincare';
+      return product.categoryId.name || product.categoryId.label || 'SKINCARE';
     }
-    return product.category || 'Skincare';
+    return product.category || 'SKINCARE';
   };
-  const categoryName = typeof getCategoryName() === 'object' ? 'Skincare' : String(getCategoryName());
-  
-  // Vendor resolution
+  const categoryName = typeof getCategoryName() === 'object' ? 'SKINCARE' : String(getCategoryName());
+
   const getVendorName = () => {
     if (product.vendor && typeof product.vendor === 'object') {
-      return product.vendor.businessName || product.vendor.name || 'WakeUp Luxe';
+      return product.vendor.businessName || product.vendor.name || 'Fashion Fever';
     }
     if (product.vendorId && typeof product.vendorId === 'object') {
-      return product.vendorId.businessName || product.vendorId.name || 'WakeUp Luxe';
+      return product.vendorId.businessName || product.vendorId.name || 'Fashion Fever';
     }
-    return product.brand || 'WakeUp Luxe';
+    return product.brand || 'Fashion Fever';
   };
-  const vendorName = typeof getVendorName() === 'object' ? 'WakeUp Luxe' : String(getVendorName());
-  
-  // Variants extraction
+  const vendorName = typeof getVendorName() === 'object' ? 'Fashion Fever' : String(getVendorName());
+
   const variants = product.variants || [];
   const firstVariant = variants[0] || {};
   const variantId = firstVariant._id || productId;
-  
-  // Pricing resolution
+
   const offeredPrice = firstVariant.offeredPrice !== undefined ? firstVariant.offeredPrice : (firstVariant.salesPrice !== undefined ? firstVariant.salesPrice : (product.price || 0));
   const salesPrice = firstVariant.salesPrice !== undefined ? firstVariant.salesPrice : (product.price || 0);
-  
-  // Stock and shipping
+
   const stock = firstVariant.stock !== undefined ? firstVariant.stock : 10;
-  const isShippingApply = product.isShippingApply === true;
-  
-  // Image URL resolution
-  const imageUrl = firstVariant.thumbnail?.url || (typeof firstVariant.thumbnail === 'string' ? firstVariant.thumbnail : null) || (product.images?.[0]?.url || (typeof product.images?.[0] === 'string' ? product.images[0] : null)) || product.image || '';
-  
-  // Rating and reviews resolution
+
+  const rawImage = firstVariant.thumbnail?.url || (typeof firstVariant.thumbnail === 'string' ? firstVariant.thumbnail : null) || (product.images?.[0]?.url || (typeof product.images?.[0] === 'string' ? product.images[0] : null)) || product.image || '';
+  const imageUrl = getImageUrl(rawImage);
+
   const averageRating = product.averageRating || product.rating || 0;
   const totalReviews = product.totalReviews || 0;
 
-  // Calculate discount percentage
-  const discountPercent = salesPrice > offeredPrice ? Math.round(((salesPrice - offeredPrice) / salesPrice) * 100) : 0;
+  const discountPercent = salesPrice > offeredPrice ? Math.round(((salesPrice - offeredPrice) / salesPrice) * 100) : 50;
 
-  // Check if item is already in the standard cart (excluding Quick Delivery cart items)
   const cartItem = cart?.find(item => (item.id === variantId || item.variantId === variantId) && !item.isQuickDelivery);
   const isInCart = !!cartItem;
 
@@ -81,88 +72,111 @@ const ProductCard = ({ product, isWishlisted, onWishlistToggle }) => {
     navigate('/checkout');
   };
 
-  const renderStars = (rating) => {
-    const stars = [];
-    const displayRating = rating || 5;
-    for (let i = 1; i <= 5; i++) {
-      stars.push(
-        <Star
-          key={i}
-          size={10}
-          className={`${
-            i <= displayRating
-              ? 'text-amber-400 fill-amber-400'
-              : 'text-gray-200 fill-gray-200'
-          }`}
-        />
-      );
-    }
-    return stars;
-  };
-
   return (
     <div
       onClick={handleCardClick}
-      className="group relative flex flex-col bg-white rounded-2xl overflow-hidden border border-gray-200/80 shadow-md hover:shadow-xl hover:shadow-gray-300/40 hover:-translate-y-1.5 transition-all duration-300 w-full cursor-pointer h-full font-outfit"
+      className="group relative flex flex-col bg-white rounded-2xl border border-gray-200/80 shadow-2xs hover:shadow-md hover:border-gray-300 transition-all duration-300 w-full cursor-pointer h-full text-left p-3 font-sans"
     >
-      {/* Product Image Section */}
-      <div className="relative w-full h-[150px] sm:h-[200px] overflow-hidden bg-gray-50 flex items-center justify-center">
-        {/* Hover Zoom Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-gray-900/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"></div>
-        
+      {/* ── Product Image Box ────────────────── */}
+      <div className="relative w-full h-[150px] sm:h-[180px] bg-white rounded-xl overflow-hidden flex items-center justify-center p-2 mb-2 shrink-0">
+
+        {/* Discount Badge on Top Left */}
+        <span className="absolute top-1.5 left-1.5 z-10 bg-[#ff4d6d] text-white text-[9px] sm:text-[10px] font-black uppercase px-2 py-0.5 rounded-md shadow-2xs tracking-wider">
+          {discountPercent}% OFF
+        </span>
+
+        {/* Wishlist Heart Button on Top Right */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            if (onWishlistToggle) onWishlistToggle(productId, variantId);
+          }}
+          className="absolute top-1.5 right-1.5 z-20 p-1 text-gray-400 hover:text-[#ff4d6d] transition-colors cursor-pointer"
+          title="Wishlist"
+        >
+          <Heart size={16} fill={isWishlisted ? '#ff4d6d' : 'none'} className={isWishlisted ? 'text-[#ff4d6d]' : ''} />
+        </button>
+
         {imageUrl ? (
           <img
             src={imageUrl}
             alt={name}
-            className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+            className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
             onError={(e) => { e.target.style.opacity = '0.3'; }}
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-300 font-bold uppercase text-[10px]">
+          <div className="w-full h-full flex items-center justify-center bg-gray-50 text-gray-300 font-bold uppercase text-[9px]">
             No Image
           </div>
         )}
+      </div>
 
-        {/* Discount Badge on Top Left */}
-        {discountPercent > 0 && (
-          <span className="absolute top-2.5 left-2.5 z-10 bg-rose-500 text-white text-[8px] sm:text-[9px] font-black uppercase px-1.5 py-0.5 rounded shadow-sm">
-            {discountPercent}% OFF
+      {/* ── Product Info Section ────────────────── */}
+      <div className="flex flex-col flex-grow text-left min-w-0">
+
+        {/* Category Name */}
+        <span className="text-[9px] sm:text-[10px] font-bold uppercase text-gray-400 tracking-wider truncate mb-0.5">
+          {categoryName}
+        </span>
+
+        {/* Brand / Vendor Name */}
+        <p className="text-[10px] sm:text-xs text-gray-700 font-bold truncate mb-0.5">
+          {vendorName}
+        </p>
+
+        {/* Product Title */}
+        <h3 className="text-gray-900 font-extrabold text-[12px] sm:text-sm tracking-tight truncate leading-tight group-hover:text-[#ff4d6d] transition-colors mb-1" title={name}>
+          {name}
+        </h3>
+
+        {/* Rating Stars & Reviews */}
+        <div className="flex items-center gap-1 text-[9px] sm:text-[10px] font-semibold text-gray-400 mb-1">
+          <div className="flex items-center text-amber-400">
+            <Star size={10} className="fill-amber-400" />
+            <Star size={10} className="fill-amber-400" />
+            <Star size={10} className="fill-amber-400" />
+            <Star size={10} className="fill-amber-400" />
+            <Star size={10} className="fill-gray-200 text-gray-200" />
+          </div>
+          <span>{totalReviews > 0 ? `${averageRating} (${totalReviews})` : 'No Reviews Yet'}</span>
+        </div>
+
+    
+
+        {/* Price & Stock Status Row */}
+        <div className="flex items-baseline justify-between gap-1 mb-2.5 mt-auto min-w-0">
+          <div className="flex items-baseline gap-1.5 min-w-0">
+            <span className="text-sm sm:text-base font-black text-gray-900">₹{offeredPrice}</span>
+            {salesPrice > offeredPrice && (
+              <span className="text-[10px] sm:text-xs text-gray-400 line-through font-medium truncate">₹{salesPrice}</span>
+            )}
+          </div>
+
+          <span className={`text-[9px] sm:text-[10px] font-extrabold shrink-0 ${stock > 0 ? (stock < 10 ? 'text-[#ff4d6d]' : 'text-emerald-600') : 'text-rose-600'}`}>
+            {stock > 10 ? 'In Stock' : stock > 0 ? 'Few Left' : 'Out of Stock'}
           </span>
-        )}
+        </div>
 
-        {/* Wishlist Heart Icon on Top Right */}
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onWishlistToggle(productId, variantId);
-          }}
-          className={`absolute top-2.5 right-2.5 z-20 w-7.5 h-7.5 rounded-full flex items-center justify-center shadow-md backdrop-blur-md border transition-all active:scale-90 ${
-            isWishlisted
-              ? 'bg-rose-500 border-rose-500 text-white'
-              : 'bg-white/80 border-white/50 text-gray-400 hover:text-rose-500 hover:bg-white'
-          }`}
-        >
-          <Heart size={12} fill={isWishlisted ? 'currentColor' : 'none'} />
-        </button>
+        {/* ── Action Buttons Row (Add & Buy) ────────────────── */}
+        <div className="flex items-center gap-2 pt-2 border-t border-gray-100" onClick={(e) => e.stopPropagation()}>
 
-        {/* Floating Add Button on Mobile */}
-        <div className="absolute bottom-2.5 right-2.5 z-20 sm:hidden" onClick={(e) => e.stopPropagation()}>
+          {/* Add Button */}
           {isInCart ? (
-            <div className="flex items-center bg-rose-500 text-white h-7.5 rounded-full px-1.5 gap-1 shadow-lg shadow-rose-500/20">
+            <div className="flex-1 h-8 sm:h-9 border border-[#ff4d6d] rounded-xl flex items-center justify-between px-2 bg-rose-50 text-[#ff4d6d] text-xs font-extrabold shadow-2xs">
               <button
                 onClick={() => {
                   if (cartItem.qty === 1) {
                     removeFromCart(cartItem.id);
-                    toast.success(`${name} removed from bag`);
+                    toast.success(`${name} removed`);
                   } else {
                     updateQty(cartItem.id, -1, productId);
                   }
                 }}
-                className="w-4 h-4 flex items-center justify-center hover:bg-white/10 rounded-full text-xs font-bold"
+                className="hover:bg-rose-100 rounded p-0.5 cursor-pointer"
               >
-                <Minus size={8} />
+                <Minus size={11} />
               </button>
-              <span className="text-[9px] font-extrabold">{cartItem.qty}</span>
+              <span>{cartItem.qty}</span>
               <button
                 onClick={() => {
                   if (stock && cartItem.qty >= stock) {
@@ -171,9 +185,9 @@ const ProductCard = ({ product, isWishlisted, onWishlistToggle }) => {
                     updateQty(cartItem.id, 1, productId);
                   }
                 }}
-                className="w-4 h-4 flex items-center justify-center hover:bg-white/10 rounded-full text-xs font-bold"
+                className="hover:bg-rose-100 rounded p-0.5 cursor-pointer"
               >
-                <Plus size={8} />
+                <Plus size={11} />
               </button>
             </div>
           ) : (
@@ -189,141 +203,23 @@ const ProductCard = ({ product, isWishlisted, onWishlistToggle }) => {
                 toast.success(`${name} added to bag`);
               }}
               disabled={stock === 0}
-              className="w-7 h-7 rounded-full bg-rose-500 text-white flex items-center justify-center shadow-lg shadow-rose-500/25 border border-rose-400/20"
+              className="flex-1 bg-pink-50 hover:bg-pink-100 text-[#ff4d6d] border border-pink-200 rounded-xl font-bold text-xs sm:text-sm h-8 sm:h-9 flex items-center justify-center transition-all cursor-pointer disabled:opacity-50"
             >
-              <Plus size={14} />
+              Add
             </button>
           )}
-        </div>
-      </div>
 
-      {/* Product Information Section */}
-      <div className="p-2.5 sm:p-3 flex flex-col flex-grow text-left">
-        {/* Category & Vendor */}
-        <div className="flex items-center justify-between gap-2 mb-1">
-          <span className="text-[8px] sm:text-[9px] font-extrabold uppercase text-rose-500 tracking-wider truncate max-w-[45%]">
-            {categoryName}
-          </span>
-          <span className="text-[8px] sm:text-[9px] text-gray-400 font-bold uppercase truncate max-w-[50%]">
-            {vendorName}
-          </span>
-        </div>
-
-        {/* Product Name */}
-        <h3 className="text-gray-900 font-extrabold text-sm sm:text-xs uppercase tracking-tight line-clamp-2 leading-snug min-h-[1.6rem] sm:min-h-[2rem] group-hover:text-rose-500 transition-colors mb-1">
-          {name}
-        </h3>
-
-        {/* Rating Section */}
-        <div className="mb-1">
-          {totalReviews > 0 ? (
-            <div className="flex items-center gap-1">
-              <div className="flex">{renderStars(averageRating)}</div>
-              <span className="text-[8px] sm:text-[9px] font-extrabold text-gray-400">({totalReviews})</span>
-            </div>
-          ) : (
-            <span className="text-[8px] sm:text-[9px] font-bold text-gray-400 italic">No Reviews Yet</span>
-          )}
-        </div>
-
-        {/* Shipping Badge */}
-        {isShippingApply && (
-          <div className="flex items-center gap-1 bg-emerald-50 text-[7px] sm:text-[8px] font-extrabold text-emerald-700 px-1.5 py-0.5 rounded w-fit mb-1">
-            <Truck size={8} />
-            <span>Free Shipping</span>
-          </div>
-        )}
-
-        {/* Pricing Section */}
-        <div className="flex items-baseline flex-wrap gap-1 mb-1.5">
-          <span className="text-xs sm:text-sm font-black text-gray-900">₹{offeredPrice}</span>
-          {salesPrice > offeredPrice && (
-            <>
-              <span className="text-[9px] sm:text-sm text-gray-400 line-through font-medium">₹{salesPrice}</span>
-              <span className="text-[7px] sm:text-[8px] font-extrabold text-rose-500 bg-rose-50 px-1 py-0.5 rounded">
-                {discountPercent}% OFF
-              </span>
-            </>
-          )}
-        </div>
-
-        {/* Stock Indicator */}
-        <div className="flex items-center gap-1 text-[8px] sm:text-[9px] font-extrabold uppercase mb-2 mt-auto">
-          {stock > 10 ? (
-            <span className="text-emerald-600 flex items-center gap-0.5">
-              <span className="w-1 h-1 rounded-full bg-emerald-500 inline-block"></span> In Stock
-            </span>
-          ) : stock > 0 ? (
-            <span className="text-amber-600 flex items-center gap-0.5">
-              <span className="w-1 h-1 rounded-full bg-amber-500 animate-pulse inline-block"></span> Few Left
-            </span>
-          ) : (
-            <span className="text-rose-600 flex items-center gap-0.5">
-              <span className="w-1 h-1 rounded-full bg-rose-500 inline-block"></span> Out of Stock
-            </span>
-          )}
-        </div>
-
-        {/* Action Buttons (Desktop Only) */}
-        <div className="hidden sm:flex items-center gap-1.5 pt-2 border-t border-gray-100" onClick={(e) => e.stopPropagation()}>
-          <div className="w-1/2">
-            {isInCart ? (
-              <div className="w-full h-7.5 border border-rose-500/20 rounded-lg flex items-center justify-between overflow-hidden bg-rose-500/5 text-rose-500 text-[9px] font-black uppercase select-none">
-                <button
-                  onClick={() => {
-                    if (cartItem.qty === 1) {
-                      removeFromCart(cartItem.id);
-                      toast.success(`${name} removed from bag`);
-                    } else {
-                      updateQty(cartItem.id, -1, productId);
-                    }
-                  }}
-                  className="px-1.5 h-full flex items-center justify-center hover:bg-rose-500/10 transition-colors"
-                >
-                  <Minus size={8} />
-                </button>
-                <span className="font-extrabold text-[8px]">{cartItem.qty} BAG</span>
-                <button
-                  onClick={() => {
-                    if (stock && cartItem.qty >= stock) {
-                      toast.error("Maximum available stock reached!");
-                    } else {
-                      updateQty(cartItem.id, 1, productId);
-                    }
-                  }}
-                  className="px-1.5 h-full flex items-center justify-center hover:bg-rose-500/10 transition-colors"
-                >
-                  <Plus size={8} />
-                </button>
-              </div>
-            ) : (
-              <button
-                onClick={() => {
-                  const cartItemLocal = {
-                    id: variantId,
-                    name: `${name} ${firstVariant?.attributes?.color ? `(${firstVariant.attributes.color})` : ''}`,
-                    price: offeredPrice,
-                    image: imageUrl,
-                  };
-                  addToCart(cartItemLocal, variantId, productId);
-                  toast.success(`${name} added to bag`);
-                }}
-                disabled={stock === 0}
-                className="w-full bg-gray-900 hover:bg-rose-500 text-white py-1.5 rounded-lg font-bold uppercase text-[8px] tracking-wider transition-all duration-300 flex items-center justify-center gap-0.5 disabled:opacity-50 disabled:cursor-not-allowed h-7.5 cursor-pointer shadow-sm"
-              >
-                <ShoppingBag size={8} /> Add
-              </button>
-            )}
-          </div>
-
+          {/* Buy Button */}
           <button
             onClick={handleBuyNow}
             disabled={stock === 0}
-            className="w-1/2 bg-rose-600 hover:bg-rose-700 text-white py-1.5 rounded-lg font-bold uppercase text-[8px] tracking-wider transition-all duration-300 flex items-center justify-center gap-0.5 disabled:opacity-50 disabled:cursor-not-allowed h-7.5 cursor-pointer shadow-sm"
+            className="flex-1 bg-[#ff4d6d] hover:bg-[#e63956] text-white rounded-xl font-extrabold text-xs sm:text-sm h-8 sm:h-9 flex items-center justify-center transition-all cursor-pointer shadow-2xs disabled:opacity-50"
           >
             Buy
           </button>
+
         </div>
+
       </div>
     </div>
   );

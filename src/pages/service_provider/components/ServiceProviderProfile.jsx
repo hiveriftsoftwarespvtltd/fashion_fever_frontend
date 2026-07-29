@@ -172,7 +172,7 @@ const ServiceProviderProfile = ({ isDarkMode, profileData, setProfileData }) => 
               <p className={`text-sm font-bold ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                 {profileData.verificationStatus === 'APPROVED'
                   ? 'Your profile is approved and active in searches.'
-                  : 'Your profile registration is pending review by Wakeup Makeup admin.'}
+                  : 'Your profile registration is pending review by FashionFever admin.'}
               </p>
             </div>
           </div>

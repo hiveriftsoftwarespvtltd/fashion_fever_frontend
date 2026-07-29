@@ -36,12 +36,12 @@ const EducatorSidebar = ({
         <div className={`h-24 px-5 flex items-center justify-between border-b flex-shrink-0 ${isDarkMode ? 'border-white/5' : 'border-gray-100'}`}>
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/30 flex-shrink-0">
-              <span className="text-white text-xs font-black tracking-tight">WM</span>
+              <span className="text-white text-xs font-black tracking-tight">FF</span>
             </div>
             <div>
-              <p className="text-xs font-black uppercase text-primary tracking-widest leading-none">Wakeup</p>
-              <p className={`text-sm font-bold uppercase tracking-wider leading-tight mt-0.5 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
-                Academy Portal
+              <p className="text-[10px] font-black uppercase text-primary tracking-widest leading-none">FashionFever</p>
+              <p className={`text-sm font-extrabold uppercase tracking-wider leading-tight mt-0.5 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                Educator Dashboard
               </p>
             </div>
           </div>

@@ -5,14 +5,7 @@ const UserContext = createContext(null);
 
 const resolveRole = (user) => {
   if (!user) return 'user';
-  let role = 'user';
-  if (Array.isArray(user.roles) && user.roles.length > 0) {
-    const nonUserRole = user.roles.find(r => r && r !== 'user');
-    if (nonUserRole) role = nonUserRole;
-    else if (user.role && user.role !== 'user') role = user.role;
-  } else if (user.role) {
-    role = user.role;
-  }
+  const role = user.role || (Array.isArray(user.roles) ? (user.roles.find(r => r !== 'user') || 'user') : 'user');
   const normalized = typeof role === 'string' ? role.toLowerCase() : 'user';
   return normalized === 'super_admin' ? 'admin' : normalized;
 };
@@ -23,7 +16,7 @@ export const UserProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   // Safe Local Storage Session Loader
-  useEffect(() => { 
+  useEffect(() => {
     const bootstrapAuth = async () => {
       try {
         const sessionStr = localStorage.getItem('user_session');
@@ -34,7 +27,7 @@ export const UserProvider = ({ children }) => {
             const userWithRole = { ...session.user, role: resolvedRole };
             setToken(session.token);
             setUser(userWithRole);
-            
+
             // Sync authorization header on initial load
             apiClient.defaults.headers.common['Authorization'] = `Bearer ${session.token}`;
           }
@@ -65,7 +58,7 @@ export const UserProvider = ({ children }) => {
       const rawUser = sessionData.safeUser || sessionData.user;
       const resolvedRole = resolveRole(rawUser);
       const userWithRole = { ...rawUser, role: resolvedRole };
-      
+
       const dataToSave = {
         user: userWithRole,
         token: sessionData.access_token || sessionData.token,
@@ -73,7 +66,7 @@ export const UserProvider = ({ children }) => {
       setUser(dataToSave.user);
       setToken(dataToSave.token);
       localStorage.setItem('user_session', JSON.stringify(dataToSave));
-      
+
       // Update interceptor state dynamically
       apiClient.defaults.headers.common['Authorization'] = `Bearer ${dataToSave.token}`;
     } catch (err) {
@@ -85,7 +78,7 @@ export const UserProvider = ({ children }) => {
     setUser(null);
     setToken(null);
     localStorage.removeItem('user_session');
-    
+
     // Clear Authorization header completely
     delete apiClient.defaults.headers.common['Authorization'];
   };
@@ -111,13 +104,13 @@ export const UserProvider = ({ children }) => {
   };
 
   return (
-    <UserContext.Provider 
-      value={{ 
-        user, 
-        token, 
-        isLoading, 
-        login, 
-        logout, 
+    <UserContext.Provider
+      value={{
+        user,
+        token,
+        isLoading,
+        login,
+        logout,
         updateUser,
         isAuthenticated: !!token,
         role: user?.role || 'user'

@@ -11,7 +11,7 @@ import { getUserDetails, uploadUserAvatar, getUserAvatar, deleteUserAvatar, edit
 import { toast } from '../../utils/toast';
 import UserSidebar from './UserSidebar';
 
-const AVATAR_KEY = 'wakeup_avatar_url';
+const AVATAR_KEY = 'fashionfever_avatar_url';
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -544,7 +544,7 @@ const Profile = () => {
             {profileData?.role === 'user' && !profileData?.isVendorOnboardingCompleted && (
               <div className="bg-gradient-to-r from-primary to-primary-hover text-white rounded-xl shadow-lg shadow-primary/20 p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div className="text-left">
-                  <h3 className="text-sm font-bold uppercase  mb-1">Want to sell on WAKEUP?</h3>
+                  <h3 className="text-sm font-bold uppercase  mb-1">Want to sell on FASHIONFEVER?</h3>
                   <p className="text-sm font-medium uppercase opacity-80">Become a registered merchant and list your products or beauty services!</p>
                 </div>
                 <button
