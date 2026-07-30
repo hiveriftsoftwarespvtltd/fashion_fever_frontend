@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { getPublicBrands } from '../api/productService';
-import { getImageUrl } from '../utils/imageUrl';
 
 const bgColors = [
   'bg-[#fff4f6]', // Soft blush pink
@@ -49,10 +48,9 @@ const TopBrands = () => {
               if (item.brand) {
                 const bName = item.brand.trim().toLowerCase();
                 if (!uniqueBrandsMap[bName]) {
-                  const rawImg = typeof item.image === 'string'
+                  const imgUrl = typeof item.image === 'string'
                     ? item.image
                     : (item.image?.url || null);
-                  const imgUrl = getImageUrl(rawImg);
                   uniqueBrandsMap[bName] = {
                     name: item.brand,
                     img: imgUrl,

@@ -6,6 +6,7 @@ import {
 import Swal from 'sweetalert2';
 import { getAllServiceCategories, deleteServiceCategory } from '../../../api/adminService';
 import { toast } from '../../../utils/toast';
+import { getImageUrl } from '../../../utils/imageUrl';
 import DataTable from '../../../components/shared/DataTable';
 import CreateServiceCategoryModal from './CreateServiceCategoryModal';
 import ServiceCategoryDetailsModal from './ServiceCategoryDetailsModal';
@@ -97,23 +98,26 @@ const ServiceCategories = ({ isDarkMode }) => {
   const columns = [
     {
       header: 'Category',
-      render: (cat) => (
-        <div className="flex items-center gap-4">
-          <div className={`w-12 h-12 rounded-2xl overflow-hidden flex items-center justify-center font-bold border ${isDarkMode ? 'bg-gray-800 border-white/5' : 'bg-gray-100 border-gray-100 shadow-sm'} flex-shrink-0`}>
-            {cat.image?.url ? (
-              <img src={cat.image.url} alt={cat.label || cat.name} className="w-full h-full object-cover" />
-            ) : (
-              <span className="text-primary font-bold">{cat.label?.charAt(0) || cat.name?.charAt(0) || 'C'}</span>
-            )}
+      render: (cat) => {
+        const catImgUrl = getImageUrl(cat.image);
+        return (
+          <div className="flex items-center gap-4">
+            <div className={`w-12 h-12 rounded-2xl overflow-hidden flex items-center justify-center font-bold border ${isDarkMode ? 'bg-gray-800 border-white/5' : 'bg-gray-100 border-gray-100 shadow-sm'} flex-shrink-0`}>
+              {catImgUrl ? (
+                <img src={catImgUrl} alt={cat.label || cat.name} className="w-full h-full object-cover" />
+              ) : (
+                <span className="text-primary font-bold">{cat.label?.charAt(0) || cat.name?.charAt(0) || 'C'}</span>
+              )}
+            </div>
+            <div className="flex flex-col">
+              <span className={`text-sm font-bold ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>{cat.label || cat.name}</span>
+              {cat.name !== cat.label && (
+                <span className="text-sm font-bold uppercase text-gray-400">/{cat.name}</span>
+              )}
+            </div>
           </div>
-          <div className="flex flex-col">
-            <span className={`text-sm font-bold ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>{cat.label || cat.name}</span>
-            {cat.name !== cat.label && (
-              <span className="text-sm font-bold uppercase text-gray-400">/{cat.name}</span>
-            )}
-          </div>
-        </div>
-      )
+        );
+      }
     },
     {
       header: 'Description',

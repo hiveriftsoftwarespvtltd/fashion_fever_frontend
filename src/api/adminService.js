@@ -1279,10 +1279,13 @@ export const addHomeContent = async (data) => {
     if (data.redirectUrl !== undefined && data.redirectUrl !== null) formData.append('redirectUrl', data.redirectUrl);
     if (data.backgroundColor !== undefined && data.backgroundColor !== null) formData.append('backgroundColor', data.backgroundColor);
     if (data.textColor !== undefined && data.textColor !== null) formData.append('textColor', data.textColor);
-    if (data.displayOrder !== undefined && data.displayOrder !== null) formData.append('displayOrder', data.displayOrder);
     if (data.isActive !== undefined && data.isActive !== null) formData.append('isActive', data.isActive);
-    if (data.startDate !== undefined && data.startDate !== null) formData.append('startDate', data.startDate);
-    if (data.endDate !== undefined && data.endDate !== null) formData.append('endDate', data.endDate);
+    if (data.startDate && String(data.startDate).trim() !== '') {
+      try { formData.append('startDate', new Date(data.startDate).toISOString()); } catch (_) { formData.append('startDate', data.startDate); }
+    }
+    if (data.endDate && String(data.endDate).trim() !== '') {
+      try { formData.append('endDate', new Date(data.endDate).toISOString()); } catch (_) { formData.append('endDate', data.endDate); }
+    }
 
     if (data.metaData !== undefined && data.metaData !== null) {
       formData.append('metaData', typeof data.metaData === 'object' ? JSON.stringify(data.metaData) : data.metaData);
@@ -1393,9 +1396,12 @@ export const updateHomeContent = async (id, data) => {
     if (data.backgroundColor !== undefined && data.backgroundColor !== null) formData.append('backgroundColor', data.backgroundColor);
     if (data.textColor !== undefined && data.textColor !== null) formData.append('textColor', data.textColor);
     if (data.displayOrder !== undefined && data.displayOrder !== null) formData.append('displayOrder', data.displayOrder);
-    if (data.isActive !== undefined && data.isActive !== null) formData.append('isActive', data.isActive);
-    if (data.startDate !== undefined && data.startDate !== null) formData.append('startDate', data.startDate);
-    if (data.endDate !== undefined && data.endDate !== null) formData.append('endDate', data.endDate);
+    if (data.startDate && String(data.startDate).trim() !== '') {
+      try { formData.append('startDate', new Date(data.startDate).toISOString()); } catch (_) { formData.append('startDate', data.startDate); }
+    }
+    if (data.endDate && String(data.endDate).trim() !== '') {
+      try { formData.append('endDate', new Date(data.endDate).toISOString()); } catch (_) { formData.append('endDate', data.endDate); }
+    }
 
     if (data.metaData !== undefined && data.metaData !== null) {
       formData.append('metaData', typeof data.metaData === 'object' ? JSON.stringify(data.metaData) : data.metaData);
