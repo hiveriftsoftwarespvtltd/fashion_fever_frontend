@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import config from '../../config/config';
 import {
   getQuickVendorDashboard,
   updateQuickVendorConfig,
@@ -395,7 +396,7 @@ const VendorFlow = () => {
     if (!raw) return null;
 
     if (raw.startsWith('http://') || raw.startsWith('https://')) return raw;
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://192.168.0.102:9000';
+    const apiUrl = config.API_URL;
     const baseUrl = apiUrl.replace(/\/api\/v1\/?$/, '');
     return `${baseUrl}${raw.startsWith('/') ? '' : '/'}${raw}`;
   };

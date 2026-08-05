@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Loader2, X, Layers, Clock, ShieldAlert, Image, Database, User } from 'lucide-react';
 import { toast } from '../../../utils/toast';
-import { getImageUrl } from '../../../utils/imageUrl';
 import { getServiceCategoryDetails } from '../../../api/adminService';
 import { useTheme } from '../../../context/ThemeContext';
 
@@ -45,8 +44,6 @@ const ServiceCategoryDetailsModal = ({ categoryId, onClose }) => {
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   };
 
-  const categoryImgUrl = getImageUrl(category?.image);
-
   return (
     <div className="fixed inset-0 z-[4000] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto font-outfit">
       <div className={`w-full max-w-xl my-auto rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white'}`}>
@@ -61,8 +58,8 @@ const ServiceCategoryDetailsModal = ({ categoryId, onClose }) => {
             <div className="flex justify-between items-start mb-6">
               <div className="flex items-center gap-4">
                 <div className={`w-16 h-16 rounded-2xl overflow-hidden flex items-center justify-center font-bold border shadow-inner flex-shrink-0 ${isDarkMode ? 'bg-gray-900 border-white/5' : 'bg-gray-50 border-gray-100'}`}>
-                  {categoryImgUrl ? (
-                    <img src={categoryImgUrl} alt={category.label} className="w-full h-full object-cover" />
+                  {category.image?.url ? (
+                    <img src={category.image.url} alt={category.label} className="w-full h-full object-cover" />
                   ) : (
                     <Layers className="text-primary" size={24} />
                   )}

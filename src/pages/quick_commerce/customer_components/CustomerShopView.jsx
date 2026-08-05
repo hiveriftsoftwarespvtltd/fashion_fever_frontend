@@ -1,5 +1,6 @@
 import React from 'react';
 import { Zap, MapPin, Search, ShoppingBag, Check, ChevronRight, Star, Heart, Plus, Minus } from 'lucide-react';
+import { getImageUrl } from '../../../utils/imageUrl';
 
 const CustomerShopView = ({
   category,
@@ -199,9 +200,7 @@ const CustomerShopView = ({
                 (typeof prod.images?.[0] === 'string' ? prod.images[0] : '') ||
                 prod.image || '';
 
-              const productImage = rawImage && !rawImage.startsWith('http') && !rawImage.startsWith('data:')
-                ? `https://fashionfever.in/api/v1/${rawImage.replace(/^\/+/, '')}`
-                : rawImage;
+              const productImage = getImageUrl(rawImage);
 
               const categoryName = prod.categoryId?.name || prod.categoryId?.label || prod.category || 'COSMETICS';
               const vendorName = prod.vendorId?.businessName || prod.vendor?.businessName || prod.brand || 'Fashion Fever';

@@ -6,7 +6,6 @@ import {
 import Swal from 'sweetalert2';
 import { getAllServiceCategories, deleteServiceCategory } from '../../../api/adminService';
 import { toast } from '../../../utils/toast';
-import { getImageUrl } from '../../../utils/imageUrl';
 import DataTable from '../../../components/shared/DataTable';
 import CreateServiceCategoryModal from './CreateServiceCategoryModal';
 import ServiceCategoryDetailsModal from './ServiceCategoryDetailsModal';
@@ -57,10 +56,10 @@ const ServiceCategories = ({ isDarkMode }) => {
   useEffect(() => { fetchCategories(); }, [fetchCategories]);
 
   const filtered = categories.filter((c) => {
-    if (filter === 'active')     return c.isActive;
-    if (filter === 'inactive')   return !c.isActive;
+    if (filter === 'active') return c.isActive;
+    if (filter === 'inactive') return !c.isActive;
     if (filter === 'with-image') return !!c.image?.url;
-    if (filter === 'no-image')   return !c.image?.url;
+    if (filter === 'no-image') return !c.image?.url;
     return true;
   });
 
@@ -98,26 +97,23 @@ const ServiceCategories = ({ isDarkMode }) => {
   const columns = [
     {
       header: 'Category',
-      render: (cat) => {
-        const catImgUrl = getImageUrl(cat.image);
-        return (
-          <div className="flex items-center gap-4">
-            <div className={`w-12 h-12 rounded-2xl overflow-hidden flex items-center justify-center font-bold border ${isDarkMode ? 'bg-gray-800 border-white/5' : 'bg-gray-100 border-gray-100 shadow-sm'} flex-shrink-0`}>
-              {catImgUrl ? (
-                <img src={catImgUrl} alt={cat.label || cat.name} className="w-full h-full object-cover" />
-              ) : (
-                <span className="text-primary font-bold">{cat.label?.charAt(0) || cat.name?.charAt(0) || 'C'}</span>
-              )}
-            </div>
-            <div className="flex flex-col">
-              <span className={`text-sm font-bold ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>{cat.label || cat.name}</span>
-              {cat.name !== cat.label && (
-                <span className="text-sm font-bold uppercase text-gray-400">/{cat.name}</span>
-              )}
-            </div>
+      render: (cat) => (
+        <div className="flex items-center gap-4">
+          <div className={`w-12 h-12 rounded-2xl overflow-hidden flex items-center justify-center font-bold border ${isDarkMode ? 'bg-gray-800 border-white/5' : 'bg-gray-100 border-gray-100 shadow-sm'} flex-shrink-0`}>
+            {cat.image?.url ? (
+              <img src={cat.image.url} alt={cat.label || cat.name} className="w-full h-full object-cover" />
+            ) : (
+              <span className="text-primary font-bold">{cat.label?.charAt(0) || cat.name?.charAt(0) || 'C'}</span>
+            )}
           </div>
-        );
-      }
+          <div className="flex flex-col">
+            <span className={`text-sm font-bold ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>{cat.label || cat.name}</span>
+            {cat.name !== cat.label && (
+              <span className="text-sm font-bold uppercase text-gray-400">/{cat.name}</span>
+            )}
+          </div>
+        </div>
+      )
     },
     {
       header: 'Description',
@@ -254,10 +250,10 @@ const ServiceCategories = ({ isDarkMode }) => {
       {/* ── Summary Stats ── */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { label: 'Active',      value: categories.filter(c => c.isActive).length,    color: 'text-emerald-500', bg: isDarkMode ? 'bg-emerald-500/5' : 'bg-emerald-50',  icon: <CheckCircle2 size={15} /> },
-          { label: 'Inactive',    value: categories.filter(c => !c.isActive).length,   color: 'text-rose-500',    bg: isDarkMode ? 'bg-rose-500/5'    : 'bg-rose-50',      icon: <XCircle size={15} /> },
-          { label: 'With Image',  value: categories.filter(c => !!c.image?.url).length, color: 'text-primary',    bg: isDarkMode ? 'bg-primary/5'    : 'bg-primary/5',     icon: <Tag size={15} /> },
-          { label: 'No Image',    value: categories.filter(c => !c.image?.url).length, color: 'text-gray-400',   bg: isDarkMode ? 'bg-white/5'      : 'bg-gray-50',       icon: <ImageOff size={15} /> },
+          { label: 'Active', value: categories.filter(c => c.isActive).length, color: 'text-emerald-500', bg: isDarkMode ? 'bg-emerald-500/5' : 'bg-emerald-50', icon: <CheckCircle2 size={15} /> },
+          { label: 'Inactive', value: categories.filter(c => !c.isActive).length, color: 'text-rose-500', bg: isDarkMode ? 'bg-rose-500/5' : 'bg-rose-50', icon: <XCircle size={15} /> },
+          { label: 'With Image', value: categories.filter(c => !!c.image?.url).length, color: 'text-primary', bg: isDarkMode ? 'bg-primary/5' : 'bg-primary/5', icon: <Tag size={15} /> },
+          { label: 'No Image', value: categories.filter(c => !c.image?.url).length, color: 'text-gray-400', bg: isDarkMode ? 'bg-white/5' : 'bg-gray-50', icon: <ImageOff size={15} /> },
         ].map((s, i) => (
           <div key={i} className={`px-4 py-4 rounded-2xl border flex items-center gap-3 ${isDarkMode ? 'bg-gray-900 border-white/5' : 'bg-white border-gray-100'} shadow-sm`}>
             <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${s.bg} ${s.color}`}>
@@ -274,22 +270,21 @@ const ServiceCategories = ({ isDarkMode }) => {
       {/* ── Filter tabs ── */}
       <div className={`flex flex-wrap gap-2 p-1.5 rounded-2xl ${isDarkMode ? 'bg-gray-900 border border-white/5' : 'bg-gray-100'} w-fit`}>
         {[
-          { key: 'all',        label: 'All' },
-          { key: 'active',     label: 'Active' },
-          { key: 'inactive',   label: 'Inactive' },
+          { key: 'all', label: 'All' },
+          { key: 'active', label: 'Active' },
+          { key: 'inactive', label: 'Inactive' },
           { key: 'with-image', label: 'With Image' },
-          { key: 'no-image',   label: 'No Image' },
+          { key: 'no-image', label: 'No Image' },
         ].map((f) => (
           <button
             key={f.key}
             onClick={() => setFilter(f.key)}
-            className={`px-4 py-2 rounded-xl text-sm font-black uppercase tracking-wide transition-all duration-200 ${
-              filter === f.key
+            className={`px-4 py-2 rounded-xl text-sm font-black uppercase tracking-wide transition-all duration-200 ${filter === f.key
                 ? 'bg-primary text-white shadow-lg shadow-primary/25'
                 : isDarkMode
-                ? 'text-gray-500 hover:text-gray-300 hover:bg-white/5'
-                : 'text-gray-500 hover:text-gray-700 hover:bg-white'
-            }`}
+                  ? 'text-gray-500 hover:text-gray-300 hover:bg-white/5'
+                  : 'text-gray-500 hover:text-gray-700 hover:bg-white'
+              }`}
           >
             {f.label}
           </button>

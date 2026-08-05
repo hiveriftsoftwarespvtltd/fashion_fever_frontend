@@ -2,15 +2,12 @@ const getApiUrl = () => {
   if (import.meta.env.VITE_API_URL) {
     return import.meta.env.VITE_API_URL;
   }
-  const isLocal = typeof window !== 'undefined' && 
-    (window.location.hostname === 'localhost' || 
-     window.location.hostname === '127.0.0.1' || 
-     window.location.hostname.startsWith('192.168.'));
 
-  if (!isLocal && typeof window !== 'undefined') {
-    return 'https://fashionfever.in/api/v1';
-  }
-  return 'http://192.168.0.103:9000/api/v1';
+  // Live Production API URL (Active)
+  return 'https://fashionfever.in/fashionfever_api/api/v1';
+
+  // Localhost API URL (Commented)
+  // return 'http://localhost:9000/api/v1';
 };
 
 const config = {
@@ -18,3 +15,6 @@ const config = {
 };
 
 export default config;
+
+
+
