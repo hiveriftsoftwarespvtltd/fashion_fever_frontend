@@ -97,19 +97,27 @@ const Checkout = () => {
   };
 
   const getSubtotalAmount = () => {
-    const items = getMergedLocalCartItems();
+    if (detailedCart?.cartSummary?.subtotal !== undefined && Number(detailedCart.cartSummary.subtotal) > 0) {
+      return Number(detailedCart.cartSummary.subtotal);
+    }
     if (detailedCart?.cartItems?.length > 0) {
       const detailedItems = getMergedDetailedCartItems();
-      return detailedItems.reduce((acc, item) => acc + (Number(item.price || item.finalPrice || 0) * Number(item.quantity || 1)), 0);
+      return detailedItems.reduce((acc, item) => {
+        const itemPrice = Number(item.unitPrice ?? item.offeredPrice ?? item.salesPrice ?? item.price ?? item.finalPrice ?? 0);
+        return acc + (itemPrice * Number(item.quantity || 1));
+      }, 0);
     }
-    return items.reduce((acc, item) => acc + (Number(item.price || 0) * Number(item.qty || 1)), 0);
+    const items = getMergedLocalCartItems();
+    return items.reduce((acc, item) => acc + (Number(item.price || item.salesPrice || 0) * Number(item.qty || 1)), 0);
   };
 
   const getFinalTotal = () => {
     const baseTotal = getSubtotalAmount();
-    const codCharge = paymentMethod === 'cod' ? (detailedCart?.cartSummary?.codCharge || 0) : 0;
-    const discount = appliedCoupon?.discount || 0;
-    return Math.max(0, baseTotal + codCharge - discount);
+    const shippingCharge = Number(detailedCart?.cartSummary?.shippingCharge || 0);
+    const codCharge = paymentMethod === 'cod' ? Number(detailedCart?.cartSummary?.codCharge || 0) : 0;
+    const cartDiscount = Number(detailedCart?.cartSummary?.discount || 0);
+    const couponDiscount = Number(appliedCoupon?.discount || 0);
+    return Math.max(0, baseTotal + shippingCharge + codCharge - cartDiscount - couponDiscount);
   };
 
   // Dynamic Product Hydration inside Checkout from /cart/cart-details/:addressId
