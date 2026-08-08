@@ -14,6 +14,7 @@ import {
 import Swal from 'sweetalert2';
 import { useUser } from '../../context/UserContext';
 import { getImageUrl } from '../../utils/imageUrl';
+import { formatOrderId } from '../../utils/orderUtils';
 
 const RiderFlow = () => {
   const { user } = useUser();
@@ -414,8 +415,8 @@ const RiderFlow = () => {
                     </div>
                   )}
                   <span className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white flex items-center justify-center shadow-xs ${status === 'AVAILABLE' ? 'bg-emerald-500' :
-                      status === 'ON_DELIVERY' ? 'bg-amber-500' :
-                        status === 'BREAK' ? 'bg-blue-500' : 'bg-slate-400'
+                    status === 'ON_DELIVERY' ? 'bg-amber-500' :
+                      status === 'BREAK' ? 'bg-blue-500' : 'bg-slate-400'
                     }`} title={`Status: ${status}`}>
                     <span className="w-1 h-1 rounded-full bg-white animate-ping" />
                   </span>
@@ -427,8 +428,8 @@ const RiderFlow = () => {
                       <Zap size={10} className="fill-primary" /> Express Partner
                     </span>
                     <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-md shadow-2xs ${status === 'AVAILABLE' ? 'bg-emerald-50 text-emerald-700' :
-                        status === 'ON_DELIVERY' ? 'bg-amber-50 text-amber-700' :
-                          status === 'BREAK' ? 'bg-blue-50 text-blue-700' : 'bg-slate-100 text-slate-600'
+                      status === 'ON_DELIVERY' ? 'bg-amber-50 text-amber-700' :
+                        status === 'BREAK' ? 'bg-blue-50 text-blue-700' : 'bg-slate-100 text-slate-600'
                       }`}>
                       ● {status === 'AVAILABLE' ? 'ONLINE' : status === 'ON_DELIVERY' ? 'BUSY' : status}
                     </span>
@@ -690,7 +691,7 @@ const RiderFlow = () => {
                               <Zap size={10} className="fill-primary" /> Express
                             </span>
                           )}
-                          <p className="font-mono font-black text-slate-900 text-xs">#{ord.orderNumber || ord._id?.substring(0, 8)}</p>
+                          <p className="font-mono font-black text-slate-900 text-xs">{formatOrderId(ord)}</p>
                           <p className="text-[10px] font-medium text-slate-400 mt-0.5">
                             📅 {new Date(ord.createdAt || ord.quickOrderId?.createdAt).toLocaleString()}
                           </p>
@@ -771,8 +772,8 @@ const RiderFlow = () => {
                         {/* 6. Status */}
                         <td className="p-3.5 align-top text-center min-w-[110px]">
                           <span className={`text-[10px] font-black uppercase px-2.5 py-1 rounded-full border inline-block whitespace-nowrap ${isDelivered
-                              ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                              : 'bg-amber-50 text-amber-700 border-amber-200'
+                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                            : 'bg-amber-50 text-amber-700 border-amber-200'
                             }`}>
                             ● {isDelivered ? 'DELIVERED ✅' : (ord.status || 'OUT_FOR_DELIVERY')}
                           </span>
@@ -851,7 +852,7 @@ const RiderFlow = () => {
                           </span>
                         )}
                         <span className="text-xs font-mono font-black text-slate-900">
-                          #{ord.orderNumber || ord._id?.substring(0, 8)}
+                          {formatOrderId(ord)}
                         </span>
                       </div>
                       <span className="text-[10px] font-semibold text-slate-400 block mt-1">
@@ -866,8 +867,8 @@ const RiderFlow = () => {
 
                     <div className="flex items-center gap-2">
                       <span className={`text-[10px] font-black uppercase px-3 py-1 rounded-full shadow-2xs ${isDelivered
-                          ? 'bg-emerald-50 text-emerald-700'
-                          : 'bg-amber-50 text-amber-700'
+                        ? 'bg-emerald-50 text-emerald-700'
+                        : 'bg-amber-50 text-amber-700'
                         }`}>
                         ● {isDelivered ? 'DELIVERED ✅' : (ord.status || 'OUT_FOR_DELIVERY')}
                       </span>
@@ -1052,8 +1053,8 @@ const RiderFlow = () => {
                 onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                 disabled={currentPage === 1}
                 className={`px-3.5 py-1.5 rounded-xl text-xs font-black uppercase transition-all cursor-pointer shadow-xs ${currentPage === 1
-                    ? 'bg-slate-100 text-slate-400 cursor-not-allowed opacity-60'
-                    : 'bg-slate-100 hover:bg-rose-50 text-slate-700 hover:text-primary'
+                  ? 'bg-slate-100 text-slate-400 cursor-not-allowed opacity-60'
+                  : 'bg-slate-100 hover:bg-rose-50 text-slate-700 hover:text-primary'
                   }`}
               >
                 ← Prev
@@ -1064,8 +1065,8 @@ const RiderFlow = () => {
                   key={page}
                   onClick={() => setCurrentPage(page)}
                   className={`w-8 h-8 rounded-xl text-xs font-black transition-all cursor-pointer shadow-xs ${currentPage === page
-                      ? 'bg-gradient-to-r from-primary via-rose-600 to-[#b50157] text-white shadow-md'
-                      : 'bg-slate-100 hover:bg-rose-50 text-slate-700'
+                    ? 'bg-gradient-to-r from-primary via-rose-600 to-[#b50157] text-white shadow-md'
+                    : 'bg-slate-100 hover:bg-rose-50 text-slate-700'
                     }`}
                 >
                   {page}
@@ -1076,8 +1077,8 @@ const RiderFlow = () => {
                 onClick={() => setCurrentPage(prev => Math.min(prev + 1, Math.ceil(getSortedFilteredOrders().length / itemsPerPage)))}
                 disabled={currentPage >= Math.ceil(getSortedFilteredOrders().length / itemsPerPage)}
                 className={`px-3.5 py-1.5 rounded-xl text-xs font-black uppercase transition-all cursor-pointer shadow-xs ${currentPage >= Math.ceil(getSortedFilteredOrders().length / itemsPerPage)
-                    ? 'bg-slate-100 text-slate-400 cursor-not-allowed opacity-60'
-                    : 'bg-slate-100 hover:bg-rose-50 text-slate-700 hover:text-primary'
+                  ? 'bg-slate-100 text-slate-400 cursor-not-allowed opacity-60'
+                  : 'bg-slate-100 hover:bg-rose-50 text-slate-700 hover:text-primary'
                   }`}
               >
                 Next →
@@ -1230,7 +1231,7 @@ const RiderFlow = () => {
               <div className="min-w-0 flex-1">
                 <span className="text-[10px] font-black uppercase text-rose-100 tracking-wider block">Express Delivery Order Details</span>
                 <h3 className="text-xs sm:text-base font-black font-mono truncate text-white max-w-[180px] sm:max-w-none">
-                  #{selectedRiderOrderModal._id}
+                  {formatOrderId(selectedRiderOrderModal)}
                 </h3>
                 <span className="text-[10px] text-rose-100 font-semibold block mt-0.5">
                   📅 Placed: {new Date(selectedRiderOrderModal.createdAt || selectedRiderOrderModal.quickOrderId?.createdAt).toLocaleString()}

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { RefreshCw, Search, X, ShoppingBag, Calendar, Eye, Truck, ChevronLeft, ChevronRight, Phone, MapPin } from 'lucide-react';
+import { formatOrderId } from '../../../utils/orderUtils';
 
 const VendorOrdersPipeline = ({
   orders = [],
@@ -142,7 +143,7 @@ const VendorOrdersPipeline = ({
                   {/* Order ID & Date */}
                   <td className="py-3.5 px-4">
                     <span className="font-mono font-black text-slate-800 block text-xs">
-                      #{ord._id?.substring(0, 8)}
+                      {formatOrderId(ord)}
                     </span>
                     <span className="text-[10px] font-semibold text-slate-400 block mt-0.5 flex items-center gap-1">
                       <Calendar size={10} className="inline text-slate-400" />

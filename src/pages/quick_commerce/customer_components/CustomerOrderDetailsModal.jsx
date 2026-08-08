@@ -1,5 +1,6 @@
 import React from 'react';
 import { X, MapPin, Truck, Package, Calendar, Phone, Zap, ShoppingBag } from 'lucide-react';
+import { formatOrderId } from '../../../utils/orderUtils';
 
 const CustomerOrderDetailsModal = ({
   selectedUserOrderModal,
@@ -18,7 +19,7 @@ const CustomerOrderDetailsModal = ({
           <div className="min-w-0 flex-1">
             <span className="text-[9px] sm:text-[10px] font-black uppercase text-rose-100 tracking-wider block">Express Quick Order Details</span>
             <h3 className="text-xs sm:text-base font-black font-mono truncate text-white max-w-[180px] sm:max-w-none">
-              #{selectedUserOrderModal._id}
+              {formatOrderId(selectedUserOrderModal)}
             </h3>
             <span className="text-[9px] sm:text-[10px] text-rose-100 font-semibold block mt-0.5 flex items-center gap-1">
               <Calendar size={11} /> Placed: {formatOrderDate(selectedUserOrderModal.createdAt)}

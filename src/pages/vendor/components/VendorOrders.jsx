@@ -1,5 +1,6 @@
 import React from 'react';
 import { Eye, Download, Truck, UserCheck, Bike } from 'lucide-react';
+import { formatOrderId } from '../../../utils/orderUtils';
 
 const VendorOrders = ({
   isDarkMode,
@@ -88,7 +89,7 @@ const VendorOrders = ({
                   <tr key={order._id} className={`${isDarkMode ? 'hover:bg-white/5' : 'hover:bg-gray-50/50'} transition-colors`}>
                     <td className="px-6 py-4">
                       <div className="flex flex-col gap-1">
-                        <span className={`font-bold text-sm ${isDarkMode ? 'text-gray-250' : 'text-gray-800'}`}>{order.orderNumber}</span>
+                        <span className={`font-bold text-sm ${isDarkMode ? 'text-gray-250' : 'text-gray-800'}`}>{formatOrderId(order)}</span>
                         {(order.isQuickDelivery || order.orderType === 'QUICK' || order.isQuickCommerce) ? (
                           <span className="inline-flex items-center gap-1 w-max px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-amber-500/20 text-amber-500 border border-amber-500/30 animate-pulse">
                             ⚡ 10-MIN EXPRESS

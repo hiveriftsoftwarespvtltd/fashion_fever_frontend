@@ -4,6 +4,7 @@ import { updateVendorOrder } from '../../../api/vendorService';
 import { getVendorDeliveryPersons, assignDeliveryPerson, assignRiderToStandardOrder, getAvailableRiders } from '../../../api/quickECommerceService';
 import { toast } from '../../../utils/toast';
 import { useTheme } from '../../../context/ThemeContext';
+import { formatOrderId } from '../../../utils/orderUtils';
 
 /**
  * Premium Vendor Order Details / Invoice Modal
@@ -166,7 +167,7 @@ const VendorOrderDetailsModal = ({ isOpen, onClose, order, onUpdate }) => {
                 <ShoppingBag className="text-primary" size={20} />
               </div>
               <div>
-                <h2 className={`text-lg font-bold leading-tight ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{currentOrder.orderNumber}</h2>
+                <h2 className={`text-lg font-bold leading-tight ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{formatOrderId(currentOrder)}</h2>
                 <p className="text-sm font-bold text-gray-400 uppercase mt-0.5 flex items-center gap-1">
                   <Calendar size={10} /> {isDateValid ? dateObj.toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' }) : 'N/A'}
                 </p>

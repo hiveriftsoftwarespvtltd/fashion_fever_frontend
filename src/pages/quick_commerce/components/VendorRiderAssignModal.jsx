@@ -1,5 +1,6 @@
 import React from 'react';
 import { Truck, X, MapPin, Phone, Zap } from 'lucide-react';
+import { formatOrderId } from '../../../utils/orderUtils';
 
 const VendorRiderAssignModal = ({
   assigningOrderId,
@@ -28,7 +29,7 @@ const VendorRiderAssignModal = ({
             <div>
               <h3 className="text-base font-black uppercase tracking-tight">Assign Express Rider</h3>
               <p className="text-rose-100 text-[10px] font-mono font-bold">
-                Order #{assigningOrderId?.substring(0, 8)}
+                Order {formatOrderId(assigningOrderId)}
               </p>
             </div>
           </div>
