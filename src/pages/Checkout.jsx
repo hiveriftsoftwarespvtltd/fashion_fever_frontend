@@ -97,13 +97,13 @@ const Checkout = () => {
   };
 
   const getSubtotalAmount = () => {
-    if (detailedCart?.cartSummary?.subtotal !== undefined && Number(detailedCart.cartSummary.subtotal) > 0) {
-      return Number(detailedCart.cartSummary.subtotal);
+    const backendSubtotal = detailedCart?.cartSummary?.subTotal ?? detailedCart?.cartSummary?.subtotal;
+    if (backendSubtotal !== undefined && Number(backendSubtotal) > 0) {
+      return Number(backendSubtotal);
     }
     if (detailedCart?.cartItems?.length > 0) {
-      const detailedItems = getMergedDetailedCartItems();
-      return detailedItems.reduce((acc, item) => {
-        const itemPrice = Number(item.unitPrice ?? item.offeredPrice ?? item.salesPrice ?? item.price ?? item.finalPrice ?? 0);
+      return detailedCart.cartItems.reduce((acc, item) => {
+        const itemPrice = Number(item.unitPrice ?? item.offeredPrice ?? item.salesPrice ?? item.totalPrice ?? item.price ?? 0);
         return acc + (itemPrice * Number(item.quantity || 1));
       }, 0);
     }
