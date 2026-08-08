@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import Swal from 'sweetalert2';
 import { useUser } from '../../context/UserContext';
+import { getImageUrl } from '../../utils/imageUrl';
 
 const RiderFlow = () => {
   const { user } = useUser();
@@ -50,9 +51,9 @@ const RiderFlow = () => {
   const getSortedFilteredOrders = () => {
     let list = [...assignedOrders];
     if (queueTab === 'PENDING') {
-      list = list.filter(o => o.status !== 'DELIVERED' && o.status !== 'DELIVERED_SUCCESSFULLY');
+      list = list.filter(o => o.status !== 'DELIVERED' && o.status !== 'DELIVERED_SUCCESSFULLY' && o.orderStatus !== 'delivered');
     } else if (queueTab === 'DELIVERED') {
-      list = list.filter(o => o.status === 'DELIVERED' || o.status === 'DELIVERED_SUCCESSFULLY');
+      list = list.filter(o => o.status === 'DELIVERED' || o.status === 'DELIVERED_SUCCESSFULLY' || o.orderStatus === 'delivered');
     }
 
     // Sort Newest Orders First (Top)
@@ -353,12 +354,7 @@ const RiderFlow = () => {
         ) : null);
     }
 
-    if (!raw) return null;
-
-    if (raw.startsWith('http://') || raw.startsWith('https://')) return raw;
-    const apiUrl = config.API_URL;
-    const baseUrl = apiUrl.replace(/\/api\/v1\/?$/, '');
-    return `${baseUrl}${raw.startsWith('/') ? '' : '/'}${raw}`;
+    return getImageUrl(raw);
   };
 
   const getProfileAvatar = () => {
@@ -592,14 +588,14 @@ const RiderFlow = () => {
                 className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase transition-all cursor-pointer ${queueTab === 'PENDING' ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-500 hover:text-slate-800'
                   }`}
               >
-                Active ({assignedOrders.filter(o => o.status !== 'DELIVERED').length})
+                Active ({assignedOrders.filter(o => o.status !== 'DELIVERED' && o.orderStatus !== 'delivered').length})
               </button>
               <button
                 onClick={() => handleTabChange('DELIVERED')}
                 className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase transition-all cursor-pointer ${queueTab === 'DELIVERED' ? 'bg-white text-emerald-600 shadow-sm' : 'text-slate-500 hover:text-slate-800'
                   }`}
               >
-                Delivered ({assignedOrders.filter(o => o.status === 'DELIVERED').length})
+                Delivered ({assignedOrders.filter(o => o.status === 'DELIVERED' || o.orderStatus === 'delivered').length})
               </button>
             </div>
 
@@ -698,6 +694,11 @@ const RiderFlow = () => {
                           <p className="text-[10px] font-medium text-slate-400 mt-0.5">
                             📅 {new Date(ord.createdAt || ord.quickOrderId?.createdAt).toLocaleString()}
                           </p>
+                          {isStandardOrder && (
+                            <p className="text-[10px] font-extrabold text-blue-600 mt-0.5 flex items-center gap-1">
+                              🚚 Target: {ord.estimatedDeliveryDate ? new Date(ord.estimatedDeliveryDate).toLocaleDateString() : new Date(new Date(ord.createdAt || Date.now()).getTime() + 3 * 24 * 60 * 60 * 1000).toLocaleDateString()}
+                            </p>
+                          )}
                         </td>
 
                         {/* 2. Pickup Store */}
@@ -840,16 +841,27 @@ const RiderFlow = () => {
                   <div className="flex flex-wrap items-center justify-between border-b border-slate-100 pb-3.5 gap-2">
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="bg-rose-50 text-primary text-[10px] font-black uppercase px-2.5 py-0.5 rounded-md flex items-center gap-1 shadow-2xs">
-                          <Zap size={11} className="fill-primary" /> 10-Min Express
-                        </span>
+                        {isStandardOrder ? (
+                          <span className="bg-blue-50 text-blue-700 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-md flex items-center gap-1 shadow-2xs">
+                            📦 Standard Delivery
+                          </span>
+                        ) : (
+                          <span className="bg-rose-50 text-primary text-[10px] font-black uppercase px-2.5 py-0.5 rounded-md flex items-center gap-1 shadow-2xs">
+                            <Zap size={11} className="fill-primary" /> 10-Min Express
+                          </span>
+                        )}
                         <span className="text-xs font-mono font-black text-slate-900">
-                          #{ord._id?.substring(0, 8)}
+                          #{ord.orderNumber || ord._id?.substring(0, 8)}
                         </span>
                       </div>
                       <span className="text-[10px] font-semibold text-slate-400 block mt-1">
                         📅 {new Date(ord.createdAt || ord.quickOrderId?.createdAt).toLocaleString()}
                       </span>
+                      {isStandardOrder && (
+                        <span className="text-[10px] font-extrabold text-blue-600 block mt-0.5">
+                          🚚 Target: {ord.estimatedDeliveryDate ? new Date(ord.estimatedDeliveryDate).toLocaleDateString() : new Date(new Date(ord.createdAt || Date.now()).getTime() + 3 * 24 * 60 * 60 * 1000).toLocaleDateString()}
+                        </span>
+                      )}
                     </div>
 
                     <div className="flex items-center gap-2">

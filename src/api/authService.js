@@ -302,4 +302,37 @@ export const deleteTicket = async (ticketId) => {
   }
 };
 
+/** Get tickets assigned to logged-in vendor */
+export const getVendorTickets = async () => {
+  try {
+    const response = await apiClient.get('/ticket/vendor-tickets');
+    return response.data;
+  } catch (error) {
+    console.error('Get vendor tickets error:', error);
+    return error.response?.data || { success: false, message: 'Failed to fetch vendor tickets', statusCode: 500 };
+  }
+};
+
+/** Get all tickets for Admin */
+export const getAllTicketsAdmin = async () => {
+  try {
+    const response = await apiClient.get('/ticket/get-all-tickets');
+    return response.data;
+  } catch (error) {
+    console.error('Get all tickets error:', error);
+    return error.response?.data || { success: false, message: 'Failed to fetch all tickets', statusCode: 500 };
+  }
+};
+
+/** Add reply to a support ticket */
+export const addTicketReply = async (ticketId, message) => {
+  try {
+    const response = await apiClient.post(`/ticket/${ticketId}/reply`, { message });
+    return response.data;
+  } catch (error) {
+    console.error('Add ticket reply error:', error);
+    return error.response?.data || { success: false, message: 'Failed to add reply', statusCode: 500 };
+  }
+};
+
 

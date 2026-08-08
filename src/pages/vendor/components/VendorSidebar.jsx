@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   LayoutDashboard,
   Package,
@@ -9,7 +8,9 @@ import {
   X,
   Wallet,
   Landmark,
-  Zap
+  Zap,
+  Bike,
+  LifeBuoy
 } from 'lucide-react';
 
 import { useTheme } from '../../../context/ThemeContext';
@@ -20,6 +21,8 @@ const VendorSidebar = ({ activeTab, setActiveTab, isSidebarOpen, setIsSidebarOpe
     { id: 'overview', icon: <LayoutDashboard size={18} />, label: 'Overview' },
     { id: 'products', icon: <Package size={18} />, label: 'Products' },
     { id: 'orders', icon: <ShoppingCart size={18} />, label: 'Orders' },
+    { id: 'riders', icon: <Bike size={18} />, label: 'Delivery Riders' },
+    { id: 'tickets', icon: <LifeBuoy size={18} />, label: 'Support Tickets' },
     { id: 'quickcommerce', icon: <Zap size={18} />, label: '⚡ Quick Commerce' },
     { id: 'earnings', icon: <IndianRupee size={18} />, label: 'Earnings' },
     { id: 'wallet', icon: <Wallet size={18} />, label: 'Wallet Ledger' },

@@ -40,6 +40,8 @@ import VendorProfile from './components/VendorProfile';
 import VendorWallet from './components/VendorWallet';
 import PayoutBankDetails from '../../components/shared/PayoutBankDetails';
 import VendorFlow from '../quick_commerce/VendorFlow';
+import VendorRiders from './components/VendorRiders';
+import VendorTickets from './components/VendorTickets';
 
 const VendorDashboard = () => {
   const { isDarkMode, toggleTheme } = useTheme();
@@ -551,9 +553,16 @@ const VendorDashboard = () => {
             />
           </div>
 
+          <div className={activeTab === 'riders' ? 'block animate-in fade-in duration-300' : 'hidden'}>
+            <VendorRiders
+              isDarkMode={isDarkMode}
+              getImageUrl={getImageUrl}
+            />
+          </div>
+
           {/* ⚡ Quick Commerce Tab */}
           <div className={activeTab === 'quickcommerce' ? 'block animate-in fade-in duration-300' : 'hidden'}>
-            <VendorFlow />
+            <VendorFlow onNavigateToRiders={() => setActiveTab('riders')} />
           </div>
 
           <div className={activeTab === 'earnings' ? 'block animate-in fade-in duration-300' : 'hidden'}>
@@ -592,6 +601,10 @@ const VendorDashboard = () => {
               role="vendor"
               ownerId={vendorData?._id}
             />
+          </div>
+
+          <div className={activeTab === 'tickets' ? 'block animate-in fade-in duration-300' : 'hidden'}>
+            <VendorTickets />
           </div>
 
           <div className={activeTab === 'profile' ? 'block animate-in fade-in duration-300' : 'hidden'}>

@@ -3,6 +3,7 @@ import { Truck, Plus, X, Upload, Sliders, Eye } from 'lucide-react';
 
 const VendorRidersRoster = ({
   riders = [],
+  onNavigateToRiders,
   showRiderForm,
   editingRider,
   riderName,
@@ -43,18 +44,17 @@ const VendorRidersRoster = ({
           </span>
         </div>
         <button
-          onClick={showRiderForm ? resetRiderForm : handleOpenAddRider}
+          onClick={() => {
+            if (onNavigateToRiders) {
+              onNavigateToRiders();
+            } else {
+              localStorage.setItem('vendorActiveTab', 'riders');
+              window.location.reload();
+            }
+          }}
           className="bg-primary hover:bg-primary/95 text-white px-2.5 py-1 rounded-xl shadow-md cursor-pointer inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider transition-all hover:scale-[1.02]"
         >
-          {showRiderForm ? (
-            <>
-              <X size={13} /> Cancel
-            </>
-          ) : (
-            <>
-              <Plus size={13} /> Onboard
-            </>
-          )}
+          <Plus size={13} /> Onboard / Manage Riders
         </button>
       </div>
 

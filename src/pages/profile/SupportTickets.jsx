@@ -16,16 +16,16 @@ import {
   Paperclip
 } from 'lucide-react';
 import UserSidebar from './UserSidebar';
-import { raiseTicket, getUserTickets, updateTicketStatus, editTicket, deleteTicket } from '../../api/authService';
+import { raiseTicket, getUserTickets, updateTicketStatus, editTicket, deleteTicket, addTicketReply, getUserOrders } from '../../api/authService';
 import { toast } from '../../utils/toast';
 import Swal from 'sweetalert2';
 
 const ticketTypes = [
   { id: 'ORDER', name: 'Order Issue' },
   { id: 'PRODUCT', name: 'Product Quality / Defect' },
-  { id: 'DELIVERY', name: 'Delivery Status / Delay' },
-  { id: 'PAYMENT', name: 'Payment Failure / Refund' },
-  { id: 'OTHER', name: 'Other Support Queries' },
+  { id: 'DELIVERY', name: 'Delivery / Rider Problem' },
+  { id: 'PAYMENT', name: 'Payment / Refund Query' },
+  { id: 'OTHER', name: 'Other General Inquiry' }
 ];
 
 const SupportTickets = () => {
@@ -33,6 +33,15 @@ const SupportTickets = () => {
   const [loadingTickets, setLoadingTickets] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+
+  // User Orders State for Vendor/Product Linking
+  const [userOrders, setUserOrders] = useState([]);
+  const [selectedOrderId, setSelectedOrderId] = useState('');
+
+  // Discussion Modal State
+  const [selectedTicketForView, setSelectedTicketForView] = useState(null);
+  const [replyMessage, setReplyMessage] = useState('');
+  const [sendingReply, setSendingReply] = useState(false);
 
   // Editing States
   const [isEditing, setIsEditing] = useState(false);
@@ -50,6 +59,10 @@ const SupportTickets = () => {
       const response = await getUserTickets();
       if (response.success && response.data) {
         setTickets(response.data);
+      }
+      const ordersRes = await getUserOrders();
+      if (ordersRes?.success) {
+        setUserOrders(ordersRes.data?.orders || ordersRes.data || []);
       }
     } catch (err) {
       console.error('Error fetching user tickets:', err);
@@ -92,6 +105,7 @@ const SupportTickets = () => {
     setEditingTicketId(ticket._id);
     setTicketType(ticket.ticketType || 'ORDER');
     setDescription(ticket.description || '');
+    setSelectedOrderId(ticket.orderId?._id || ticket.orderId || '');
     setExistingMedia(
       Array.isArray(ticket.mediaFiles)
         ? ticket.mediaFiles
@@ -108,6 +122,7 @@ const SupportTickets = () => {
     setEditingTicketId(null);
     setTicketType('ORDER');
     setDescription('');
+    setSelectedOrderId('');
     setExistingMedia([]);
     setMediaFiles([]);
     setIsModalOpen(true);
@@ -126,6 +141,17 @@ const SupportTickets = () => {
       formData.append('ticketType', ticketType);
       formData.append('description', description);
       
+      if (selectedOrderId) {
+        const chosenOrd = userOrders.find(o => o._id === selectedOrderId);
+        if (chosenOrd) {
+          const vId = chosenOrd.vendorId?._id || chosenOrd.vendorId;
+          const pId = chosenOrd.items?.[0]?.productId?._id || chosenOrd.items?.[0]?.productId || chosenOrd.items?.[0]?._id;
+          if (vId) formData.append('vendorId', vId);
+          if (pId) formData.append('productId', pId);
+          formData.append('orderId', chosenOrd._id);
+        }
+      }
+
       mediaFiles.forEach(file => {
         formData.append('mediaFiles', file);
       });
@@ -293,6 +319,28 @@ const SupportTickets = () => {
     }
   };
 
+  const handleCustomerSendReply = async () => {
+    if (!replyMessage.trim() || !selectedTicketForView) return;
+
+    setSendingReply(true);
+    try {
+      const res = await addTicketReply(selectedTicketForView._id, replyMessage.trim());
+      if (res?.success) {
+        toast.success('Reply sent to vendor & support team!');
+        setReplyMessage('');
+        setSelectedTicketForView(res.data);
+        fetchTickets();
+      } else {
+        toast.error(res?.message || 'Failed to send reply');
+      }
+    } catch (err) {
+      console.error('Customer reply error:', err);
+      toast.error('Failed to send reply');
+    } finally {
+      setSendingReply(false);
+    }
+  };
+
   const getStatusBadge = (status) => {
     switch (status) {
       case 'RESOLVED':
@@ -388,7 +436,7 @@ const SupportTickets = () => {
           <UserSidebar />
 
           {/* Right Content */}
-          <div className="flex-grow">
+          <div className="flex-grow min-w-0">
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 min-h-[600px] overflow-hidden flex flex-col justify-between text-left">
               
               <div>
@@ -405,14 +453,14 @@ const SupportTickets = () => {
 
                   <button
                     onClick={handleOpenNewTicketModal}
-                    className="inline-flex items-center gap-1.5 px-4.5 py-2.5 text-xs font-black uppercase rounded-xl text-white bg-primary hover:bg-primary-hover shadow-md shadow-primary/10 transition-all cursor-pointer hover:-translate-y-0.5"
+                    className="inline-flex items-center gap-1.5 px-4.5 py-2.5 text-xs font-black uppercase rounded-xl text-white bg-primary hover:bg-primary-hover shadow-md shadow-primary/10 transition-all cursor-pointer hover:-translate-y-0.5 shrink-0"
                   >
                     <Plus size={14} /> Raise New Ticket
                   </button>
                 </div>
 
                 {/* Tickets Table Area */}
-                <div className="p-6">
+                <div className="p-4 sm:p-6">
                   {loadingTickets ? (
                     <div className="flex flex-col items-center justify-center py-20 text-center">
                       <Loader2 className="animate-spin text-primary mb-4" size={32} />
@@ -433,62 +481,69 @@ const SupportTickets = () => {
                       </button>
                     </div>
                   ) : (
-                    <div className="overflow-x-auto border border-gray-100 rounded-2xl">
-                      <table className="w-full text-left border-collapse">
+                    <div className="overflow-x-auto border border-gray-100 rounded-2xl w-full">
+                      <table className="w-full text-left border-collapse min-w-[700px]">
                         <thead>
                           <tr className="bg-gray-50/75 border-b border-gray-100">
-                            <th className="px-6 py-4 text-sm font-black uppercase tracking-wider text-gray-400">Ticket ID</th>
-                            <th className="px-6 py-4 text-sm font-black uppercase tracking-wider text-gray-400">Category</th>
-                            <th className="px-6 py-4 text-sm font-black uppercase tracking-wider text-gray-400">Description</th>
-                            <th className="px-6 py-4 text-sm font-black uppercase tracking-wider text-gray-400">Attachments</th>
-                            <th className="px-6 py-4 text-sm font-black uppercase tracking-wider text-gray-400">Date Raised</th>
-                            <th className="px-6 py-4 text-sm font-black uppercase tracking-wider text-gray-400">Status</th>
-                            <th className="px-6 py-4 text-sm font-black uppercase tracking-wider text-gray-400 text-right">Actions</th>
+                            <th className="px-4 py-3 text-xs font-black uppercase tracking-wider text-gray-400">Ticket ID</th>
+                            <th className="px-4 py-3 text-xs font-black uppercase tracking-wider text-gray-400">Category</th>
+                            <th className="px-4 py-3 text-xs font-black uppercase tracking-wider text-gray-400">Description</th>
+                            <th className="px-4 py-3 text-xs font-black uppercase tracking-wider text-gray-400">Attachments</th>
+                            <th className="px-4 py-3 text-xs font-black uppercase tracking-wider text-gray-400">Date Raised</th>
+                            <th className="px-4 py-3 text-xs font-black uppercase tracking-wider text-gray-400">Status</th>
+                            <th className="px-4 py-3 text-xs font-black uppercase tracking-wider text-gray-400 text-right">Actions</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-50 bg-white">
                           {paginatedTickets.map((ticket) => (
                             <tr key={ticket._id} className="hover:bg-gray-50/50 transition-colors">
-                              <td className="px-6 py-4 whitespace-nowrap text-xs font-extrabold text-primary">
+                              <td className="px-4 py-3 whitespace-nowrap text-xs font-extrabold text-primary">
                                 #{ticket._id ? ticket._id.substring(ticket._id.length - 8).toUpperCase() : 'N/A'}
                               </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <span className="inline-flex px-2 py-0.5 rounded text-sm font-black uppercase tracking-wider bg-gray-100 text-gray-700">
+                              <td className="px-4 py-3 whitespace-nowrap">
+                                <span className="inline-flex px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-gray-100 text-gray-700">
                                   {ticket.ticketType}
                                 </span>
                               </td>
-                              <td className="px-6 py-4 max-w-xs truncate text-xs font-bold text-gray-600">
+                              <td className="px-4 py-3 max-w-[180px] truncate text-xs font-bold text-gray-600">
                                 {ticket.description}
                               </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-xs font-bold text-gray-600">
+                              <td className="px-4 py-3 whitespace-nowrap text-xs font-bold text-gray-600">
                                 {renderAttachments(ticket.mediaFiles)}
                               </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-xs font-bold text-gray-400 flex items-center gap-1.5">
-                                <Calendar size={12} className="shrink-0 mt-0.5" />
+                              <td className="px-4 py-3 whitespace-nowrap text-[11px] font-bold text-gray-400 flex items-center gap-1 mt-1">
+                                <Calendar size={11} className="shrink-0" />
                                 {new Date(ticket.createdAt).toLocaleDateString('en-IN', {
                                   day: '2-digit',
                                   month: 'short',
                                   year: 'numeric'
                                 })}
                               </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
+                              <td className="px-4 py-3 whitespace-nowrap">
                                 {getStatusBadge(ticket.ticketStatus || 'PENDING')}
                               </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-right">
-                                <div className="flex items-center justify-end gap-1.5">
+                              <td className="px-4 py-3 whitespace-nowrap text-right">
+                                <div className="flex items-center justify-end gap-1 font-sans">
+                                  <button
+                                    type="button"
+                                    onClick={() => setSelectedTicketForView(ticket)}
+                                    className="px-2.5 py-1.5 text-[10px] font-black uppercase rounded-lg border border-primary/20 text-primary bg-primary/5 hover:bg-primary hover:text-white transition-all cursor-pointer flex items-center gap-1"
+                                  >
+                                    <MessageSquare size={11} /> Discussion ({ticket.replies?.length || 0})
+                                  </button>
                                   {ticket.ticketStatus !== 'CLOSED' && ticket.ticketStatus !== 'RESOLVED' && (
                                     <>
                                       <button
                                         type="button"
                                         onClick={() => handleOpenEditModal(ticket)}
-                                        className="px-3 py-1.5 text-sm font-black uppercase rounded-xl border border-blue-200 text-blue-500 hover:bg-blue-50 transition-all cursor-pointer"
+                                        className="px-2.5 py-1.5 text-[10px] font-black uppercase rounded-lg border border-blue-200 text-blue-500 hover:bg-blue-50 transition-all cursor-pointer"
                                       >
                                         Edit
                                       </button>
                                       <button
                                         type="button"
                                         onClick={() => handleCloseTicket(ticket._id)}
-                                        className="px-3 py-1.5 text-sm font-black uppercase rounded-xl border border-red-200 text-red-500 hover:bg-red-50 transition-all cursor-pointer"
+                                        className="px-2.5 py-1.5 text-[10px] font-black uppercase rounded-lg border border-red-200 text-red-500 hover:bg-red-50 transition-all cursor-pointer"
                                       >
                                         Close
                                       </button>
@@ -497,7 +552,7 @@ const SupportTickets = () => {
                                   <button
                                     type="button"
                                     onClick={() => handleDeleteTicket(ticket._id)}
-                                    className="px-3 py-1.5 text-sm font-black uppercase rounded-xl border border-gray-200 text-gray-500 hover:bg-gray-100 transition-all cursor-pointer"
+                                    className="px-2.5 py-1.5 text-[10px] font-black uppercase rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-100 transition-all cursor-pointer"
                                   >
                                     Delete
                                   </button>
@@ -592,6 +647,31 @@ const SupportTickets = () => {
                     {ticketTypes.map(type => (
                       <option key={type.id} value={type.id}>{type.name}</option>
                     ))}
+                  </select>
+                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-gray-400 mt-4.5">
+                    <ChevronRight size={16} className="rotate-90" />
+                  </div>
+                </div>
+
+                {/* Link Order & Vendor Dropdown */}
+                <div className="space-y-1 relative">
+                  <label className="text-sm font-black uppercase text-gray-400 block">Related Order & Vendor Product (Optional)</label>
+                  <select
+                    value={selectedOrderId}
+                    onChange={e => setSelectedOrderId(e.target.value)}
+                    className="w-full pl-4 pr-10 py-3 border border-gray-200 rounded-xl leading-5 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-xs font-bold cursor-pointer appearance-none"
+                  >
+                    <option value="">-- General Platform Inquiry (No specific order/vendor) --</option>
+                    {userOrders.map((ord) => {
+                      const vName = ord.vendorId?.businessName || ord.vendorId?.storeName || ord.vendorId?.name || 'Vendor';
+                      const pName = ord.items?.[0]?.name || ord.items?.[0]?.product?.name || 'Product Item';
+                      const shortId = ord._id ? ord._id.slice(-6).toUpperCase() : 'N/A';
+                      return (
+                        <option key={ord._id} value={ord._id}>
+                          Order #{shortId} — {vName} ({pName})
+                        </option>
+                      );
+                    })}
                   </select>
                   <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-gray-400 mt-4.5">
                     <ChevronRight size={16} className="rotate-90" />
@@ -704,6 +784,89 @@ const SupportTickets = () => {
               </div>
             </form>
 
+          </div>
+        </div>
+      )}
+
+      {/* TICKET CONVERSATION & VENDOR REPLY MODAL */}
+      {selectedTicketForView && (
+        <div className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-xs" onClick={() => setSelectedTicketForView(null)} />
+          
+          <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 max-w-xl w-full z-10 overflow-hidden text-left relative animate-in fade-in zoom-in-95 duration-200">
+            <div className="p-5 border-b border-gray-100 flex items-center justify-between">
+              <div>
+                <span className="text-[10px] font-black text-gray-400 font-mono">TICKET #{selectedTicketForView._id?.toUpperCase()}</span>
+                <h2 className="text-sm font-extrabold text-gray-900 uppercase">
+                  Category: {selectedTicketForView.ticketType}
+                </h2>
+              </div>
+              <button onClick={() => setSelectedTicketForView(null)} className="text-gray-400 hover:text-gray-600 p-1">
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
+              {/* Vendor Info if assigned */}
+              {selectedTicketForView.vendorId && (
+                <div className="p-3 bg-pink-50/50 border border-pink-100 rounded-xl">
+                  <span className="text-[9px] font-black text-primary uppercase block">Assigned Store Partner</span>
+                  <p className="text-xs font-black text-gray-900">
+                    {selectedTicketForView.vendorId.businessName || selectedTicketForView.vendorId.storeName || selectedTicketForView.vendorId.name}
+                  </p>
+                </div>
+              )}
+
+              {/* Original Complaint */}
+              <div>
+                <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider block mb-1">Your Complaint</span>
+                <div className="p-3 bg-gray-50 border border-gray-100 rounded-xl text-xs font-medium text-gray-700">
+                  {selectedTicketForView.description}
+                </div>
+              </div>
+
+              {/* Conversation Thread */}
+              <div className="pt-2">
+                <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider block mb-2">Replies & Resolution History</span>
+                <div className="space-y-2">
+                  {(!selectedTicketForView.replies || selectedTicketForView.replies.length === 0) ? (
+                    <p className="text-xs text-gray-400 italic">No replies yet. Vendor/Support team will reply shortly.</p>
+                  ) : (
+                    selectedTicketForView.replies.map((r, idx) => (
+                      <div key={idx} className={`p-3 rounded-xl border text-xs ${
+                        r.senderRole === 'VENDOR' ? 'bg-emerald-50 border-emerald-100 text-emerald-950 ml-3' :
+                        r.senderRole === 'ADMIN' ? 'bg-blue-50 border-blue-100 text-blue-950 ml-3' : 'bg-gray-50 border-gray-100 mr-3'
+                      }`}>
+                        <div className="flex justify-between items-center text-[9px] font-black uppercase mb-1 opacity-70">
+                          <span>{r.senderName} ({r.senderRole})</span>
+                          <span>{new Date(r.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                        </div>
+                        <p className="font-medium">{r.message}</p>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Customer Reply Input Footer */}
+            <div className="p-4 border-t border-gray-100 bg-gray-50/75 flex items-center gap-2">
+              <input
+                type="text"
+                value={replyMessage}
+                onChange={(e) => setReplyMessage(e.target.value)}
+                placeholder="Type your message to vendor/support..."
+                onKeyDown={(e) => e.key === 'Enter' && handleCustomerSendReply()}
+                className="flex-1 px-3.5 py-2.5 text-xs font-medium rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-primary/20"
+              />
+              <button
+                disabled={sendingReply || !replyMessage.trim()}
+                onClick={handleCustomerSendReply}
+                className="px-4 py-2.5 text-xs font-black uppercase rounded-xl text-white bg-primary hover:bg-primary-hover disabled:opacity-50 transition-all cursor-pointer"
+              >
+                Send
+              </button>
+            </div>
           </div>
         </div>
       )}

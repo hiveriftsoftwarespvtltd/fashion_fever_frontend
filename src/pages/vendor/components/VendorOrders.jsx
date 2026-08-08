@@ -1,5 +1,5 @@
 import React from 'react';
-import { Eye, Download } from 'lucide-react';
+import { Eye, Download, Truck, UserCheck, Bike } from 'lucide-react';
 
 const VendorOrders = ({
   isDarkMode,
@@ -8,7 +8,7 @@ const VendorOrders = ({
   onViewOrder,
   onExportOrders
 }) => {
-  const [orderTypeFilter, setOrderTypeFilter] = React.useState('all');
+  const [orderTypeFilter, setOrderTypeFilter] = React.useState('standard');
 
   const filteredOrders = orders.filter((order) => {
     const isQuick = order.isQuickDelivery || order.orderType === 'QUICK' || order.isQuickCommerce;
@@ -31,15 +31,6 @@ const VendorOrders = ({
                 }`}
             >
               All ({orders.length})
-            </button>
-            <button
-              onClick={() => setOrderTypeFilter('quick')}
-              className={`px-3 py-1 rounded-lg text-xs font-bold uppercase transition-all cursor-pointer flex items-center gap-1 ${orderTypeFilter === 'quick'
-                  ? 'bg-amber-500 text-white shadow-sm'
-                  : 'text-amber-600 dark:text-amber-400 hover:text-amber-700'
-                }`}
-            >
-              ⚡ Quick Commerce ({orders.filter(o => o.isQuickDelivery || o.orderType === 'QUICK' || o.isQuickCommerce).length})
             </button>
             <button
               onClick={() => setOrderTypeFilter('standard')}
@@ -129,18 +120,39 @@ const VendorOrders = ({
                     <td className="px-6 py-4 text-sm font-bold text-primary">₹{(order.grandTotal || 0).toLocaleString()}</td>
                     <td className={`px-6 py-4 text-sm font-bold ${isDarkMode ? 'text-green-400' : 'text-green-600'}`}>₹{(order.payoutAmount || 0).toLocaleString()}</td>
                     <td className="px-6 py-4">
-                      <span className={`text-xs font-bold uppercase px-2 py-1 rounded-full ${statusColor}`}>
-                        {order.orderStatus || 'pending'}
-                      </span>
+                      <div className="flex flex-col gap-1">
+                        <span className={`text-xs font-bold uppercase px-2 py-1 rounded-full w-max ${statusColor}`}>
+                          {order.orderStatus || 'pending'}
+                        </span>
+                        {order.deliveryPersonId ? (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-bold text-green-500">
+                            <UserCheck size={11} /> {typeof order.deliveryPersonId === 'object' ? (order.deliveryPersonId.name || 'Rider Assigned') : 'Rider Assigned'}
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-medium text-amber-500/80">
+                            <Bike size={11} /> Rider Unassigned
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <button
-                        onClick={() => onViewOrder(order)}
-                        className={`p-2 rounded-lg transition-all ${isDarkMode ? 'text-gray-500 hover:text-blue-400 hover:bg-blue-500/10' : 'text-gray-300 hover:text-blue-500 hover:bg-blue-50'} cursor-pointer`}
-                        title="View Details"
-                      >
-                        <Eye size={16} />
-                      </button>
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          onClick={() => onViewOrder(order)}
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary/10 hover:bg-primary/20 text-primary text-xs font-bold transition-all cursor-pointer"
+                          title="Assign Rider & View Details"
+                        >
+                          <Truck size={14} />
+                          <span>{order.deliveryPersonId ? 'Rider Details' : 'Assign Rider'}</span>
+                        </button>
+                        <button
+                          onClick={() => onViewOrder(order)}
+                          className={`p-2 rounded-xl transition-all ${isDarkMode ? 'text-gray-400 hover:text-white hover:bg-white/5' : 'text-gray-400 hover:text-gray-900 hover:bg-gray-100'} cursor-pointer`}
+                          title="View Details"
+                        >
+                          <Eye size={16} />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );

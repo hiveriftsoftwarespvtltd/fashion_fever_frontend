@@ -559,7 +559,19 @@ export const getAllProducts = async (params = {}) => {
  */
 export const deleteProduct = async (vendorId, productId) => {
   try {
-    const response = await apiClient.delete(`/admin/delete-product/${vendorId}/${productId}`);
+    let vId = vendorId;
+    let pId = productId;
+    if (typeof vId === 'object' && vId !== null) {
+      vId = vId._id || vId.id || vId.vendorId || 'all';
+    }
+    if (!pId && vId) {
+      pId = vId;
+      vId = 'all';
+    }
+    if (typeof pId === 'object' && pId !== null) {
+      pId = pId._id || pId.id;
+    }
+    const response = await apiClient.delete(`/admin/delete-product/${vId}/${pId}`);
     return response.data;
   } catch (error) {
     console.error('Delete product error:', error);

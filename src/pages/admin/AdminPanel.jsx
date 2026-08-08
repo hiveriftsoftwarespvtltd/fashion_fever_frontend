@@ -1181,7 +1181,8 @@ const AdminPanel = () => {
                 if (result.isConfirmed) {
                   const loadingToast = toast.loading('Deleting product...');
                   try {
-                    const res = await deleteProduct(product.vendorId, product._id);
+                    const vId = typeof product.vendorId === 'object' && product.vendorId !== null ? (product.vendorId._id || product.vendorId.id) : (product.vendorId || 'all');
+                    const res = await deleteProduct(vId, product._id);
                     toast.dismiss(loadingToast);
                     if (res.success) {
                       toast.success(res.message || 'Product deleted successfully!');

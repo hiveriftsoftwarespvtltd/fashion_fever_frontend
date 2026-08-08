@@ -2,19 +2,19 @@ const getApiUrl = () => {
   if (import.meta.env.VITE_API_URL) {
     return import.meta.env.VITE_API_URL;
   }
+  return 'https://fashionfever.in/fashion_fever_api/api/v1';
+};
 
-  // Live Production API URL (Active)
-  return 'https://fashionfever.in/fashionfever_api/api/v1';
-
-  // Localhost API URL (Commented)
-  // return 'http://localhost:9000/api/v1';
+const getBaseUrl = () => {
+  if (import.meta.env.VITE_BASE_URL) {
+    return import.meta.env.VITE_BASE_URL;
+  }
+  return getApiUrl().replace(/\/api\/v1\/?$/, '');
 };
 
 const config = {
-  API_URL: getApiUrl()
+  API_URL: getApiUrl(),
+  BASE_URL: getBaseUrl(),
 };
 
 export default config;
-
-
-

@@ -17,6 +17,7 @@ import { useUser } from '../../context/UserContext';
 import { useCart } from '../../context/CartContext';
 import { toast } from '../../utils/toast';
 import Swal from 'sweetalert2';
+import { getImageUrl } from '../../utils/imageUrl';
 
 // Sub-components
 import CustomerSubNav from './customer_components/CustomerSubNav';
@@ -748,12 +749,7 @@ const CustomerFlow = () => {
       }
     }
 
-    if (!raw) return null;
-
-    if (raw.startsWith('http://') || raw.startsWith('https://')) return raw;
-    const apiUrl = config.API_URL;
-    const baseUrl = apiUrl.replace(/\/api\/v1\/?$/, '');
-    return `${baseUrl}${raw.startsWith('/') ? '' : '/'}${raw}`;
+    return getImageUrl(raw);
   };
 
   const filteredUserOrders = orders.filter((o) => {

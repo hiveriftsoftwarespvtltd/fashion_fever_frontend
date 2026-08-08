@@ -16,6 +16,8 @@ import {
 import Swal from 'sweetalert2';
 import { toast } from '../../utils/toast';
 
+import { getImageUrl } from '../../utils/imageUrl';
+
 // Sub-components
 import VendorStatsOverview from './components/VendorStatsOverview';
 import VendorShopConfig from './components/VendorShopConfig';
@@ -25,7 +27,7 @@ import VendorOrderDetailsModal from './components/VendorOrderDetailsModal';
 import VendorRiderAssignModal from './components/VendorRiderAssignModal';
 import VendorRiderMetricsModal from './components/VendorRiderMetricsModal';
 
-const VendorFlow = () => {
+const VendorFlow = ({ onNavigateToRiders }) => {
   // Stats states
   const [stats, setStats] = useState(null);
   const [orders, setOrders] = useState([]);
@@ -393,12 +395,7 @@ const VendorFlow = () => {
           ) : null);
     }
 
-    if (!raw) return null;
-
-    if (raw.startsWith('http://') || raw.startsWith('https://')) return raw;
-    const apiUrl = config.API_URL;
-    const baseUrl = apiUrl.replace(/\/api\/v1\/?$/, '');
-    return `${baseUrl}${raw.startsWith('/') ? '' : '/'}${raw}`;
+    return getImageUrl(raw);
   };
 
   const orderStatuses = [
@@ -441,6 +438,7 @@ const VendorFlow = () => {
           {/* 3. Riders Roster */}
           <VendorRidersRoster
             riders={riders}
+            onNavigateToRiders={onNavigateToRiders}
             showRiderForm={showRiderForm}
             setShowRiderForm={setShowRiderForm}
             editingRider={editingRider}

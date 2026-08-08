@@ -39,21 +39,16 @@ const VendorOrderDetailsModal = ({ isOpen, onClose, order, onUpdate }) => {
     }
   }, [order]);
 
-  // Fetch all active riders when modal opens
+  // Fetch vendor's own riders when modal opens
   useEffect(() => {
     if (!isOpen) return;
-    getAvailableRiders()
+    getVendorDeliveryPersons(1, 100)
       .then((res) => {
-        // getAvailableRiders returns plain array directly
         let list = [];
-        if (Array.isArray(res)) {
-          list = res;
-        } else if (Array.isArray(res?.data)) {
-          list = res.data;
-        } else if (Array.isArray(res?.data?.deliveryPersons)) {
-          list = res.data.deliveryPersons;
-        }
-        console.log('[Rider Modal] fetched riders:', list.length, list);
+        if (Array.isArray(res)) list = res;
+        else if (Array.isArray(res?.data)) list = res.data;
+        else if (Array.isArray(res?.data?.deliveryPersons)) list = res.data.deliveryPersons;
+        else if (Array.isArray(res?.deliveryPersons)) list = res.deliveryPersons;
         setRiders(list);
       })
       .catch((err) => { console.error('[Rider Modal] fetch error:', err); setRiders([]); });

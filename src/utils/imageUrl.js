@@ -18,8 +18,8 @@ export const getImageUrl = (img) => {
     url = url.replace(/http:\/\/(192\.168\.\d+\.\d+|localhost|[\w.-]+)(:\d+)?(\/api\/v1)?/, backendBase);
   }
 
-  // Convert old live domain URLs missing /fashionfever_api subpath
-  if (config.API_URL.includes('/fashionfever_api') && url.includes('fashionfever.in/') && !url.includes('/fashionfever_api/')) {
+  // Convert old live domain URLs missing subpath
+  if (config.API_URL.includes('/fashion_fever_api') && url.includes('fashionfever.in/') && !url.includes('/fashion_fever_api/')) {
     url = url.replace(/https?:\/\/fashionfever\.in(\/api\/v1)?/, backendBase);
   }
 
